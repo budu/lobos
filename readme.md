@@ -5,7 +5,8 @@ schemas and applying them to any supported RDBMS. It is based on the
 [original ClojureQL] but exclude the query language part which is better
 handled by the [new ClojureQL] project.
 
-This is currently a very early release, use at your own risk.
+This is currently a very early release, use at your own risk. Have a
+look at the [roadmap] for more information about future releases.
 
 ## Usage
 
@@ -68,3 +69,4 @@ the file epl-v10.html in the project root directory.
 
 [original ClojureQL]: http://gitorious.org/clojureql
 [new ClojureQL]: https://github.com/LauJensen/clojureql
+[roadmap]: https://github.com/budu/lobos/blob/master/roadmap.md
