@@ -1,7 +1,9 @@
 # Lobos
 
 Lobos is a library to create and manipulate abstract SQL database
-schemas and applying them to any supported RDBMS.
+schemas and applying them to any supported RDBMS. It is based on the
+[original ClojureQL] but exclude the query language part which is better
+handled by the [new ClojureQL] project.
 
 This is currently a very early release, use at your own risk.
 
@@ -63,3 +65,6 @@ Copyright (C) 2010 Nicolas Buduroi. All rights reserved
 
 Distributed under the Eclipse Public License, the same as Clojure. See
 the file epl-v10.html in the project root directory.
+
+[original ClojureQL]: http://gitorious.org/clojureql
+[new ClojureQL]: https://github.com/LauJensen/clojureql
