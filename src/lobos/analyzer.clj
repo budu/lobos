@@ -143,15 +143,9 @@
 ;;;; Schemas analysis
 
 (defn analyse-schema
-  "Returns the abstract schema definition for the specified schema name."
-  [sname]
-  (apply schema/schema sname nil (tables sname)))
-
-(defn schemas
-  "Returns a list of abstract schema definitions for the currently bound
-  DatabaseMetaData object."
-  []
-  (into {}
-        (map #(let [sname (-> % :table_schem keyword)]
-                [sname (analyse-schema sname)])
-             (resultset-seq (.getSchemas (db-meta))))))
+  "Returns the abstract schema definition for the specified schema name
+  using the given connection-info if specified or the default one."
+  [sname & [connection-info]]
+  (let [options {:connection-info (or connection-info
+                                      :default-connection)}]
+    (apply schema/schema sname options (tables sname))))

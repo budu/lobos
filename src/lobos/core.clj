@@ -44,11 +44,13 @@
   (@global-schemas @default-schema))
 
 (defmacro defschema
-  "Defines a var containing the specified schema."
-  [var-name schema-name connection-info & elements]
-  (let [options {:connection-info connection-info}]
+  "Defines a var containing the specified schema constructed from
+  database meta-data."
+  [var-name schema-name & [connection-info]]
+  (let [connection-info (or connection-info :default-connection)
+        options {:connection-info connection-info}]
     `(let [schema# (set-global-schema
-                    (schema/schema ~schema-name ~options ~@elements))]
+                    (analyzer/analyse-schema ~schema-name ~connection-info))]
          (defn ~var-name []
            (@global-schemas (schema-key schema#))))))
 
