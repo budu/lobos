@@ -8,6 +8,7 @@
 
 (ns lobos.core
   "Main interface to interact with Lobos."
+  (:refer-clojure :exclude [drop])
   (require (lobos [analyzer :as analyzer]
                   [compiler :as compiler]
                   [connectivity :as conn]
@@ -79,19 +80,33 @@
         (.execute stmt sql-string))))
   nil)
 
-(defn drop-table
-  "Contructs a table definition, builds a drop table statement with it
-  and execute it."
-  [tname & [behavior cnx-or-schema]]
+(defn create
+  "Builds a create statement with the given schema object and execute it."
+  [cnx-or-schema tdef]
   (let [cnx-or-schema (or cnx-or-schema (get-default-schema))
         schema (cond (schema/schema? cnx-or-schema) cnx-or-schema
                      (fn? cnx-or-schema) (cnx-or-schema))
         cnx (or (-> schema :options :connection-info)
                 cnx-or-schema
                 :default-connection)]
-    (execute
-     (schema/drop (schema/table tname) behavior nil) ; HACK: no backend yet
-     cnx)
+    (execute (schema/build-create-statement tdef nil) ; HACK: no backend yet
+             cnx)
     (when schema
       (set-global-schema
-       (update-in schema [:elements] dissoc tname)))))
+       (assoc-in schema [:elements (:name tdef)] tdef)))))
+
+(defn drop
+  "Builds a drop statement with the given schema object and execute it."
+  [cnx-or-schema odef & [behavior]]
+  (let [cnx-or-schema (or cnx-or-schema (get-default-schema))
+        schema (cond (schema/schema? cnx-or-schema) cnx-or-schema
+                     (fn? cnx-or-schema) (cnx-or-schema))
+        cnx (or (-> schema :options :connection-info)
+                cnx-or-schema
+                :default-connection)]
+    (execute (schema/build-drop-statement
+              odef behavior nil) ; HACK: no backend yet
+             cnx)
+    (when schema
+      (set-global-schema
+       (update-in schema [:elements] dissoc (:name odef))))))

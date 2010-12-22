@@ -9,26 +9,25 @@
 (ns lobos.schema
   "The abstract schema data-structure and some function to help creating
   one."
-  (:refer-clojure :exclude [drop])
   (require (lobos [ast :as ast])))
 
 ;;;; Protocols
 
 (defprotocol Buildable
-  (build [this]))
+  (build-definition [this]))
 
 (defprotocol Creatable
-  (create [this cnx]))
+  (build-create-statement [this cnx]))
 
 (defprotocol Dropable
-  (drop [this behavior cnx]))
+  (build-drop-statement [this behavior cnx]))
 
 ;;;; Constraint definition
 
 (defrecord Constraint [cname ctype specification]
   Buildable
   
-  (build [this]
+  (build-definition [this]
     (condp contains? ctype
       #{:unique :primary-key}
       (lobos.ast.UniqueConstraintDefinition.
@@ -78,7 +77,7 @@
 (defrecord Column [cname data-type default identity not-null others]
   Buildable
   
-  (build [this]
+  (build-definition [this]
     (lobos.ast.ColumnDefinition.
      cname
      (lobos.ast.DataTypeExpression.
@@ -140,13 +139,13 @@
 (defrecord Table [name columns constraints options]
   Creatable Dropable
   
-  (create [this cnx]
+  (build-create-statement [this cnx]
     (lobos.ast.CreateTableStatement.
      cnx
      name
-     (map build (concat columns constraints))))
+     (map build-definition (concat columns constraints))))
 
-  (drop [this behavior cnx]
+  (build-drop-statement [this behavior cnx]
     (lobos.ast.DropStatement. cnx :table name behavior)))
 
 (defn table*
@@ -165,13 +164,13 @@
 (defrecord Schema [sname elements options]
   Creatable Dropable
   
-  (create [this cnx]
+  (build-create-statement [this cnx]
     (lobos.ast.CreateSchemaStatement.
      cnx
      sname
-     (map #(create (second %) cnx) elements)))
+     (map #(build-create-statement (second %) cnx) elements)))
 
-  (drop [this behavior cnx]
+  (build-drop-statement [this behavior cnx]
     (lobos.ast.DropStatement. cnx :schema sname behavior)))
 
 (defn schema? [o] (isa? (type o) lobos.schema.Schema))
