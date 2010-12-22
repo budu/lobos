@@ -21,7 +21,7 @@ Here's how to define a schema:
     (use 'lobos.core
          'lobos.schema)
 
-    (defschema sample-schema :public
+    (defschema sample-schema :public nil
       (table :users
              (integer :id :unique)
              (varchar :name 100 [:default "joe"])))
