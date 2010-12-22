@@ -29,7 +29,7 @@ Here's how to define a schema:
 Then you can build a create statement for that schema. To have a peek at
 the resulting SQL output, you can use the debug function:
     
-    user> (debug create sample-schema)
+    user> (debug create (sample-schema))
     CREATE SCHEMA public 
     
     CREATE TABLE users (id INTEGER, name VARCHAR(100) DEFAULT 'joe', UNIQUE (id))
@@ -52,7 +52,7 @@ connection. Here's how to define a global one:
 Using `open-global` without connection name defines a default
 connection. Now you can execute the create statement like this:
 
-    user> (execute (create sample-schema nil))
+    user> (execute (create (sample-schema) nil))
     nil
 
 ## Installation
