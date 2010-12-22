@@ -55,8 +55,11 @@
 
 (defn debug
   "Prints useful information on the given action/object combination."
-  [action object & [args connection-info level]]
+  [action object-or-fn & [args connection-info level]]
   (let [level (or level @debug-level :output)
+        object (if (fn? object-or-fn)
+                 (object-or-fn)
+                 object-or-fn)
         ast (when-not (= :schema level)
               (apply action object (conj args connection-info)))]
     (case level
