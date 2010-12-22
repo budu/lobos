@@ -45,9 +45,9 @@ And we can make it the default schema like that:
 Finally you can test the available actions (only create and drop tables
 for now) to manipulate a schema:
 
-    user> (create nil (table :users (integer :id :unique)))
+    user> (create (table :users (integer :id :unique)))
     #:lobos.schema.Schema{...}
-    user> (drop nil (table :users))
+    user> (drop (table :users))
     #:lobos.schema.Schema{...}
 
 You can always use the debug action to see the compiled statement:
