@@ -13,7 +13,8 @@
                   [compiler :as compiler]
                   [connectivity :as conn]
                   [schema :as schema]))
-  (use (clojure [pprint :only [pprint]])))
+  (use (clojure.contrib [def :only [name-with-attributes]])
+       (clojure [pprint :only [pprint]])))
 
 ;;;; Globals
 
@@ -91,29 +92,41 @@
         (.execute stmt sql-string))))
   nil)
 
-(defn create
-  "Builds a create statement with the given schema object and execute it."
-  [cnx-or-schema tdef]
-  (let [cnx-or-schema (or cnx-or-schema (get-default-schema))
-        schema (cond (schema/schema? cnx-or-schema) cnx-or-schema
-                     (fn? cnx-or-schema) (cnx-or-schema))
-        cnx (or (-> schema :options :connection-info)
-                cnx-or-schema
-                :default-connection)]
-    (execute (schema/build-create-statement tdef nil) ; HACK: no backend yet
-             cnx)
-    (when schema (update-schema schema))))
+(defmacro defaction
+  "Define an action applicable to an optional abstract schema."
+  {:arglists '([name doc-string? attr-map? [params*] & body])}
+  [name & args]
+  (let [params (seq (first (filter vector? args)))
+        [name args] (name-with-attributes name args)
+        [params* & body] args]
+    `(do
+       (defn ~name [& params#]
+         (let [[cnx-or-schema# params#] (if (or (fn? (first params#))
+                                                (schema/schema? (first params#))
+                                                (keyword? (first params#)))
+                                          [(first params#) (next params#)]
+                                          [nil params#])
+               ~params* params#
+               cnx-or-schema# (or cnx-or-schema# (get-default-schema))
+               ~'schema (cond (schema/schema? cnx-or-schema#) cnx-or-schema#
+                              (fn? cnx-or-schema#) (cnx-or-schema#))
+               ~'cnx (or (-> ~'schema :options :connection-info)
+                         cnx-or-schema#
+                         :default-connection)]
+           ~@body
+           (when ~'schema (update-schema ~'schema))))
+       (.setMeta #'~name
+                 (merge (.meta #'name)
+                        {:arglists '(~(vec (conj params 'cnx-or-schema?)))})))))
 
-(defn drop
+(defaction create
+  "Builds a create statement with the given schema object and execute it."
+  [tdef]
+  ;; HACK: no backend yet
+  (execute (schema/build-create-statement tdef nil) cnx))
+
+(defaction drop
   "Builds a drop statement with the given schema object and execute it."
-  [cnx-or-schema odef & [behavior]]
-  (let [cnx-or-schema (or cnx-or-schema (get-default-schema))
-        schema (cond (schema/schema? cnx-or-schema) cnx-or-schema
-                     (fn? cnx-or-schema) (cnx-or-schema))
-        cnx (or (-> schema :options :connection-info)
-                cnx-or-schema
-                :default-connection)]
-    (execute (schema/build-drop-statement
-              odef behavior nil) ; HACK: no backend yet
-             cnx)
-    (when schema (update-schema schema))))
+  [odef & [behavior]]
+  ;; HACK: no backend yet
+  (execute (schema/build-drop-statement odef behavior nil) cnx))
