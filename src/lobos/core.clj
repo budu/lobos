@@ -8,21 +8,63 @@
 
 (ns lobos.core
   "Main interface to interact with Lobos."
-  (require (lobos [connectivity :as conn]
+  (require (lobos [analyzer :as analyzer]
                   [compiler :as compiler]
+                  [connectivity :as conn]
                   [schema :as schema]))
   (use (clojure [pprint :only [pprint]])))
 
 ;;;; Globals
 
-(def *debug* nil)
+(defonce debug-level (atom nil))
+
+(defonce global-schemas (atom {}))
+
+(defonce default-schema (atom nil))
+
+;;;; Schema definition
+
+(defn schema-key [schema]
+  (str (-> schema
+           :options
+           :connection-info
+           conn/get-db-spec
+           :subname)
+       (:sname schema)))
+
+(defn set-global-schema [schema]
+  (swap! global-schemas assoc (schema-key schema) schema)
+  schema)
+
+(defn set-default-schema [schema]
+  (swap! default-schema (constantly (schema-key (schema)))))
+
+(defn get-default-schema []
+  (@global-schemas @default-schema))
+
+(defmacro defschema
+  "Defines a var containing the specified schema."
+  [var-name schema-name connection-info & elements]
+  (let [options {:connection-info connection-info}]
+    `(let [schema# (set-global-schema
+                    (schema/schema ~schema-name ~options ~@elements))]
+         (defn ~var-name []
+           (@global-schemas (schema-key schema#))))))
 
 ;;;; Actions
 
-(defn drop-table
-  "Builds a drop table statement."
-  [tname & [behavior connection-info]]
-  (schema/drop (schema/table tname) behavior connection-info))
+(defn debug
+  "Prints useful information on the given action/object combination."
+  [action object & [args connection-info level]]
+  (let [level (or level @debug-level :output)
+        ast (when-not (= :schema level)
+              (apply action object (conj args connection-info)))]
+    (case level
+      :output (println (compiler/compile ast))
+      :ast (do (println (type ast))
+               (pprint ast))
+      :schema (do (println (type object))
+                  (pprint object)))))
 
 (defn execute
   "Execute the given statement using the specified connection
@@ -34,15 +76,16 @@
         (.execute stmt sql-string))))
   nil)
 
-(defn debug
-  "Prints useful information on the given action/object combination."
-  [action object & [args connection-info level]]
-  (let [level (or level *debug* :output)
-        ast (when-not (= :schema level)
-              (apply action object (conj args connection-info)))]
-    (case level
-      :output (println (compiler/compile ast))
-      :ast (do (println (type ast))
-               (pprint ast))
-      :schema (do (println (type object))
-                  (pprint object)))))
+(defn drop-table
+  "Builds a drop table statement."
+  [tname & [behavior cnx-or-schema]]
+  (let [cnx-or-schema (or cnx-or-schema (get-default-schema))
+        schema (cond (schema/schema? cnx-or-schema) cnx-or-schema
+                     (fn? cnx-or-schema) (cnx-or-schema))]
+    (execute
+     (schema/drop (schema/table tname) behavior nil) ; HACK: no backend yet
+                  (or (-> schema :options :connection-info)
+                      :default-connection))
+    (when schema
+      (set-global-schema
+       (update-in schema [:elements] dissoc tname)))))

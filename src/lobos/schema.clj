@@ -137,17 +137,17 @@
 
 ;;;; Table definition
 
-(defrecord Table [tname columns constraints options]
+(defrecord Table [name columns constraints options]
   Creatable Dropable
   
   (create [this cnx]
     (lobos.ast.CreateTableStatement.
      cnx
-     tname
+     name
      (map build (concat columns constraints))))
 
   (drop [this behavior cnx]
-    (lobos.ast.DropStatement. cnx :table tname behavior)))
+    (lobos.ast.DropStatement. cnx :table name behavior)))
 
 (defn table*
   "Constructs an abstract table definition."
@@ -174,24 +174,12 @@
   (drop [this behavior cnx]
     (lobos.ast.DropStatement. cnx :schema sname behavior)))
 
+(defn schema? [o] (isa? (type o) lobos.schema.Schema))
+
 (defn schema
   "Constructs an abstract schema definition."
   [schema-name options & elements]
-  (lobos.schema.Schema. schema-name (vec elements) (or options {})))
-
-(defmacro defschema
-  "Defines a var containing the specified schema."
-  {:arglists '([var-name schema-name? options? & elements])}
-  [& args]
-  (let [[var-name & args] args
-        [farg sarg & rargs] args
-        sname (when (keyword? farg) farg)
-        options (if sname
-                  (when (map? sarg) sarg)
-                  (when (map? farg) farg))
-        elements (cond (and sname options) rargs
-                       (or sname options) (next args)
-                       :else args)
-        sname (or sname 'default_schema)]
-    `(def ~var-name
-          (schema ~(keyword sname) ~options ~@elements))))
+  (lobos.schema.Schema.
+   schema-name
+   (into {} (map #(vector (:name %) %) elements))
+   (or options {})))

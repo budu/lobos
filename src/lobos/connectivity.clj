@@ -32,7 +32,7 @@
           (.setAutoCommit cnx ac))
         (swap! global-connections assoc
                (or connection-name :default-connection)
-               {:connection cnx :opts db-spec})))))
+               {:connection cnx :db-spec db-spec})))))
 
 (defn close-global
   "Supplied with a keyword identifying a global connection, that connection
@@ -62,7 +62,7 @@
                  :connection (:connection con)
                  :level 0
                  :rollback (atom false)
-                 :opts     (:opts con))]
+                 :db-spec (:db-spec con))]
        (func))
      (throw
       (Exception.
@@ -129,3 +129,11 @@
     (with-named-connection :default-connection
       connection)
     (catch Exception e nil)))
+
+(defn get-db-spec
+  "Returns the associated db-spec or itself."
+  [connection-info]
+  (let [connection-info (or connection-info :default-connection)]
+    (if (keyword? connection-info)
+      (-> @global-connections connection-info :db-spec)
+      connection-info)))
