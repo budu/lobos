@@ -24,6 +24,11 @@
 
 (defonce default-schema (atom nil))
 
+;;;; Debugging interface
+
+(defn set-debug-level [level]
+  (swap! debug-level (constantly level)))
+
 ;;;; Schema definition
 
 (defn schema-key [schema]
@@ -69,14 +74,14 @@
 (defn debug
   "Prints useful information on the given action/object combination."
   [action object-or-fn & [args connection-info level]]
-  (let [level (or level @debug-level :output)
+  (let [level (or level @debug-level :sql)
         object (if (fn? object-or-fn)
                  (object-or-fn)
                  object-or-fn)
         ast (when-not (= :schema level)
               (apply action object (conj args connection-info)))]
     (case level
-      :output (println (compiler/compile ast))
+      :sql (println (compiler/compile ast))
       :ast (do (println (type ast))
                (pprint ast))
       :schema (do (println (type object))
@@ -87,6 +92,8 @@
   information or the bound one."
   [statement & [connection-info]]
   (let [sql-string (compiler/compile statement)]
+    (when (= :sql @debug-level)
+      (println sql-string))
     (conn/with-connection connection-info
       (with-open [stmt (.createStatement (conn/connection))]
         (.execute stmt sql-string))))
