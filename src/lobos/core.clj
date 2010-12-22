@@ -86,12 +86,12 @@
   (let [cnx-or-schema (or cnx-or-schema (get-default-schema))
         schema (cond (schema/schema? cnx-or-schema) cnx-or-schema
                      (fn? cnx-or-schema) (cnx-or-schema))
-        cnx (when-not schema cnx-or-schema)]
+        cnx (or (-> schema :options :connection-info)
+                cnx-or-schema
+                :default-connection)]
     (execute
      (schema/drop (schema/table tname) behavior nil) ; HACK: no backend yet
-                  (or (-> schema :options :connection-info)
-                      cnx
-                      :default-connection))
+     cnx)
     (when schema
       (set-global-schema
        (update-in schema [:elements] dissoc tname)))))
