@@ -169,7 +169,7 @@
     (lobos.ast.CreateSchemaStatement.
      cnx
      sname
-     (map #(create % cnx) elements)))
+     (map #(create (second %) cnx) elements)))
 
   (drop [this behavior cnx]
     (lobos.ast.DropStatement. cnx :schema sname behavior)))
@@ -181,5 +181,6 @@
   [schema-name options & elements]
   (lobos.schema.Schema.
    schema-name
-   (into {} (map #(vector (:name %) %) elements))
+   (into (sorted-map)
+         (map #(vector (:name %) %) elements))
    (or options {})))
