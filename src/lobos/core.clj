@@ -37,6 +37,16 @@
   (swap! global-schemas assoc (schema-key schema) schema)
   schema)
 
+(defn update-schema [schema-or-name & [connection-info]]
+  (set-global-schema
+   (analyzer/analyse-schema (if (keyword? schema-or-name)
+                              schema-or-name
+                              (:sname schema-or-name))
+                            (or connection-info
+                                (-> schema-or-name
+                                    :options
+                                    :connection-info)))))
+
 (defn set-default-schema [schema]
   (swap! default-schema (constantly (schema-key (schema)))))
 
@@ -49,8 +59,7 @@
   [var-name schema-name & [connection-info]]
   (let [connection-info (or connection-info :default-connection)
         options {:connection-info connection-info}]
-    `(let [schema# (set-global-schema
-                    (analyzer/analyse-schema ~schema-name ~connection-info))]
+    `(let [schema# (update-schema ~schema-name ~connection-info)]
          (defn ~var-name []
            (@global-schemas (schema-key schema#))))))
 
@@ -93,9 +102,7 @@
                 :default-connection)]
     (execute (schema/build-create-statement tdef nil) ; HACK: no backend yet
              cnx)
-    (when schema
-      (set-global-schema
-       (assoc-in schema [:elements (:name tdef)] tdef)))))
+    (when schema (update-schema schema))))
 
 (defn drop
   "Builds a drop statement with the given schema object and execute it."
@@ -109,6 +116,4 @@
     (execute (schema/build-drop-statement
               odef behavior nil) ; HACK: no backend yet
              cnx)
-    (when schema
-      (set-global-schema
-       (update-in schema [:elements] dissoc (:name odef))))))
+    (when schema (update-schema schema))))
