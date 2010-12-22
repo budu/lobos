@@ -16,29 +16,14 @@ based on the SQL Standard for now, it's the default one used by the
 compiler when there's no connection specified. Look at the code to learn
 more.
 
-Here's how to define a schema:
-
-    (use 'lobos.core
+First you'll need to use at least the following namespaces:
+    
+    (use 'lobos.connectivity
+         'lobos.core
          'lobos.schema)
 
-    (defschema sample-schema :public nil
-      (table :users
-             (integer :id :unique)
-             (varchar :name 100 [:default "joe"])))
-
-Then you can build a create statement for that schema. To have a peek at
-the resulting SQL output, you can use the debug function:
-    
-    user> (debug create (sample-schema))
-    CREATE SCHEMA public 
-    
-    CREATE TABLE users (id INTEGER, name VARCHAR(100) DEFAULT 'joe', UNIQUE (id))
-    nil
-
-To send that compiled statement to a database you first need to define a
-connection. Here's how to define a global one:
-
-    (use 'lobos.connectivity)
+Then you'll need a connection, the following example define a test
+connection and use it as the default global connection:
     
     (def db
          {:classname "org.postgresql.Driver"
@@ -46,14 +31,29 @@ connection. Here's how to define a global one:
           :user "test"
           :password "test123"
           :subname "//localhost:5432/test"})
-    
+
     (open-global db)
 
-Using `open-global` without connection name defines a default
-connection. Now you can execute the create statement like this:
+We now must define which schema we'd like to work on:
 
-    user> (execute (create (sample-schema) nil))
-    nil
+    (defschema sample-schema :public)
+
+And we can make it the default schema like that:
+
+    (set-default-schema sample-schema)
+
+Finally you can test the available actions (only create and drop tables
+for now) to manipulate a schema:
+
+    user> (create nil (table :users (integer :id :unique)))
+    #:lobos.schema.Schema{...}
+    user> (drop nil (table :users))
+    #:lobos.schema.Schema{...}
+
+You can always use the debug action to see the compiled statement:
+
+    user> (debug build-create-statement (table :users (integer :id :unique)))
+    CREATE TABLE users (id INTEGER, UNIQUE (id))
 
 ## Installation
 
