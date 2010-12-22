@@ -80,14 +80,17 @@
   nil)
 
 (defn drop-table
-  "Builds a drop table statement."
+  "Contructs a table definition, builds a drop table statement with it
+  and execute it."
   [tname & [behavior cnx-or-schema]]
   (let [cnx-or-schema (or cnx-or-schema (get-default-schema))
         schema (cond (schema/schema? cnx-or-schema) cnx-or-schema
-                     (fn? cnx-or-schema) (cnx-or-schema))]
+                     (fn? cnx-or-schema) (cnx-or-schema))
+        cnx (when-not schema cnx-or-schema)]
     (execute
      (schema/drop (schema/table tname) behavior nil) ; HACK: no backend yet
                   (or (-> schema :options :connection-info)
+                      cnx
                       :default-connection))
     (when schema
       (set-global-schema
