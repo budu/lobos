@@ -11,11 +11,12 @@
   (:refer-clojure :exclude [replace])
   (require (lobos [connectivity :as conn]
                   [schema :as schema]))
-  (use (clojure [string :only [replace]])))
+  (use (clojure.contrib [def :only [defvar-]])
+       (clojure [string :only [replace]])))
 
 ;;;; Metadata
 
-(def *db-meta* nil)
+(defvar- *db-meta* nil)
 
 (defn db-meta
   "Returns the binded DatabaseMetaData object found in *db-meta* or get
@@ -70,7 +71,7 @@
 
 ;;;; Columns analysis
 
-(def dtypes-alias
+(defvar- dtypes-alias
   {:int4 :integer})
 
 (defn dtypes-replace
