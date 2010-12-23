@@ -184,7 +184,7 @@
 
 (defn schema
   "Constructs an abstract schema definition."
-  [schema-name options & elements]
+  [schema-name & [options & elements]]
   (lobos.schema.Schema.
    schema-name
    (into (sorted-map)
