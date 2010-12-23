@@ -21,6 +21,7 @@
 ## 0.3
 
  * Add logging
+ * Add unit tests
    
 ## 0.2
 
