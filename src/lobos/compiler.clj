@@ -49,8 +49,8 @@
 (defmulti compile
   "Compile the given statement."
   (fn [stmt & [connection-info]]
-    (let [cnx (or connection-info (:cnx stmt))]
-      [(keyword (or (-> cnx :subprotocol) ::standard))
+    (let [db-spec (or connection-info (:db-spec stmt))]
+      [(keyword (or (-> db-spec :subprotocol) ::standard))
        (type stmt)])))
 
 ;;;; Default compiler

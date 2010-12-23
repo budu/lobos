@@ -17,10 +17,10 @@
   (build-definition [this]))
 
 (defprotocol Creatable
-  (build-create-statement [this cnx]))
+  (build-create-statement [this db-spec]))
 
 (defprotocol Dropable
-  (build-drop-statement [this behavior cnx]))
+  (build-drop-statement [this behavior db-spec]))
 
 ;;;; Constraint definition
 
@@ -139,14 +139,14 @@
 (defrecord Table [name columns constraints options]
   Creatable Dropable
   
-  (build-create-statement [this cnx]
+  (build-create-statement [this db-spec]
     (lobos.ast.CreateTableStatement.
-     cnx
+     db-spec
      name
      (map build-definition (concat columns constraints))))
 
-  (build-drop-statement [this behavior cnx]
-    (lobos.ast.DropStatement. cnx :table name behavior)))
+  (build-drop-statement [this behavior db-spec]
+    (lobos.ast.DropStatement. db-spec :table name behavior)))
 
 (defn table*
   "Constructs an abstract table definition."
@@ -164,14 +164,14 @@
 (defrecord Schema [sname elements options]
   Creatable Dropable
   
-  (build-create-statement [this cnx]
+  (build-create-statement [this db-spec]
     (lobos.ast.CreateSchemaStatement.
-     cnx
+     db-spec
      sname
-     (map #(build-create-statement (second %) cnx) elements)))
+     (map #(build-create-statement (second %) db-spec) elements)))
 
-  (build-drop-statement [this behavior cnx]
-    (lobos.ast.DropStatement. cnx :schema sname behavior)))
+  (build-drop-statement [this behavior db-spec]
+    (lobos.ast.DropStatement. db-spec :schema sname behavior)))
 
 (defn schema?
   "Returns true if the given object is a Schema."

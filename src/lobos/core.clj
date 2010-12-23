@@ -133,7 +133,8 @@
                               (fn? cnx-or-schema#) (cnx-or-schema#))
                ~'cnx (or (-> ~'schema :options :connection-info)
                          cnx-or-schema#
-                         :default-connection)]
+                         :default-connection)
+               ~'db-spec (conn/get-db-spec ~'cnx)]
            ~@body
            (when ~'schema (update-schema ~'schema))))
        (.setMeta #'~name
@@ -143,11 +144,9 @@
 (defaction create
   "Builds a create statement with the given schema object and execute it."
   [odef]
-  ;; HACK: no backend yet
-  (execute (schema/build-create-statement odef nil) cnx))
+  (execute (schema/build-create-statement odef db-spec) cnx))
 
 (defaction drop
   "Builds a drop statement with the given schema object and execute it."
   [odef & [behavior]]
-  ;; HACK: no backend yet
-  (execute (schema/build-drop-statement odef behavior nil) cnx))
+  (execute (schema/build-drop-statement odef behavior db-spec) cnx))

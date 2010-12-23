@@ -38,10 +38,10 @@
 
 ;;;; Statement records
 
-(defrecord CreateSchemaStatement [cnx sname elements])
+(defrecord CreateSchemaStatement [db-spec sname elements])
 
-(defrecord CreateTableStatement [cnx tname elements])
+(defrecord CreateTableStatement [db-spec tname elements])
 
-(defrecord AlterTableStatement [cnx tname action])
+(defrecord AlterTableStatement [db-spec tname action])
 
-(defrecord DropStatement [cnx otype oname behavior])
+(defrecord DropStatement [db-spec otype oname behavior])
