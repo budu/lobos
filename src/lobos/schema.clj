@@ -14,7 +14,7 @@
 ;;;; Protocols
 
 (defprotocol Buildable
-  (build-definition [this]))
+  (build-definition [this db-spec]))
 
 (defprotocol Creatable
   (build-create-statement [this db-spec]))
@@ -27,10 +27,11 @@
 (defrecord Constraint [cname ctype specification]
   Buildable
   
-  (build-definition [this]
+  (build-definition [this db-spec]
     (condp contains? ctype
       #{:unique :primary-key}
       (lobos.ast.UniqueConstraintDefinition.
+       db-spec
        cname
        ctype
        (:columns specification)))))
@@ -74,17 +75,19 @@
 
 (defrecord DataType [dtype args])
 
-(defrecord Column [cname data-type default identity not-null others]
+(defrecord Column [cname data-type default auto-inc not-null others]
   Buildable
   
-  (build-definition [this]
+  (build-definition [this db-spec]
     (lobos.ast.ColumnDefinition.
+     db-spec
      cname
      (lobos.ast.DataTypeExpression.
+      db-spec
       (:dtype data-type)
       (:args data-type))
-     (when default (lobos.ast.ValueExpression. default))
-     identity
+     (when default (lobos.ast.ValueExpression. db-spec default))
+     (when auto-inc (lobos.ast.AutoIncClause. db-spec))
      not-null
      others)))
 
@@ -97,7 +100,7 @@
         others   (vec (filter string? options))
         options  (set options)
         not-null (boolean (options :not-null))
-        identity (boolean (options :identity))]
+        auto-inc (boolean (options :auto-inc))]
     (#(cond (options :primary-key) (primary-key % column-name)
             (options :unique) (unique % column-name)
             :else %)
@@ -105,7 +108,7 @@
                 (lobos.schema.Column. column-name
                                       data-type
                                       (second default)
-                                      identity
+                                      auto-inc
                                       not-null
                                       others)))))
 
@@ -143,7 +146,8 @@
     (lobos.ast.CreateTableStatement.
      db-spec
      name
-     (map build-definition (concat columns constraints))))
+     (map #(build-definition % db-spec)
+          (concat columns constraints))))
 
   (build-drop-statement [this behavior db-spec]
     (lobos.ast.DropStatement. db-spec :table name behavior)))

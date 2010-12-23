@@ -11,37 +11,50 @@
 
 ;;;; Atomic records
 
-(defrecord Identifier [value])
+(defrecord Identifier
+  [db-spec value])
 
-(defrecord Literal [value])
+(defrecord Literal
+  [db-spec value])
 
 ;;;; Expression records
 
-(defrecord DataTypeExpression [dtype args])
+(defrecord DataTypeExpression
+  [db-spec dtype args])
 
 ;; not going down the rabbit hole yet!
-(defrecord ValueExpression [specification])
+(defrecord ValueExpression
+  [db-spec specification])
+
+;;; Clause records
+
+(defrecord AutoIncClause
+  [db-spec])
 
 ;;;; Definition records
 
 (defrecord ColumnDefinition
-  [cname data-type default identity not-null others])
+  [db-spec cname data-type default auto-inc not-null others])
 
 (defrecord UniqueConstraintDefinition
-  [cname ctype columns])
+  [db-spec cname ctype columns])
 
 (defrecord ForeignKeyConstraintDefinition
-  [cname columns refered match-type triggered-action])
+  [db-spec cname columns refered match-type triggered-action])
 
 (defrecord CheckConstraintDefinition
-  [cname predicate])
+  [db-spec cname predicate])
 
 ;;;; Statement records
 
-(defrecord CreateSchemaStatement [db-spec sname elements])
+(defrecord CreateSchemaStatement
+  [db-spec sname elements])
 
-(defrecord CreateTableStatement [db-spec tname elements])
+(defrecord CreateTableStatement
+  [db-spec tname elements])
 
-(defrecord AlterTableStatement [db-spec tname action])
+(defrecord AlterTableStatement
+  [db-spec tname action])
 
-(defrecord DropStatement [db-spec otype oname behavior])
+(defrecord DropStatement
+  [db-spec otype oname behavior])
