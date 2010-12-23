@@ -49,7 +49,7 @@
   (swap! global-schemas assoc (schema-key schema) schema)
   schema)
 
-(defn update-schema
+(defn update-global-schema
   "If given a schema, update it in the global schemas map, else analyze
   the specified schema found with the given connection."
   [schema-or-name & [db-spec]]
@@ -61,6 +61,11 @@
                                 (-> schema-or-name
                                     :options
                                     :db-spec)))))
+
+(defn remove-global-schema
+  "Removes the given schema from the global schema map."
+  [schema]
+  (swap! global-schemas dissoc (schema-key schema)))
 
 (defn set-default-schema
   "Set the default schema."
@@ -78,7 +83,7 @@
   [var-name schema-name & [connection-info]]
   (let [db-spec (conn/get-db-spec connection-info)
         options {:db-spec db-spec}]
-    `(let [schema# (update-schema ~schema-name ~db-spec)]
+    `(let [schema# (update-global-schema ~schema-name ~db-spec)]
          (defn ~var-name []
            (@global-schemas (schema-key schema#))))))
 
@@ -136,7 +141,7 @@
                          :default-connection)
                ~'db-spec (conn/get-db-spec ~'cnx)]
            ~@body
-           (when ~'schema (update-schema ~'schema))))
+           (when ~'schema (update-global-schema ~'schema))))
        (.setMeta #'~name
                  (merge (.meta #'name)
                         {:arglists '(~(vec (conj params 'cnx-or-schema?)))})))))
@@ -150,3 +155,19 @@
   "Builds a drop statement with the given schema object and execute it."
   [odef & [behavior]]
   (execute (schema/build-drop-statement odef behavior db-spec) cnx))
+
+(defn create-schema
+  "Create a new schema."
+  [name & [connection-info]]
+  (let [db-spec (conn/get-db-spec connection-info)
+        schema (schema/schema name {:db-spec db-spec})]
+    (execute (schema/build-create-statement schema db-spec) db-spec)
+    (update-global-schema schema)))
+
+(defn drop-schema
+  "Drop the specified schema using the given behavior."
+  [name behavior & [connection-info]]
+  (let [db-spec (conn/get-db-spec connection-info)
+        schema (schema/schema name {:db-spec db-spec})]
+    (execute (schema/build-drop-statement schema behavior db-spec) db-spec)
+    (remove-global-schema schema)))
