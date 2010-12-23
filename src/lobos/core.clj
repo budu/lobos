@@ -142,9 +142,9 @@
 
 (defaction create
   "Builds a create statement with the given schema object and execute it."
-  [tdef]
+  [odef]
   ;; HACK: no backend yet
-  (execute (schema/build-create-statement tdef nil) cnx))
+  (execute (schema/build-create-statement odef nil) cnx))
 
 (defaction drop
   "Builds a drop statement with the given schema object and execute it."
