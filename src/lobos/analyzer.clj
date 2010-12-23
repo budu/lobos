@@ -51,21 +51,33 @@
                                       false
                                       false))))))
 
+(defn primary-keys
+  "Returns primary key names as a set of keywords."
+  [sname tname]
+  (set
+   (map #(-> % :pk_name keyword)
+        (resultset-seq (.getPrimaryKeys (db-meta) nil
+                                        (name sname)
+                                        (name tname))))))
+
 (defn unique-constraints
   "Returns a list of unique constraints for the specified schema and
   table names."
   [sname tname]
-  (map (fn [[cname cmeta]]
-         (lobos.schema.Constraint. (keyword cname)
-                                   :unique
-                                   {:columns
-                                    (vec (map #(-> % :column_name keyword)
-                                              cmeta))}))
-       (indexes sname tname #(-> % :non_unique not))))
+  (let [pkeys (primary-keys sname tname)]
+    (map (fn [[cname cmeta]]
+           (lobos.schema.Constraint. (keyword cname)
+                                     (if (pkeys (keyword cname))
+                                       :primary-key
+                                       :unique)
+                                     {:columns
+                                      (vec (map #(-> % :column_name keyword)
+                                                cmeta))}))
+         (indexes sname tname #(-> % :non_unique not)))))
 
 (defn constraints
   "Returns a list of constraints for the specified schema and table
-  names. Supports only unique constraint at the moment."
+  names. Supports only unique constraints at the moment."
   [sname tname]
   (unique-constraints sname tname))
 
