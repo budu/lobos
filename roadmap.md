@@ -21,10 +21,10 @@
 ## 0.3
 
  * Add logging
- * Add unit tests
    
 ## 0.2
 
  * Implementation of the backend for at least one real database
  * Support for creating and dropping schemas
- * Support for identity column option (auto-increment)
+ * Support for auto-inc column option
+ * Add unit tests
