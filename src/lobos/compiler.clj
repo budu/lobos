@@ -44,6 +44,13 @@
   [s]
   (replace (-> s as-str upper-case) \- \space))
 
+(defn as-schema-qualified-name
+  "Returns a schema qualified name if db-spec contains a :schema key,
+  else it act the same as as-str."
+  [db-spec name]
+  (let [schema (:schema db-spec)]
+    (as-str (when schema (str (:schema db-spec) ".")) name)))
+
 (defn unsupported
   "Throws an UnsupportedOperationException using the given message."
   [msg]
@@ -117,17 +124,17 @@
 
 (defmethod compile [::standard lobos.ast.CreateTableStatement]
   [statement]
-  (let [{:keys [tname elements]} statement]
+  (let [{:keys [db-spec tname elements]} statement]
     (format "CREATE TABLE %s %s"
-            (as-str tname)
+            (as-schema-qualified-name db-spec tname)
             (or (as-list (map compile elements))
                 "()"))))
 
 (defmethod compile [::standard lobos.ast.DropStatement]
   [statement]
-  (let [{:keys [otype oname behavior]} statement]
+  (let [{:keys [db-spec otype oname behavior]} statement]
     (join \space
       ["DROP"
        (as-sql-keyword otype)
-       (as-str oname)
+       (as-schema-qualified-name db-spec oname)
        (as-sql-keyword behavior)])))
