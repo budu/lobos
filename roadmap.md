@@ -24,10 +24,6 @@
    
 ## 0.2
 
- * Implementation of the backend for at least one database.
-
-## 0.1
-
- * Basic implementation of the compiler, ast, schema, analyzer,
-   connectivity and core namespaces.
- * Support for creating and dropping tables
+ * Implementation of the backend for at least one real database
+ * Support for creating and dropping schemas
+ * Support for identity column option (auto-increment)
