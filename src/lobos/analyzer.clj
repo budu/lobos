@@ -7,7 +7,7 @@
 ;; You must not remove this notice, or any other, from this software.
 
 (ns lobos.analyzer
-  "Analyse a database's meta-data to contruct an abstract schema."
+  "Analyze a database's meta-data to contruct an abstract schema."
   (:refer-clojure :exclude [replace])
   (require (lobos [connectivity :as conn]
                   [schema :as schema]))
@@ -135,7 +135,7 @@
 
 ;;;; Tables analysis
 
-(defn analyse-table
+(defn analyze-table
   "Returns the abstract table definition for the specified schema and
   table names."
   [sname tname]
@@ -147,7 +147,7 @@
 (defn tables
   "Returns a list of abstract table definitions for the specified schema name."
   [sname]
-  (map #(analyse-table sname (-> % :table_name keyword))
+  (map #(analyze-table sname (-> % :table_name keyword))
        (resultset-seq (.getTables (db-meta) nil
                                   (name sname)
                                   nil
@@ -155,10 +155,10 @@
 
 ;;;; Schemas analysis
 
-(defn analyse-schema
+(defn analyze-schema
   "Returns the abstract schema definition for the specified schema name
   using the given connection-info if specified or the default one."
   [sname & [connection-info]]
-  (let [options {:connection-info (or connection-info
-                                      :default-connection)}]
+  (let [db-spec (conn/get-db-spec connection-info)
+        options {:db-spec db-spec}]
     (apply schema/schema sname options (tables sname))))

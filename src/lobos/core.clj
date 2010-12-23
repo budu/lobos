@@ -35,12 +35,11 @@
 
 (defn schema-key
   "Returns a unique schema key for the given schema. This schema must
-  have its connection-info option properly set."
+  have its db-spec option properly set."
   [schema]
   (str (-> schema
            :options
-           :connection-info
-           conn/get-db-spec
+           :db-spec
            :subname)
        (:sname schema)))
 
@@ -53,15 +52,15 @@
 (defn update-schema
   "If given a schema, update it in the global schemas map, else analyze
   the specified schema found with the given connection."
-  [schema-or-name & [connection-info]]
+  [schema-or-name & [db-spec]]
   (set-global-schema
-   (analyzer/analyse-schema (if (keyword? schema-or-name)
+   (analyzer/analyze-schema (if (keyword? schema-or-name)
                               schema-or-name
                               (:sname schema-or-name))
-                            (or connection-info
+                            (or db-spec
                                 (-> schema-or-name
                                     :options
-                                    :connection-info)))))
+                                    :db-spec)))))
 
 (defn set-default-schema
   "Set the default schema."
@@ -77,9 +76,9 @@
   "Defines a var containing the specified schema constructed from
   database meta-data."
   [var-name schema-name & [connection-info]]
-  (let [connection-info (or connection-info :default-connection)
-        options {:connection-info connection-info}]
-    `(let [schema# (update-schema ~schema-name ~connection-info)]
+  (let [db-spec (conn/get-db-spec connection-info)
+        options {:db-spec db-spec}]
+    `(let [schema# (update-schema ~schema-name ~db-spec)]
          (defn ~var-name []
            (@global-schemas (schema-key schema#))))))
 
@@ -92,8 +91,9 @@
         object (if (fn? object-or-fn)
                  (object-or-fn)
                  object-or-fn)
+        db-spec (conn/get-db-spec connection-info)
         ast (when-not (= :schema level)
-              (apply action object (conj args connection-info)))]
+              (apply action object (conj args db-spec)))]
     (case level
       :sql (println (compiler/compile ast))
       :ast (do (println (type ast))
@@ -131,7 +131,7 @@
                cnx-or-schema# (or cnx-or-schema# (get-default-schema))
                ~'schema (cond (schema/schema? cnx-or-schema#) cnx-or-schema#
                               (fn? cnx-or-schema#) (cnx-or-schema#))
-               ~'cnx (or (-> ~'schema :options :connection-info)
+               ~'cnx (or (-> ~'schema :options :db-spec)
                          cnx-or-schema#
                          :default-connection)
                ~'db-spec (conn/get-db-spec ~'cnx)]
