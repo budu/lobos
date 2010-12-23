@@ -31,11 +31,17 @@
           (str sb)))
       (new StringBuilder ^String (as-str x)) ys)))
 
-(defn as-list [coll]
+(defn as-list
+  "Returns the given collection parenthesized string with its items
+  separated by commas."
+  [coll]
   (when (not-empty coll)
     (format "(%s)" (join ", " coll))))
 
-(defn as-sql-keyword [s]
+(defn as-sql-keyword
+  "Returns the given string, symbol or keyword as an upper-cased string
+  and replace dashes with spaces."
+  [s]
   (replace (-> s as-str upper-case) \- \space))
 
 ;;;; Compiler

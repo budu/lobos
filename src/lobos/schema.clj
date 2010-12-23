@@ -173,7 +173,10 @@
   (build-drop-statement [this behavior cnx]
     (lobos.ast.DropStatement. cnx :schema sname behavior)))
 
-(defn schema? [o] (isa? (type o) lobos.schema.Schema))
+(defn schema?
+  "Returns true if the given object is a Schema."
+  [o]
+  (isa? (type o) lobos.schema.Schema))
 
 (defn schema
   "Constructs an abstract schema definition."

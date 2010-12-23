@@ -26,12 +26,17 @@
 
 ;;;; Debugging interface
 
-(defn set-debug-level [level]
+(defn set-debug-level
+  "Set the current debugging level."
+  [level]
   (swap! debug-level (constantly level)))
 
 ;;;; Schema definition
 
-(defn schema-key [schema]
+(defn schema-key
+  "Returns a unique schema key for the given schema. This schema must
+  have its connection-info option properly set."
+  [schema]
   (str (-> schema
            :options
            :connection-info
@@ -39,11 +44,16 @@
            :subname)
        (:sname schema)))
 
-(defn set-global-schema [schema]
+(defn set-global-schema
+  "Set the given schema in the global schemas map and returns it."
+  [schema]
   (swap! global-schemas assoc (schema-key schema) schema)
   schema)
 
-(defn update-schema [schema-or-name & [connection-info]]
+(defn update-schema
+  "If given a schema, update it in the global schemas map, else analyze
+  the specified schema found with the given connection."
+  [schema-or-name & [connection-info]]
   (set-global-schema
    (analyzer/analyse-schema (if (keyword? schema-or-name)
                               schema-or-name
@@ -53,10 +63,14 @@
                                     :options
                                     :connection-info)))))
 
-(defn set-default-schema [schema]
+(defn set-default-schema
+  "Set the default schema."
+  [schema]
   (swap! default-schema (constantly (schema-key (schema)))))
 
-(defn get-default-schema []
+(defn get-default-schema
+  "Returns the default schema."
+  []
   (@global-schemas @default-schema))
 
 (defmacro defschema
