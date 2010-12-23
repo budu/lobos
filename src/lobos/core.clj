@@ -35,19 +35,28 @@
 
 (defn schema-key
   "Returns a unique schema key for the given schema. This schema must
-  have its db-spec option properly set."
-  [schema]
-  (str (-> schema
-           :options
-           :db-spec
-           :subname)
-       (:sname schema)))
+  have its db-spec option properly set. When given a keyword instead of
+  a schema look-up this schema by name using the db-spec argument."
+  [schema-or-name & [db-spec]]
+  (str (:subname (or db-spec (-> schema-or-name
+                                 :options
+                                 :db-spec)))
+       (if (keyword? schema-or-name)
+         schema-or-name
+         (:sname schema-or-name))))
 
 (defn set-global-schema
   "Set the given schema in the global schemas map and returns it."
   [schema]
   (swap! global-schemas assoc (schema-key schema) schema)
   schema)
+
+(defn get-global-schema
+  "Returns the specified schema for the given optional connection-info,
+  use default connection if no missing."
+  [sname & [connection-info]]
+  (let [db-spec (conn/get-db-spec connection-info)]
+    (@global-schemas (schema-key sname db-spec))))
 
 (defn update-global-schema
   "If given a schema, update it in the global schemas map, else analyze
@@ -139,7 +148,9 @@
                ~'cnx (or (-> ~'schema :options :db-spec)
                          cnx-or-schema#
                          :default-connection)
-               ~'db-spec (conn/get-db-spec ~'cnx)]
+               ~'db-spec (merge (conn/get-db-spec ~'cnx)
+                                (when ~'schema
+                                  {:schema (-> ~'schema :sname name)}))]
            ~@body
            (when ~'schema (update-global-schema ~'schema))))
        (.setMeta #'~name
