@@ -1,5 +1,12 @@
 # Lobos History
 
+## 0.2
+
+ * Implementation of the PostgreSQL backend
+ * Support for creating and dropping schemas
+ * Support for schema-scoped table operations
+ * Support for auto-inc column option
+
 ## 0.1
 
  * Basic implementation of the compiler, ast, schema, analyzer,

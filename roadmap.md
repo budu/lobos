@@ -20,11 +20,6 @@
 
 ## 0.3
 
- * Add logging
-   
-## 0.2
-
- * Implementation of the backend for at least one real database
- * Support for creating and dropping schemas
- * Support for auto-inc column option
  * Add unit tests
+ * Implementation of another backend
+ * Add logging feature
