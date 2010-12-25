@@ -101,6 +101,9 @@
         options  (set options)
         not-null (boolean (options :not-null))
         auto-inc (boolean (options :auto-inc))]
+    (when-not column-name
+      (throw (IllegalArgumentException.
+              "A column definition needs at least a name.")))
     (#(cond (options :primary-key) (primary-key % column-name)
             (options :unique) (unique % column-name)
             :else %)
