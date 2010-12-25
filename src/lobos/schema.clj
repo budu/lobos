@@ -22,6 +22,14 @@
 (defprotocol Dropable
   (build-drop-statement [this behavior db-spec]))
 
+;;;; Common exceptions
+
+(defn name-required [name otype]
+  (when-not name
+    (throw (IllegalArgumentException.
+            (format "A % definition needs at least a name."
+                    otype)))))
+
 ;;;; Constraint definition
 
 (defrecord Constraint [cname ctype specification]
@@ -101,9 +109,7 @@
         options  (set options)
         not-null (boolean (options :not-null))
         auto-inc (boolean (options :auto-inc))]
-    (when-not column-name
-      (throw (IllegalArgumentException.
-              "A column definition needs at least a name.")))
+    (name-required column-name "column")
     (#(cond (options :primary-key) (primary-key % column-name)
             (options :unique) (unique % column-name)
             :else %)
@@ -158,6 +164,7 @@
 (defn table*
   "Constructs an abstract table definition."
   [table-name columns constraints options]
+  (name-required table-name "table")
   (lobos.schema.Table. table-name columns constraints options))
 
 (defmacro table
@@ -188,6 +195,7 @@
 (defn schema
   "Constructs an abstract schema definition."
   [schema-name & [options & elements]]
+  (name-required schema-name "schema")
   (lobos.schema.Schema.
    schema-name
    (into (sorted-map)
