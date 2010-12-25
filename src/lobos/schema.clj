@@ -127,7 +127,7 @@
   given table."
   [table column-name & [limit & options]]
   (let [limit (when (integer? limit) limit)
-        dtype (lobos.schema.DataType. :varchar [limit])
+        dtype (lobos.schema.DataType. :varchar (when limit [limit]))
         options (if limit
                   options
                   (conj options limit))]
