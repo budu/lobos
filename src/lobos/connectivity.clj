@@ -56,13 +56,13 @@
   database."
   [connection-name func]
   (io!
-   (if-let [con (@global-connections connection-name)]
+   (if-let [cnx (@global-connections connection-name)]
      (binding [sqlint/*db*
                (assoc sqlint/*db*
-                 :connection (:connection con)
+                 :connection (:connection cnx)
                  :level 0
                  :rollback (atom false)
-                 :db-spec (:db-spec con))]
+                 :db-spec (:db-spec cnx))]
        (func))
      (throw
       (Exception.
@@ -74,13 +74,14 @@
   "Evaluates func in the context of a new connection to a database then
   closes the connection."
   [db-spec func]
-  (with-open [con (sqlint/get-connection db-spec)]
+  (with-open [cnx (sqlint/get-connection db-spec)]
     (binding [sqlint/*db* (assoc sqlint/*db*
-                            :connection con
+                            :connection cnx
                             :level 0
                             :rollback (atom false)
                             :db-spec db-spec)]
-      (.setAutoCommit con (or (:auto-commit db-spec) true))
+      (when-let [ac (-> db-spec :auto-commit)]
+        (.setAutoCommit cnx ac))
       (func))))
 
 (defmacro with-connection
