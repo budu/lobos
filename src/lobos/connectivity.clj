@@ -132,7 +132,7 @@
 
 (defn get-db-spec
   "Returns the associated db-spec or itself."
-  [connection-info]
+  [& [connection-info]]
   (let [connection-info (or connection-info :default-connection)]
     (if (keyword? connection-info)
       (-> @global-connections connection-info :db-spec)
