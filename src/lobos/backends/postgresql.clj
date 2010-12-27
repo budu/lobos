@@ -8,9 +8,9 @@
 
 (ns lobos.backends.postgresql
   "Compiler implementation for PostgreSQL."
-  (refer-clojure :exclude [compile])
-  (require (lobos [compiler :as compiler]))
-  (use (clojure [string :only [join]])))
+  (:refer-clojure :exclude [compile])
+  (:require (lobos [compiler :as compiler]))
+  (:use (clojure [string :only [join]])))
 
 (defmethod compiler/compile [:postgresql lobos.ast.ColumnDefinition]
   [definition]

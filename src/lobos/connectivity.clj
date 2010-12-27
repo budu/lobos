@@ -8,8 +8,8 @@
 
 (ns lobos.connectivity
   "A set of connectivity functions."
-  (require (clojure.contrib.sql [internal :as sqlint]))
-  (use (clojure.contrib [def :only [defalias defvar]])))
+  (:require (clojure.contrib.sql [internal :as sqlint]))
+  (:use (clojure.contrib [def :only [defalias defvar]])))
 
 ;;;; Global connection
 

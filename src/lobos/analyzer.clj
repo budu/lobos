@@ -9,10 +9,10 @@
 (ns lobos.analyzer
   "Analyze a database's meta-data to contruct an abstract schema."
   (:refer-clojure :exclude [replace])
-  (require (lobos [connectivity :as conn]
-                  [schema :as schema]))
-  (use (clojure.contrib [def :only [defvar-]])
-       (clojure [string :only [replace]])))
+  (:require (lobos [connectivity :as conn]
+                   [schema :as schema]))
+  (:use (clojure.contrib [def :only [defvar-]])
+        (clojure [string :only [replace]])))
 
 ;;;; Metadata
 

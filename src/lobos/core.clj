@@ -9,12 +9,12 @@
 (ns lobos.core
   "Main interface to interact with Lobos."
   (:refer-clojure :exclude [drop])
-  (require (lobos [analyzer :as analyzer]
-                  [compiler :as compiler]
-                  [connectivity :as conn]
-                  [schema :as schema]))
-  (use (clojure.contrib [def :only [name-with-attributes]])
-       (clojure [pprint :only [pprint]])))
+  (:require (lobos [analyzer :as analyzer]
+                   [compiler :as compiler]
+                   [connectivity :as conn]
+                   [schema :as schema]))
+  (:use (clojure.contrib [def :only [name-with-attributes]])
+        (clojure [pprint :only [pprint]])))
 
 ;;;; Globals
 

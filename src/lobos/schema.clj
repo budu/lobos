@@ -9,7 +9,7 @@
 (ns lobos.schema
   "The abstract schema data-structure and some function to help creating
   one."
-  (require (lobos [ast :as ast])))
+  (:require (lobos [ast :as ast])))
 
 ;;;; Protocols
 

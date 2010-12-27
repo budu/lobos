@@ -9,11 +9,11 @@
 (ns lobos.compiler
   "The compiler multimethod definition, an default implementation and
   some helpers functions."
-  (refer-clojure :exclude [compile replace])
-  (require (lobos [ast :as ast]))
-  (use (clojure [string :only [join
-                               replace
-                               upper-case]])))
+  (:refer-clojure :exclude [compile replace])
+  (:require (lobos [ast :as ast]))
+  (:use (clojure [string :only [join
+                                replace
+                                upper-case]])))
 
 ;;;; Helpers
 
