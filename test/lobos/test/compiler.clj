@@ -11,6 +11,32 @@
   (:use [lobos.compiler] :reload)
   (:use [clojure.test]))
 
+;;;; Helpers
+
+(deftest test-as-str
+  (are [s] (= s "foo")
+       (as-str :foo)
+       (as-str 'foo)
+       (as-str "foo"))
+  (is (= (as-str :foo 'bar "baz") "foobarbaz")))
+
+(deftest test-as-list
+  (is (= (as-list [:foo :bar :baz]) "(foo, bar, baz)")))
+
+(deftest test-as-sql-keyword
+  (is (= (as-sql-keyword :foo-bar) "FOO BAR")))
+
+(deftest test-as-schema-qualified-name
+  (is (= (as-schema-qualified-name nil :foo) "foo"))
+  (is (= (as-schema-qualified-name {:schema :foo} :foo) "foo.foo")))
+
+(deftest test-unsupported
+  (is (thrown-with-msg? java.lang.UnsupportedOperationException
+        #"foo"
+        (unsupported "foo"))))
+
+;;;; Default compiler
+
 (deftest test-compile-value-expression
   (is (= (compile (lobos.ast.ValueExpression. nil :foo))
          "FOO()")
