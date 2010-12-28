@@ -33,10 +33,10 @@
 
 (defn as-list
   "Returns the given collection parenthesized string with its items
-  separated by commas."
+  separated by commas. Apply as-str to coll items."
   [coll]
   (when (not-empty coll)
-    (format "(%s)" (join ", " coll))))
+    (format "(%s)" (join ", " (map as-str coll)))))
 
 (defn as-sql-keyword
   "Returns the given string, symbol or keyword as an upper-cased string
@@ -108,7 +108,7 @@
   (let [{:keys [cname ctype columns]} definition
         spec (join \space
                [(as-sql-keyword ctype)
-                (as-list (map as-str columns))])]
+                (as-list columns)])]
     (if cname
       (join \space [(as-str cname) spec])
       spec)))
