@@ -13,9 +13,7 @@
 
 ;;;; Global connection
 
-(defvar global-connections
-  (atom {})
-  "The map of global connections in an atom.")
+(defonce global-connections (atom {}))
 
 (defn open-global
   "Supplied with a keyword identifying a global connection, that connection
