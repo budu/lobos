@@ -118,9 +118,9 @@
 (defmethod compile [::standard lobos.ast.CreateSchemaStatement]
   [statement]
   (let [{:keys [sname elements]} statement]
-    (format "CREATE SCHEMA %s \n\n%s"
-            (as-str sname)
-            (join "\n\n" (map compile elements)))))
+    (str "CREATE SCHEMA "
+         (join "\n\n" (conj (map compile elements)
+                            (as-str sname))))))
 
 (defmethod compile [::standard lobos.ast.CreateTableStatement]
   [statement]
