@@ -110,7 +110,7 @@
                [(as-sql-keyword ctype)
                 (as-list (map as-str columns))])]
     (if cname
-      (join \space [name spec])
+      (join \space [(as-str cname) spec])
       spec)))
 
 ;;; Statements
