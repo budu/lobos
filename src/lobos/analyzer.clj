@@ -12,7 +12,9 @@
   (:require (lobos [connectivity :as conn]
                    [schema :as schema]))
   (:use (clojure.contrib [def :only [defvar-]])
-        (clojure [string :only [replace]])))
+        (clojure [string :only [lower-case
+                                replace
+                                upper-case]])))
 
 ;;;; Metadata
 
@@ -35,6 +37,14 @@
      (binding [*db-meta* (.getMetaData (conn/connection))]
        ~@body)))
 
+;;;; Identifiers handling
+
+(defn identifier [kw]
+  (let [s (name kw)]
+    (cond (.storesLowerCaseIdentifiers (db-meta)) (lower-case s)
+          (.storesUpperCaseIdentifiers (db-meta)) (upper-case s)
+          :else s)))
+
 ;;;; Constraints analysis
 
 (defn indexes
@@ -46,8 +56,8 @@
     (sort-by :ordinal_position
       (filter (or f identity)
         (resultset-seq (.getIndexInfo (db-meta) nil
-                                      (name sname)
-                                      (name tname)
+                                      (identifier sname)
+                                      (identifier tname)
                                       false
                                       false))))))
 
@@ -57,8 +67,8 @@
   (set
    (map #(-> % :pk_name keyword)
         (resultset-seq (.getPrimaryKeys (db-meta) nil
-                                        (name sname)
-                                        (name tname))))))
+                                        (identifier sname)
+                                        (identifier tname))))))
 
 (defn unique-constraints
   "Returns a list of unique constraints for the specified schema and
@@ -129,8 +139,8 @@
   [sname tname]
   (map analyze-column
        (resultset-seq (.getColumns (db-meta) nil
-                                   (name sname)
-                                   (name tname)
+                                   (identifier sname)
+                                   (identifier tname)
                                    nil))))
 
 ;;;; Tables analysis
@@ -149,7 +159,7 @@
   [sname]
   (map #(analyze-table sname (-> % :table_name keyword))
        (resultset-seq (.getTables (db-meta) nil
-                                  (name sname)
+                                  (identifier sname)
                                   nil
                                   (into-array ["TABLE"])))))
 
