@@ -134,7 +134,8 @@
   [statement]
   (let [{:keys [db-spec otype oname behavior]} statement]
     (join \space
-      ["DROP"
-       (as-sql-keyword otype)
-       (as-schema-qualified-name db-spec oname)
-       (as-sql-keyword behavior)])))
+      (concat
+       ["DROP"
+        (as-sql-keyword otype)
+        (as-schema-qualified-name db-spec oname)]
+       (when behavior [(as-sql-keyword behavior)])))))
