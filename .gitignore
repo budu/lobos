@@ -5,6 +5,7 @@ classes
 lib
 
 playground.clj
+pom.xml
 
 *.jar
 *.org
