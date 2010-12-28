@@ -60,6 +60,7 @@
 
 (def backends-hierarchy
   (atom (-> (make-hierarchy)
+            (derive :h2 ::standard)
             (derive :postgresql ::standard))))
 
 (defmulti compile
