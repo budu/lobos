@@ -54,7 +54,7 @@
 (defn unsupported
   "Throws an UnsupportedOperationException using the given message."
   [msg]
-  (java.lang.UnsupportedOperationException. msg))
+  (throw (java.lang.UnsupportedOperationException. msg)))
 
 ;;;; Compiler
 
