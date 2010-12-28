@@ -49,7 +49,7 @@
   else it act the same as as-str."
   [db-spec name]
   (let [schema (:schema db-spec)]
-    (as-str (when schema (str (:schema db-spec) ".")) name)))
+    (as-str (when schema (as-str (:schema db-spec) ".")) name)))
 
 (defn unsupported
   "Throws an UnsupportedOperationException using the given message."
