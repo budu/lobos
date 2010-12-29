@@ -168,16 +168,17 @@
 
 ;;;; Schemas analysis
 
+(defn schemas
+  "Returns a list of schema names as keywords."
+  []
+  (map #(-> % :table_schem as-keyword)
+       (resultset-seq (.getSchemas (db-meta)))))
+
 (defn analyze-schema
   "Returns the abstract schema definition for the specified schema name
   using the given connection-info if specified or the default one."
   [sname & [connection-info]]
   (let [db-spec (conn/get-db-spec connection-info)
         options {:db-spec db-spec}]
-    (apply schema/schema sname options (tables sname))))
-
-(defn schemas
-  "Returns a list of schema names as keywords."
-  []
-  (map #(-> % :table_schem as-keyword)
-       (resultset-seq (.getSchemas (db-meta)))))
+    (when ((set (schemas)) sname)
+      (apply schema/schema sname options (tables sname)))))
