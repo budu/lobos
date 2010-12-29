@@ -201,3 +201,16 @@
    (into (sorted-map)
          (map #(vector (:name %) %) elements))
    (or options {})))
+
+;;;; Definitions hierarchy
+
+(derive lobos.schema.Constraint ::definition)
+(derive lobos.schema.DataType ::definition)
+(derive lobos.schema.Column ::definition)
+(derive lobos.schema.Table ::definition)
+(derive lobos.schema.Schema ::definition)
+
+(defn definition?
+  "Returns true if the given object is a definition."
+  [o]
+  (isa? (type o) ::definition))
