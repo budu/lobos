@@ -142,7 +142,16 @@
          (lobos.schema.Schema. :foo {} {:bar nil
                                         :baz nil}))
       "Empty schema with option.")
-  (is (= (schema :foo nil {:name :bar} {:name :baz})
-         (lobos.schema.Schema. :foo {:bar {:name :bar}
-                                     :baz {:name :baz}} {}))
-      "Schema with elements"))
+  (is (= (schema :foo (table :bar) (table :baz))
+         (lobos.schema.Schema. :foo {:bar (table :bar)
+                                     :baz (table :baz)} {}))
+      "Schema with elements")
+  (is (= (schema :foo {:bar nil :baz nil}
+                 (table :bar)
+                 (table :baz))
+         (lobos.schema.Schema. :foo
+                               {:bar (table :bar)
+                                :baz (table :baz)}
+                               {:bar nil
+                                :baz nil}))
+      "Schema with elements and options."))

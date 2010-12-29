@@ -30,6 +30,13 @@
             (format "A % definition needs at least a name."
                     otype)))))
 
+;;;; Definition predicate
+
+(defn definition?
+  "Returns true if the given object is a definition."
+  [o]
+  (isa? (type o) ::definition))
+
 ;;;; Constraint definition
 
 (defrecord Constraint [cname ctype specification]
@@ -194,13 +201,19 @@
 
 (defn schema
   "Constructs an abstract schema definition."
-  [schema-name & [options & elements]]
+  [schema-name & [options-or-element & elements]]
   (name-required schema-name "schema")
-  (lobos.schema.Schema.
-   schema-name
-   (into (sorted-map)
-         (map #(vector (:name %) %) elements))
-   (or options {})))
+  (let [options (when-not (definition? options-or-element)
+                  options-or-element)
+        elements (if options
+                   elements
+                   (when elements
+                     (conj elements options-or-element)))]
+    (lobos.schema.Schema.
+     schema-name
+     (into (sorted-map)
+           (map #(vector (:name %) %) elements))
+     (or options {}))))
 
 ;;;; Definitions hierarchy
 
@@ -209,8 +222,3 @@
 (derive lobos.schema.Column ::definition)
 (derive lobos.schema.Table ::definition)
 (derive lobos.schema.Schema ::definition)
-
-(defn definition?
-  "Returns true if the given object is a definition."
-  [o]
-  (isa? (type o) ::definition))
