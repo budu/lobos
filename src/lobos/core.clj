@@ -136,19 +136,22 @@
         [params* & body] args]
     `(do
        (defn ~name [& params#]
-         (let [[cnx-or-schema# params#] (if (or (fn? (first params#))
-                                                (schema/schema? (first params#))
-                                                (keyword? (first params#)))
-                                          [(first params#) (next params#)]
-                                          [nil params#])
+         (let [fparam# (first params#)
+               [cnx-or-schema# params#]
+               (if (or (fn? fparam#)
+                       (schema/schema? fparam#)
+                       (not (schema/definition? fparam#))
+                       (keyword? fparam#))
+                 [fparam# (next params#)]
+                 [nil params#])
                ~params* params#
                cnx-or-schema# (or cnx-or-schema# (get-default-schema))
                ~'schema (cond (schema/schema? cnx-or-schema#) cnx-or-schema#
                               (fn? cnx-or-schema#) (cnx-or-schema#))
-               ~'cnx (or (-> ~'schema :options :db-spec)
-                         cnx-or-schema#
-                         :default-connection)
-               ~'db-spec (merge (conn/get-db-spec ~'cnx)
+               cnx# (or (-> ~'schema :options :db-spec)
+                        cnx-or-schema#
+                        :default-connection)
+               ~'db-spec (merge (conn/get-db-spec cnx#)
                                 (when ~'schema
                                   {:schema (-> ~'schema :sname name)}))]
            ~@body
@@ -160,12 +163,12 @@
 (defaction create
   "Builds a create statement with the given schema object and execute it."
   [odef]
-  (execute (schema/build-create-statement odef db-spec) cnx))
+  (execute (schema/build-create-statement odef db-spec) db-spec))
 
 (defaction drop
   "Builds a drop statement with the given schema object and execute it."
   [odef & [behavior]]
-  (execute (schema/build-drop-statement odef behavior db-spec) cnx))
+  (execute (schema/build-drop-statement odef behavior db-spec) db-spec))
 
 (defn create-schema
   "Create a new schema."
