@@ -37,7 +37,10 @@
      (binding [*db-meta* (.getMetaData (conn/connection))]
        ~@body)))
 
-;;;; Identifiers handling
+;;;; Helpers
+
+(defn as-keyword [s]
+  (-> s lower-case (replace \_ \-) keyword))
 
 (defn identifier [kw]
   (let [s (name kw)]
@@ -172,3 +175,9 @@
   (let [db-spec (conn/get-db-spec connection-info)
         options {:db-spec db-spec}]
     (apply schema/schema sname options (tables sname))))
+
+(defn schemas
+  "Returns a list of schema names as keywords."
+  []
+  (map #(-> % :table_schem as-keyword)
+       (resultset-seq (.getSchemas (db-meta)))))
