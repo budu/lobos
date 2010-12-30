@@ -1,5 +1,12 @@
 # Lobos History
 
+## 0.3
+
+ * Unit tests for compiler, connectivity and schema namespaces
+ * Basic integration testing for all backends
+ * Implementation of the H2 backend
+ * Lots of issues fixed, API improved
+
 ## 0.2
 
  * Implementation of the PostgreSQL backend

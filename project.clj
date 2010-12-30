@@ -1,4 +1,4 @@
-(defproject lobos "0.3.0-SNAPSHOT"
+(defproject lobos "0.3.0"
   :description
   "A library to create and manipulate SQL database schemas."
   :dependencies [[org.clojure/clojure "1.2.0"]

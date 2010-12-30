@@ -2,6 +2,7 @@
 
 ## 0.7
 
+ * Support for declarative schema definition
  * Support for more database backends
 
 ## 0.6
@@ -17,9 +18,4 @@
  * Complete set of features to create simple schemas, including:
    * Table constraints definition
    * A comprehensive set of data types
-
-## 0.3
-
- * Add unit tests
- * Implementation of another backend
- * Add logging feature
+ * Improve integration testing
