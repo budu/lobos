@@ -74,7 +74,8 @@
 (defn remove-global-schema
   "Removes the given schema from the global schema map."
   [schema]
-  (swap! global-schemas dissoc (schema-key schema)))
+  (swap! global-schemas dissoc (schema-key schema))
+  nil)
 
 (defn set-default-schema
   "Set the default schema."
