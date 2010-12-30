@@ -23,6 +23,6 @@
           "SERIAL"
           (str (compiler/as-sql-keyword (:dtype data-type))
                (compiler/as-list (:args data-type))))]
-       (when default  ["DEFAULT" (compile default)])
+       (when default  ["DEFAULT" (compiler/compile default)])
        (when not-null ["NOT NULL"])
        others))))
