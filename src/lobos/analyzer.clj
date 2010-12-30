@@ -180,5 +180,6 @@
   [sname & [connection-info]]
   (let [db-spec (conn/get-db-spec connection-info)
         options {:db-spec db-spec}]
-    (when ((set (schemas)) sname)
-      (apply schema/schema sname options (tables sname)))))
+    (with-db-meta connection-info
+      (when ((set (schemas)) sname)
+        (apply schema/schema sname options (tables sname))))))
