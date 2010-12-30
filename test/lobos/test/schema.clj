@@ -7,6 +7,7 @@
 ;; You must not remove this notice, or any other, from this software.
 
 (ns lobos.test.schema
+  (:refer-clojure :exclude [bigint double float])
   (:use [lobos.schema] :reload)
   (:use [clojure.test]))
 
@@ -78,31 +79,53 @@
                              :others ["BAR"]))})
         "Setting custom options")))
 
-(deftest test-data-types
-  (testing "Data type definition"
+(deftest test-typed-column
+  (testing "Typed column definition"
     (is (= (integer {} :foo)
            {:columns (list (assoc column-definition-stub
-                             :data-type (lobos.schema.DataType.
-                                         :integer
-                                         nil)))})
+                             :data-type (data-type :integer)))})
         "Integer")
+    (is (= (numeric {} :foo)
+           {:columns (list (assoc column-definition-stub
+                             :data-type (data-type :numeric)))})
+        "Numeric")
+    (is (= (numeric {} :foo 2)
+           {:columns (list (assoc column-definition-stub
+                             :data-type (data-type :numeric 2)))})
+        "Numeric with precision")
+    (is (= (numeric {} :foo 2 4)
+           {:columns (list (assoc column-definition-stub
+                             :data-type (data-type :numeric 2 4)))})
+        "Numeric with precision and scale")
+    (is (= (numeric {} :foo "BAR")
+           {:columns (list (assoc column-definition-stub
+                             :data-type (data-type :numeric)
+                             :others ["BAR"]))})
+        "Numeric with other option")
+    (is (= (float {} :foo)
+           {:columns (list (assoc column-definition-stub
+                             :data-type (data-type :float)))})
+        "Float")
+    (is (= (float {} :foo 1)
+           {:columns (list (assoc column-definition-stub
+                             :data-type (data-type :float 1)))})
+        "Float with precision")
     (is (= (varchar {} :foo)
            {:columns (list (assoc column-definition-stub
-                             :data-type (lobos.schema.DataType.
-                                         :varchar
-                                         nil)))})
+                             :data-type (data-type :varchar)))})
         "Varchar")
     (is (= (varchar {} :foo 1)
            {:columns (list (assoc column-definition-stub
-                             :data-type (lobos.schema.DataType.
-                                         :varchar
-                                         [1])))})
+                             :data-type (data-type :varchar 1)))})
         "Varchar with limit")
+    (is (= (varchar {} :foo "BAR")
+           {:columns (list (assoc column-definition-stub
+                             :data-type (data-type :varchar)
+                             :others ["BAR"]))})
+        "Varchar with other option")
     (is (= (timestamp {} :foo)
            {:columns (list (assoc column-definition-stub
-                             :data-type (lobos.schema.DataType.
-                                         :timestamp
-                                         nil)))})
+                             :data-type (data-type :timestamp)))})
         "Timestamp")))
 
 ;;;; Table definition tests

@@ -7,14 +7,13 @@
 ;; You must not remove this notice, or any other, from this software.
 
 (ns lobos.test.integration
-  (:refer-clojure :exclude [compile drop])
-  (:use (lobos schema analyzer compiler core)
-        (lobos.backends h2 postgresql)
-        :reload)
+  (:refer-clojure :exclude [bigint compile double drop float])
   (:use clojure.test
         (clojure [string :only [join]])
         (clojure.contrib [io :only [delete-file
-                                    file]])))
+                                    file]])
+        (lobos schema analyzer compiler core)
+        (lobos.backends h2 postgresql)))
 
 ;;;; DB connection specifications
 

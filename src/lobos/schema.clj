@@ -9,7 +9,17 @@
 (ns lobos.schema
   "The abstract schema data-structure and some function to help creating
   one."
+  (:refer-clojure :exclude [bigint double float])
   (:require (lobos [ast :as ast])))
+
+;;;; Helpers
+
+(defn conj-when
+  "Like conj but if test is false returns coll untouched."
+  [coll test x & xs]
+  (if test
+    (apply conj coll x xs)
+    coll))
 
 ;;;; Protocols
 
@@ -86,9 +96,14 @@
   [table name-or-column & columns]
   (unique-constraint table :unique name-or-column columns))
 
-;;;; Column definition
+;;;; Data-type definition
 
 (defrecord DataType [dtype args])
+
+(defn data-type [dtype & args]
+  (lobos.schema.DataType. dtype (vec args)))
+
+;;;; Column definition
 
 (defrecord Column [cname data-type default auto-inc not-null others]
   Buildable
@@ -128,30 +143,83 @@
                                       not-null
                                       others)))))
 
-(defn integer
-  "Constructs an abstract integer column definition and add it to the
+;;;; Typed column definition
+
+;;; Typed column helpers
+
+(defmacro def-simple-typed-columns
+  "Defines typed columns for simple data-types taking no arguments."
+  [& names]
+  `(do
+     ~@(for [n names]
+         `(defn ~n
+            ~(format (str "Constructs an abstract %s column definition and"
+                          " add it to the given table.")
+                     (name n))
+            [~'table ~'column-name & ~'options]
+            (column ~'table
+                    ~'column-name
+                    (data-type ~(keyword n))
+                    ~'options)))))
+
+(defmacro def-numeric-like-typed-columns
+  "Defines numeric-like typed columns."
+  [& names]
+  `(do
+     ~@(for [n names]
+         `(defn ~n
+            ~(format (str "Constructs an abstract %s column definition and"
+                          " add it to the given table.")
+                     (name n))
+            ~'[table column-name & [precision scale & options]]
+            (let ~'[dargs (-> []
+                              (conj-when (integer? precision) precision)
+                              (conj-when (integer? scale) scale))
+                    options (-> options
+                                (conj-when (not (integer? precision)) precision)
+                                (conj-when (not (integer? scale)) scale))]
+              (column ~'table
+                      ~'column-name
+                      (apply data-type ~(keyword n) ~'dargs)
+                      ~'options))))))
+
+;;; Numeric types
+
+(def-simple-typed-columns
+  smallint
+  integer
+  bigint)
+
+(def-numeric-like-typed-columns
+  numeric
+  decimal)
+
+(def-simple-typed-columns
+  real
+  double)
+
+(defn float
+  "Constructs an abstract float column definition and add it to the
   given table."
-  [table column-name & options]
-  (let [dtype (lobos.schema.DataType. :integer nil)]
-    (column table column-name dtype options)))
+  [table column-name & [precision & options]]
+  (let [dargs (conj-when [] (integer? precision) precision)
+        options (conj-when options (not (integer? precision)) precision)]
+    (column table column-name (apply data-type :float dargs) options)))
+
+;;; Character types
 
 (defn varchar
   "Constructs an abstract varchar column definition and add it to the
   given table."
   [table column-name & [limit & options]]
-  (let [limit (when (integer? limit) limit)
-        dtype (lobos.schema.DataType. :varchar (when limit [limit]))
-        options (if limit
-                  options
-                  (conj options limit))]
-    (column table column-name dtype options)))
+  (let [dargs (conj-when [] (integer? limit) limit)
+        options (conj-when options (not (integer? limit)) limit)]
+    (column table column-name (apply data-type :varchar dargs) options)))
 
-(defn timestamp
-  "Constructs an abstract timestamp column definition and add it to the
-  given table."
-  [table column-name & options]
-  (let [dtype (lobos.schema.DataType. :timestamp nil)]
-    (column table column-name dtype options)))
+;;; Data/time types
+
+(def-simple-typed-columns
+  timestamp)
 
 ;;;; Table definition
 
