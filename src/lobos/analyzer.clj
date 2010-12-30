@@ -11,14 +11,14 @@
   (:refer-clojure :exclude [replace])
   (:require (lobos [connectivity :as conn]
                    [schema :as schema]))
-  (:use (clojure.contrib [def :only [defvar-]])
+  (:use (clojure.contrib [def :only [defvar defvar-]])
         (clojure [string :only [lower-case
                                 replace
                                 upper-case]])))
 
 ;;;; Metadata
 
-(defvar- *db-meta* nil)
+(defvar *db-meta* nil)
 
 (defn db-meta
   "Returns the binded DatabaseMetaData object found in *db-meta* or get
@@ -33,9 +33,11 @@
   connection to a database then closes the connection while binding its
   DatabaseMetaData object to *db-meta*."
   [db-spec & body]
-  `(conn/with-connection ~db-spec
-     (binding [*db-meta* (.getMetaData (conn/connection))]
-       ~@body)))
+  `(if *db-meta*
+     (do ~@body)
+     (conn/with-connection ~db-spec
+       (binding [*db-meta* (.getMetaData (conn/connection))]
+         ~@body))))
 
 ;;;; Helpers
 
