@@ -70,7 +70,7 @@
   "Returns primary key names as a set of keywords."
   [sname tname]
   (set
-   (map #(-> % :pk_name keyword)
+   (map #(-> % :pk_name as-keyword)
         (resultset-seq (.getPrimaryKeys (db-meta) nil
                                         (identifier sname)
                                         (identifier tname))))))
@@ -81,12 +81,12 @@
   [sname tname]
   (let [pkeys (primary-keys sname tname)]
     (map (fn [[cname cmeta]]
-           (lobos.schema.Constraint. (keyword cname)
-                                     (if (pkeys (keyword cname))
+           (lobos.schema.Constraint. (as-keyword cname)
+                                     (if (pkeys (as-keyword cname))
                                        :primary-key
                                        :unique)
                                      {:columns
-                                      (vec (map #(-> % :column_name keyword)
+                                      (vec (map #(-> % :column_name as-keyword)
                                                 cmeta))}))
          (indexes sname tname #(-> % :non_unique not)))))
 
@@ -112,7 +112,7 @@
 (defn analyze-data-type
   "Returns an abstract data-type definition given a column meta-data."
   [col-meta]
-  (let [dtype (-> col-meta :type_name keyword)
+  (let [dtype (-> col-meta :type_name as-keyword)
         dtype (dtypes-replace dtype)]
     (lobos.schema.DataType.
      dtype
@@ -131,7 +131,7 @@
 (defn analyze-column
   "Returns an abstract column definition given a column meta-data."
   [col-meta]
-  (lobos.schema.Column. (-> col-meta :column_name keyword)
+  (lobos.schema.Column. (-> col-meta :column_name as-keyword)
                         (analyze-data-type col-meta)
                         (analyze-expression (:column_def col-meta))
                         (= (:is_autoincrement col-meta) "YES")
@@ -162,7 +162,7 @@
 (defn tables
   "Returns a list of abstract table definitions for the specified schema name."
   [sname]
-  (map #(analyze-table sname (-> % :table_name keyword))
+  (map #(analyze-table sname (-> % :table_name as-keyword))
        (resultset-seq (.getTables (db-meta) nil
                                   (identifier sname)
                                   nil
