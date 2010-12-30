@@ -174,7 +174,7 @@
   "Returns a list of schema names as keywords."
   []
   (map #(-> % :table_schem as-keyword)
-       (resultset-seq (.getSchemas (db-meta)))))
+       (doall (resultset-seq (.getSchemas (db-meta))))))
 
 (defn analyze-schema
   "Returns the abstract schema definition for the specified schema name
