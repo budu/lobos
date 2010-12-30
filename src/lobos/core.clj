@@ -181,8 +181,11 @@
 
 (defn drop-schema
   "Drop the specified schema using the given behavior."
-  [name behavior & [connection-info]]
-  (let [db-spec (conn/get-db-spec connection-info)
-        schema (schema/schema name {:db-spec db-spec})]
+  [name-or-schema & [behavior connection-info]]
+  (let [db-spec (or (-> name-or-schema :options :db-spec)
+                    (conn/get-db-spec connection-info))
+        schema (if (schema/schema? name-or-schema)
+                 name-or-schema
+                 (schema/schema name-or-schema {:db-spec db-spec}))]
     (execute (schema/build-drop-statement schema behavior db-spec) db-spec)
     (remove-global-schema schema)))
