@@ -61,15 +61,11 @@
 (defn update-global-schema
   "If given a schema, update it in the global schemas map, else analyze
   the specified schema found with the given connection."
-  [schema-or-name & [db-spec]]
-  (set-global-schema
-   (analyzer/analyze-schema (if (keyword? schema-or-name)
-                              schema-or-name
-                              (:sname schema-or-name))
-                            (or db-spec
-                                (-> schema-or-name
-                                    :options
-                                    :db-spec)))))
+  ([schema] (set-global-schema schema))
+  ([schema-name db-spec]
+     (set-global-schema
+      (analyzer/analyze-schema schema-name
+                               db-spec))))
 
 (defn remove-global-schema
   "Removes the given schema from the global schema map."
@@ -90,12 +86,22 @@
 (defmacro defschema
   "Defines a var containing the specified schema constructed from
   database meta-data."
-  [var-name schema-name & [connection-info]]
-  (let [db-spec (conn/get-db-spec connection-info)
-        options {:db-spec db-spec}]
-    `(let [schema# (update-global-schema ~schema-name ~db-spec)]
+  [var-name schema-name & [connection-info & elements]]
+  `(let [schema-name# ~schema-name
+         connection-info# ~connection-info
+         elements# ~elements
+         [connection-info# elements#]
+         (if (schema/definition? connection-info#)
+           [nil (conj elements# connection-info#)]
+           [connection-info# elements#])
+         db-spec# (conn/get-db-spec connection-info#)
+         options# {:db-spec db-spec#}
+         schema# (if elements#
+                   (update-global-schema
+                    (apply schema/schema schema-name# options# elements#))
+                   (update-global-schema schema-name# db-spec#))]
          (defn ~var-name []
-           (@global-schemas (schema-key schema#))))))
+           (@global-schemas (schema-key schema#)))))
 
 ;;;; Actions
 
