@@ -129,8 +129,8 @@
         default  (first (filter vector? options))
         others   (vec (filter string? options))
         options  (set options)
-        not-null (boolean (options :not-null))
-        auto-inc (boolean (options :auto-inc))]
+        not-null (clojure.core/boolean (options :not-null))
+        auto-inc (clojure.core/boolean (options :auto-inc))]
     (name-required column-name "column")
     (#(cond (options :primary-key) (primary-key % column-name)
             (options :unique) (unique % column-name)
