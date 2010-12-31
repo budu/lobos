@@ -179,19 +179,32 @@
 
 (defn create-schema
   "Create a new schema."
-  [name & [connection-info]]
-  (let [db-spec (conn/get-db-spec connection-info)
-        schema (schema/schema name {:db-spec db-spec})]
+  [schema-or-name & [connection-info]]
+  (let [schema (cond (schema/schema? schema-or-name) schema-or-name
+                     (fn? schema-or-name) (schema-or-name))
+        cnx (conn/get-db-spec connection-info)
+        db-spec (if connection-info
+                  cnx
+                  (or (-> schema :options :db-spec)
+                      cnx))
+        schema (if schema
+                 (merge schema {:db-spec db-spec})
+                 (schema/schema schema-or-name {:db-spec db-spec}))]
     (execute (schema/build-create-statement schema db-spec) db-spec)
     (update-global-schema schema)))
 
 (defn drop-schema
   "Drop the specified schema using the given behavior."
-  [name-or-schema & [behavior connection-info]]
-  (let [db-spec (or (-> name-or-schema :options :db-spec)
-                    (conn/get-db-spec connection-info))
-        schema (if (schema/schema? name-or-schema)
-                 name-or-schema
-                 (schema/schema name-or-schema {:db-spec db-spec}))]
+  [schema-or-name & [behavior connection-info]]
+  (let [schema (cond (schema/schema? schema-or-name) schema-or-name
+                     (fn? schema-or-name) (schema-or-name))
+        cnx (conn/get-db-spec connection-info)
+        db-spec (if connection-info
+                  cnx
+                  (or (-> schema :options :db-spec)
+                      cnx))
+        schema (if schema
+                 (merge schema {:db-spec db-spec})
+                 (schema/schema schema-or-name {:db-spec db-spec}))]
     (execute (schema/build-drop-statement schema behavior db-spec) db-spec)
     (remove-global-schema schema)))
