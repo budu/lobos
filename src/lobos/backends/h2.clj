@@ -12,6 +12,15 @@
   (:require (lobos [compiler :as compiler]))
   (:use (clojure [string :only [join]])))
 
+(defmethod compiler/compile [:h2 lobos.ast.CreateSchemaStatement]
+  [statement]
+  (let [{:keys [sname elements]} statement]
+    (join ";\n\n"
+          (conj (map (comp compiler/compile
+                           #(assoc-in % [:db-spec :schema] sname))
+                     elements)
+                (compiler/as-str "CREATE SCHEMA " sname)))))
+
 (defmethod compiler/compile [:h2 lobos.ast.DropStatement]
   [statement]
   (let [{:keys [db-spec otype oname behavior]} statement]
