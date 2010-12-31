@@ -206,5 +206,4 @@
         schema (if schema
                  (merge schema {:db-spec db-spec})
                  (schema/schema schema-or-name {:db-spec db-spec}))]
-    (execute (schema/build-drop-statement schema behavior db-spec) db-spec)
-    (remove-global-schema schema)))
+    (execute (schema/build-drop-statement schema behavior db-spec) db-spec)))
