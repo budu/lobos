@@ -9,7 +9,7 @@
 (ns lobos.schema
   "The abstract schema data-structure and some function to help creating
   one."
-  (:refer-clojure :exclude [bigint double float])
+  (:refer-clojure :exclude [bigint char double float])
   (:require (lobos [ast :as ast])))
 
 ;;;; Helpers
@@ -147,41 +147,60 @@
 
 ;;; Typed column helpers
 
-(defmacro def-simple-typed-columns
-  "Defines typed columns for simple data-types taking no arguments."
-  [& names]
+(defn def-typed-columns*
+  "Helper for macros that create typed columns definitions."
+  [names args body]
   `(do
      ~@(for [n names]
          `(defn ~n
             ~(format (str "Constructs an abstract %s column definition and"
                           " add it to the given table.")
                      (name n))
-            [~'table ~'column-name & ~'options]
-            (column ~'table
+            ~args
+            ~@(body n)))))
+
+(defmacro def-simple-typed-columns
+  "Defines typed columns for simple data-types taking no arguments."
+  [& names]
+  (def-typed-columns*
+    names
+    '[table column-name & options]
+    #(list `(column ~'table
                     ~'column-name
-                    (data-type ~(keyword n))
-                    ~'options)))))
+                    (data-type ~(keyword %))
+                    ~'options))))
 
 (defmacro def-numeric-like-typed-columns
   "Defines numeric-like typed columns."
   [& names]
-  `(do
-     ~@(for [n names]
-         `(defn ~n
-            ~(format (str "Constructs an abstract %s column definition and"
-                          " add it to the given table.")
-                     (name n))
-            ~'[table column-name & [precision scale & options]]
-            (let ~'[dargs (-> []
-                              (conj-when (integer? precision) precision)
-                              (conj-when (integer? scale) scale))
-                    options (-> options
-                                (conj-when (not (integer? precision)) precision)
-                                (conj-when (not (integer? scale)) scale))]
-              (column ~'table
-                      ~'column-name
-                      (apply data-type ~(keyword n) ~'dargs)
-                      ~'options))))))
+  (def-typed-columns*
+    names
+    '[table column-name & [precision scale & options]]
+    #(list
+      `(let ~'[dargs (-> []
+                         (conj-when (integer? precision) precision)
+                         (conj-when (integer? scale) scale))
+               options (-> options
+                           (conj-when (not (integer? precision)) precision)
+                           (conj-when (not (integer? scale)) scale))]
+         (column ~'table
+                 ~'column-name
+                 (apply data-type ~(keyword %) ~'dargs)
+                 ~'options)))))
+
+(defmacro def-length-bounded-typed-columns
+  "Defines length-bounded typed columns."
+  [& names]
+  (def-typed-columns*
+    names
+    '[table column-name & [length & options]]
+    #(list
+      `(let ~'[dargs (conj-when [] (integer? length) length)
+               options (conj-when options (not (integer? length)) length)]
+         (column ~'table
+                 ~'column-name
+                 (apply data-type ~(keyword %) ~'dargs)
+                 ~'options)))))
 
 ;;; Numeric types
 
@@ -208,13 +227,12 @@
 
 ;;; Character types
 
-(defn varchar
-  "Constructs an abstract varchar column definition and add it to the
-  given table."
-  [table column-name & [limit & options]]
-  (let [dargs (conj-when [] (integer? limit) limit)
-        options (conj-when options (not (integer? limit)) limit)]
-    (column table column-name (apply data-type :varchar dargs) options)))
+(def-length-bounded-typed-columns
+  char
+  varchar)
+
+(def-simple-typed-columns
+  text)
 
 ;;; Data/time types
 

@@ -7,7 +7,7 @@
 ;; You must not remove this notice, or any other, from this software.
 
 (ns lobos.test.schema
-  (:refer-clojure :exclude [bigint double float])
+  (:refer-clojure :exclude [bigint char double float])
   (:use [lobos.schema] :reload)
   (:use [clojure.test]))
 
