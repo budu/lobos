@@ -9,7 +9,7 @@
 (ns lobos.schema
   "The abstract schema data-structure and some function to help creating
   one."
-  (:refer-clojure :exclude [bigint char double float])
+  (:refer-clojure :exclude [bigint boolean char double float])
   (:require (lobos [ast :as ast])))
 
 ;;;; Helpers
@@ -233,6 +233,16 @@
 
 (def-simple-typed-columns
   text)
+
+;;; Binary data type
+
+(def-simple-typed-columns
+  blob)
+
+;;; Boolean type
+
+(def-simple-typed-columns
+  boolean)
 
 ;;; Data/time types
 

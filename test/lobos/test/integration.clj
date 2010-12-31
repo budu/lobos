@@ -7,7 +7,7 @@
 ;; You must not remove this notice, or any other, from this software.
 
 (ns lobos.test.integration
-  (:refer-clojure :exclude [bigint char compile double drop float])
+  (:refer-clojure :exclude [bigint boolean char compile double drop float])
   (:use clojure.test
         (clojure [string :only [join]])
         (clojure.contrib [io :only [delete-file
