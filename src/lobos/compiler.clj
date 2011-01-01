@@ -51,6 +51,17 @@
   (let [schema (:schema db-spec)]
     (as-str (when schema (as-str (:schema db-spec) ".")) name)))
 
+(defn as-identifier
+  "Constructs an Identifier ast object and compile it."
+  [db-spec name]
+  (compile (lobos.ast.Identifier. db-spec name)))
+
+(defn as-schema-qualified-identifier
+  "Constructs an schema qualified identifier ast object and compile it."
+  [db-spec name]
+  (as-identifier db-spec
+    (as-schema-qualified-name db-spec name)))
+
 (defn unsupported
   "Throws an UnsupportedOperationException using the given message."
   [msg]
@@ -73,6 +84,11 @@
 
 ;;;; Default compiler
 
+(defmethod compile [::standard lobos.ast.Identifier]
+  [identifier]
+  (let [{:keys [value]} identifier]
+    (as-str \" value \")))
+
 ;;; Expressions
 
 (defmethod compile [::standard lobos.ast.ValueExpression]
@@ -92,11 +108,11 @@
 
 (defmethod compile [::standard lobos.ast.ColumnDefinition]
   [definition]
-  (let [{:keys [cname data-type default
+  (let [{:keys [db-spec cname data-type default
                 auto-inc not-null others]} definition]
     (join \space
       (concat
-       [(as-str cname)
+       [(as-identifier db-spec cname)
         (str (as-sql-keyword (:dtype data-type))
              (as-list (:args data-type)))]
        (when default  ["DEFAULT" (compile default)])
@@ -106,28 +122,28 @@
 
 (defmethod compile [::standard lobos.ast.UniqueConstraintDefinition]
   [definition]
-  (let [{:keys [cname ctype columns]} definition
+  (let [{:keys [db-spec cname ctype columns]} definition
         spec (join \space
                [(as-sql-keyword ctype)
-                (as-list columns)])]
+                (as-list (map (partial as-identifier db-spec) columns))])]
     (if cname
-      (join \space [(as-str cname) spec])
+      (join \space [(as-identifier db-spec cname) spec])
       spec)))
 
 ;;; Statements
 
 (defmethod compile [::standard lobos.ast.CreateSchemaStatement]
   [statement]
-  (let [{:keys [sname elements]} statement]
+  (let [{:keys [db-spec sname elements]} statement]
     (str "CREATE SCHEMA "
          (join "\n\n" (conj (map compile elements)
-                            (as-str sname))))))
+                            (as-identifier db-spec sname))))))
 
 (defmethod compile [::standard lobos.ast.CreateTableStatement]
   [statement]
   (let [{:keys [db-spec tname elements]} statement]
     (format "CREATE TABLE %s %s"
-            (as-schema-qualified-name db-spec tname)
+            (as-schema-qualified-identifier db-spec tname)
             (or (as-list (map compile elements))
                 "()"))))
 
@@ -138,5 +154,5 @@
       (concat
        ["DROP"
         (as-sql-keyword otype)
-        (as-schema-qualified-name db-spec oname)]
+        (as-schema-qualified-identifier db-spec oname)]
        (when behavior [(as-sql-keyword behavior)])))))
