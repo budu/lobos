@@ -14,11 +14,11 @@
 
 (defmethod compiler/compile [:postgresql lobos.ast.ColumnDefinition]
   [definition]
-  (let [{:keys [cname data-type default
+  (let [{:keys [db-spec cname data-type default
                 auto-inc not-null others]} definition]
     (join \space
       (concat
-       [(compiler/as-str cname)
+       [(compiler/as-identifier db-spec cname)
         (if auto-inc
           "SERIAL"
           (str (compiler/as-sql-keyword (:dtype data-type))
