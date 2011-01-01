@@ -59,8 +59,9 @@
 (defn as-schema-qualified-identifier
   "Constructs an schema qualified identifier ast object and compile it."
   [db-spec name]
-  (as-identifier db-spec
-    (as-schema-qualified-name db-spec name)))
+  (let [schema (:schema db-spec)]
+    (str (when schema (str (as-identifier db-spec schema) "."))
+         (as-identifier db-spec name))))
 
 (defn unsupported
   "Throws an UnsupportedOperationException using the given message."
