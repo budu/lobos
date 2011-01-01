@@ -15,6 +15,8 @@
                                 replace
                                 upper-case]])))
 
+(declare compile)
+
 ;;;; Helpers
 
 (defn as-str ; taken from clojure.contrib.string
