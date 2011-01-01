@@ -115,7 +115,7 @@
      dtype
      (case dtype
        :varchar [(:column_size col-meta)]
-       nil))))
+       []))))
 
 (defn analyze-expression
   "Returns the Clojure equivalent of the given SQL expression. Just a
