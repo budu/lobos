@@ -188,7 +188,7 @@
                   (or (-> schema :options :db-spec)
                       cnx))
         schema (if schema
-                 (merge schema {:db-spec db-spec})
+                 (assoc-in schema [:options :db-spec] db-spec)
                  (schema/schema schema-or-name {:db-spec db-spec}))]
     (execute (schema/build-create-statement schema db-spec) db-spec)
     (update-global-schema schema)))
@@ -204,6 +204,6 @@
                   (or (-> schema :options :db-spec)
                       cnx))
         schema (if schema
-                 (merge schema {:db-spec db-spec})
+                 (assoc-in schema [:options :db-spec] db-spec)
                  (schema/schema schema-or-name {:db-spec db-spec}))]
     (execute (schema/build-drop-statement schema behavior db-spec) db-spec)))
