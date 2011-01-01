@@ -62,23 +62,23 @@
 
 (deftest test-compile-column-definition
   (is (= (compile column-definition-stub)
-         "foo INTEGER")
+         "\"foo\" INTEGER")
       "Compiling a simple column definition")
   (is (= (compile (assoc column-definition-stub
                     :default (lobos.ast.ValueExpression. nil 0)))
-         "foo INTEGER DEFAULT 0")
+         "\"foo\" INTEGER DEFAULT 0")
       "Compiling a column definition with default value")
   (is (= (compile (assoc column-definition-stub
                     :auto-inc (lobos.ast.AutoIncClause. nil)))
-         "foo INTEGER GENERATED ALWAYS AS IDENTITY")
+         "\"foo\" INTEGER GENERATED ALWAYS AS IDENTITY")
       "Compiling a column definition with auto-incrementing clause")
   (is (= (compile (assoc column-definition-stub
                     :not-null true))
-         "foo INTEGER NOT NULL")
+         "\"foo\" INTEGER NOT NULL")
       "Compiling a column definition with not null option")
   (is (= (compile (assoc column-definition-stub
                     :others ["BAR" "BAZ"]))
-         "foo INTEGER BAR BAZ")
+         "\"foo\" INTEGER BAR BAZ")
       "Compiling a column definition with custom options"))
 
 (def unique-constraint-definition-stub
@@ -90,15 +90,15 @@
 
 (deftest test-compile-unique-constraint-definition
   (is (= (compile unique-constraint-definition-stub)
-         "UNIQUE (foo, bar, baz)")
+         "UNIQUE (\"foo\", \"bar\", \"baz\")")
       "Compiling an unnamed unique constraint definition")
   (is (= (compile (assoc unique-constraint-definition-stub
                     :cname :foo))
-         "foo UNIQUE (foo, bar, baz)")
+         "\"foo\" UNIQUE (\"foo\", \"bar\", \"baz\")")
       "Compiling a named unique constraint definition")
   (is (= (compile (assoc unique-constraint-definition-stub
                     :ctype :primary-key))
-         "PRIMARY KEY (foo, bar, baz)")
+         "PRIMARY KEY (\"foo\", \"bar\", \"baz\")")
       "Compiling an unnamed primary key constraint definition"))
 
 (def create-schema-statement-stub
@@ -115,16 +115,16 @@
 
 (deftest test-compile-create-schema-statement
   (is (= (compile create-schema-statement-stub)
-         "CREATE SCHEMA foo")
+         "CREATE SCHEMA \"foo\"")
       "Compiling an empty create schema statement")
   (is (= (compile (assoc create-schema-statement-stub
                     :elements [create-table-statement-stub]))
-         "CREATE SCHEMA foo\n\nCREATE TABLE foo ()")
+         "CREATE SCHEMA \"foo\"\n\nCREATE TABLE \"foo\" ()")
       "Compiling a create schema statement containing a table"))
 
 (deftest test-compile-create-table-statement
   (is (= (compile create-table-statement-stub)
-         "CREATE TABLE foo ()")
+         "CREATE TABLE \"foo\" ()")
       "Compiling a create table statement"))
 
 (def drop-statement-stub
@@ -136,9 +136,9 @@
 
 (deftest test-compile-drop-statement
   (is (= (compile drop-statement-stub)
-         "DROP SCHEMA foo")
+         "DROP SCHEMA \"foo\"")
       "Compiling a drop statement")
   (is (= (compile (assoc drop-statement-stub
                     :behavior :cascade))
-         "DROP SCHEMA foo CASCADE")
+         "DROP SCHEMA \"foo\" CASCADE")
       "Compiling a drop statement with cascade behavior"))
