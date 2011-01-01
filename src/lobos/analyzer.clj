@@ -44,11 +44,8 @@
 (defn as-keyword [s]
   (-> s lower-case (replace \_ \-) keyword))
 
-(defn identifier [kw]
-  (let [s (name kw)]
-    (cond (.storesLowerCaseIdentifiers (db-meta)) (lower-case s)
-          (.storesUpperCaseIdentifiers (db-meta)) (upper-case s)
-          :else s)))
+(defn identifier [kw] ; temporary hack until I sort this out
+  (name kw))
 
 ;;;; Constraints analysis
 
@@ -125,18 +122,22 @@
   stub currently."
   [expr]
   (when expr
-    (let [[_ & [value dtype]] (first (re-seq #"(.*)::(.*)" expr))]
-      (read-string (replace (str value) \' \")))))
+    (if-let [[[_ func]] (re-seq #"(\w+)\(\)" expr)]
+      (as-keyword func)
+      (let [[_ & [value dtype]] (first (re-seq #"(.*)::(.*)" expr))]
+        (read-string (replace (str value) \' \"))))))
 
 (defn analyze-column
   "Returns an abstract column definition given a column meta-data."
   [col-meta]
-  (lobos.schema.Column. (-> col-meta :column_name as-keyword)
-                        (analyze-data-type col-meta)
-                        (analyze-expression (:column_def col-meta))
-                        (= (:is_autoincrement col-meta) "YES")
-                        (= (:is_nullable col-meta) "NO")
-                        []))
+  (let [auto-inc (= (:is_autoincrement col-meta) "YES")]
+    (lobos.schema.Column. (-> col-meta :column_name as-keyword)
+                          (analyze-data-type col-meta)
+                          (when-not auto-inc
+                            (analyze-expression (:column_def col-meta)))
+                          auto-inc
+                          (= (:is_nullable col-meta) "NO")
+                          [])))
 
 (defn columns
   "Returns a list of abstract column definitions for the specified
