@@ -12,14 +12,19 @@
   (:require (lobos [compiler :as compiler]))
   (:use (clojure [string :only [join]])))
 
+(defmethod compiler/compile [:h2 lobos.ast.AutoIncClause]
+  [_]
+  "AUTO_INCREMENT")
+
 (defmethod compiler/compile [:h2 lobos.ast.CreateSchemaStatement]
   [statement]
-  (let [{:keys [sname elements]} statement]
+  (let [{:keys [db-spec sname elements]} statement]
     (join ";\n\n"
           (conj (map (comp compiler/compile
                            #(assoc-in % [:db-spec :schema] sname))
                      elements)
-                (compiler/as-str "CREATE SCHEMA " sname)))))
+                (str "CREATE SCHEMA IF NOT EXISTS "
+                     (compiler/as-identifier db-spec sname))))))
 
 (defmethod compiler/compile [:h2 lobos.ast.DropStatement]
   [statement]
@@ -28,6 +33,6 @@
       (concat
        ["DROP"
         (compiler/as-sql-keyword otype)
-        (compiler/as-schema-qualified-name db-spec oname)]
+        (compiler/as-schema-qualified-identifier db-spec oname)]
        (when (and behavior (#{:table} otype))
          [(compiler/as-sql-keyword behavior)])))))
