@@ -181,7 +181,8 @@
   "Returns the abstract schema definition for the specified schema name
   using the given connection-info if specified or the default one."
   [sname & [connection-info]]
-  (let [db-spec (conn/get-db-spec connection-info)
+  (let [sname (keyword sname)
+        db-spec (conn/get-db-spec connection-info)
         options {:db-spec db-spec}]
     (with-db-meta connection-info
       (when ((set (schemas)) sname)
