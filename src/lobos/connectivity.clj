@@ -11,9 +11,27 @@
   (:require (clojure.contrib.sql [internal :as sqlint]))
   (:use (clojure.contrib [def :only [defalias defvar]])))
 
-;;;; Global connection
+;;;; Globals
 
 (defonce global-connections (atom {}))
+
+;;;; Helpers
+
+(defalias connection sqlint/connection*)
+
+(defn get-db-spec
+  "Returns the associated db-spec or itself."
+  [& [connection-info]]
+  (let [connection-info (or connection-info :default-connection)]
+    (if (keyword? connection-info)
+      (-> @global-connections connection-info :db-spec)
+      connection-info)))
+
+(defn- get-cnx [db-spec]
+  (let [db-spec (dissoc db-spec :schema)]
+    (sqlint/get-connection db-spec)))
+
+;;;; Global connection
 
 (defn open-global
   "Supplied with a keyword identifying a global connection, that connection
@@ -25,7 +43,7 @@
        (Exception.
         (format "A global connection by that name already exists (%s)"
                 connection-name)))
-      (let [cnx (sqlint/get-connection db-spec)]
+      (let [cnx (get-cnx db-spec)]
         (when-let [ac (-> db-spec :auto-commit)]
           (.setAutoCommit cnx ac))
         (swap! global-connections assoc
@@ -72,7 +90,7 @@
   "Evaluates func in the context of a new connection to a database then
   closes the connection."
   [db-spec func]
-  (with-open [cnx (sqlint/get-connection db-spec)]
+  (with-open [cnx (get-cnx db-spec)]
     (binding [sqlint/*db* (assoc sqlint/*db*
                             :connection cnx
                             :level 0
@@ -117,10 +135,6 @@
         with-named-connection
         with-spec-connection) connection-info# (fn [] ~@body))))
 
-;;;; Helpers
-
-(defalias connection sqlint/connection*)
-
 (defn default-connection
   "Returns the default connection if it exists."
   []
@@ -128,11 +142,3 @@
     (with-named-connection :default-connection
       connection)
     (catch Exception e nil)))
-
-(defn get-db-spec
-  "Returns the associated db-spec or itself."
-  [& [connection-info]]
-  (let [connection-info (or connection-info :default-connection)]
-    (if (keyword? connection-info)
-      (-> @global-connections connection-info :db-spec)
-      connection-info)))
