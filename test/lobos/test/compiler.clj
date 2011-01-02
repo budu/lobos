@@ -39,7 +39,7 @@
 
 (deftest test-compile-value-expression
   (is (= (compile (lobos.ast.ValueExpression. nil :foo))
-         "FOO()")
+         "FOO")
       "Compiling a parameter-less function")
   (is (= (compile (lobos.ast.ValueExpression. nil "foo"))
          "'foo'")

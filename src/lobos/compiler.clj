@@ -97,7 +97,7 @@
 (defmethod compile [::standard lobos.ast.ValueExpression]
   [expression]
   (let [{:keys [specification]} expression]
-    (cond (keyword? specification) (str (as-sql-keyword specification) "()")
+    (cond (keyword? specification) (str (as-sql-keyword specification))
           (string? specification) (str "'" specification "'")
           :else specification)))
 
