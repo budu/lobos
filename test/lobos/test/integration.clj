@@ -32,9 +32,6 @@
 (def db-specs [h2-spec
                postgresql-spec])
 
-(def *db-spec* nil)
-
-;;;; Helpers
 
 (defn driver-available? [db-spec]
   (try
@@ -42,11 +39,17 @@
     true
     (catch ClassNotFoundException e false)))
 
+(def available-specs (filter driver-available? db-specs))
+
+(def *db-spec* nil)
+
+;;;; Helpers
+
 (defmacro def-db-test [name & body]
-  `(deftest ~name
-     (doseq [db-spec# available-specs]
-       (binding [*db-spec* db-spec#]
-         ~@body))))
+  `(do ~@(for [db-spec available-specs]
+           `(deftest ~(symbol (str name "-" (:subprotocol db-spec)))
+              (binding [*db-spec* ~db-spec]
+                ~@body)))))
 
 (defmacro with-schema [[var-name sname] & body]
   `(let [~var-name (create-schema ~sname *db-spec*)]
@@ -72,8 +75,6 @@
 (use-fixtures :once remove-tmp-files-fixture)
 
 ;;;; Tests
-
-(def available-specs (filter driver-available? db-specs))
 
 (def-db-test test-create-and-drop-schema
   (with-schema [lobos :lobos]
