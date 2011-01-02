@@ -14,39 +14,41 @@
 ;;;; Constraint definition tests
 
 (deftest test-constraint
-  (is (= (constraint {} :foo :bar :baz)
-         {:constraints (list (lobos.schema.Constraint. :foo :bar :baz))})
+  (is (= (table :foo (constraint :foo :bar :baz))
+         (table* :foo {} {:foo (lobos.schema.Constraint. :foo :bar :baz)} {}))
       "Constraint definition"))
 
 (deftest test-unique-constraint
-  (is (= (unique-constraint {} :foo :bar (list :baz))
-         {:constraints (list (lobos.schema.Constraint.
-                              nil
-                              :foo
-                              {:columns [:bar :baz]}))})
+  (is (= (table :foo (unique-constraint :foo :bar (list :baz)))
+         (table* :foo {}
+                 {nil (lobos.schema.Constraint.
+                       nil
+                       :foo
+                       {:columns [:bar :baz]})} {}))
       "Unnamed unique constraint definition")
-  (is (= (unique-constraint {:columns [:bar]} :foo :bar (list :baz))
-         {:columns [:bar]
-          :constraints (list (lobos.schema.Constraint.
-                              :bar
-                              :foo
-                              {:columns [:baz]}))})
+  (is (= (table :foo (column :bar nil nil)
+                (unique-constraint :foo :bar (list :baz)))
+         (table* :foo {:bar (column* :bar nil nil)}
+                 {:bar (lobos.schema.Constraint.
+                        :bar
+                        :foo
+                        {:columns [:baz]})} {}))
       "Named unique constraint definition"))
 
 (deftest test-primary-key
-  (is (= (primary-key {} :foo :bar :baz)
-         {:constraints (list (lobos.schema.Constraint.
-                              nil
-                              :primary-key
-                              {:columns [:foo :bar :baz]}))})
+  (is (= (table :foo (primary-key :foo :bar :baz))
+         (table* :foo {} {nil (lobos.schema.Constraint.
+                               nil
+                               :primary-key
+                               {:columns [:foo :bar :baz]})} {}))
       "Primary key constraint definition"))
 
 (deftest test-unique
-  (is (= (unique {} :foo :bar :baz)
-         {:constraints (list (lobos.schema.Constraint.
-                              nil
-                              :unique
-                              {:columns [:foo :bar :baz]}))})
+  (is (= (table :foo (unique :foo :bar :baz))
+         (table* :foo {} {nil (lobos.schema.Constraint.
+                               nil
+                               :unique
+                               {:columns [:foo :bar :baz]})} {}))
       "Unique constraint definition"))
 
 ;;;; Column definition tests
@@ -59,73 +61,73 @@
     (is (thrown? IllegalArgumentException
                  (column {} nil nil nil))
         "Invalid column definition")
-    (is (= (column {} :foo nil nil)
-           {:columns (list column-definition-stub)})
+    (is (= (table :foo (column :foo nil nil))
+           (table* :foo {:foo column-definition-stub} {} {}))
         "Column with name and data-type")
-    (is (= (column {} :foo nil [:auto-inc])
-           {:columns (list (assoc column-definition-stub
-                             :auto-inc true))})
+    (is (= (table :foo (column :foo nil [:auto-inc]))
+           (table* :foo {:foo (assoc column-definition-stub
+                                :auto-inc true)} {} {}))
         "Setting column as auto incremented")
-    (is (= (column {} :foo nil [:not-null])
-           {:columns (list (assoc column-definition-stub
-                             :not-null true))})
+    (is (= (table :foo (column :foo nil [:not-null]))
+           (table* :foo {:foo (assoc column-definition-stub
+                                :not-null true)} {} {}))
         "Setting column as not null")
-    (is (= (column {} :foo nil [[:default 0]])
-           {:columns (list (assoc column-definition-stub
-                             :default 0))})
+    (is (= (table :foo (column :foo nil [[:default 0]]))
+           (table* :foo {:foo (assoc column-definition-stub
+                                :default 0)} {} {}))
         "Setting default value")
-    (is (= (column {} :foo nil ["BAR"])
-           {:columns (list (assoc column-definition-stub
-                             :others ["BAR"]))})
+    (is (= (table :foo (column :foo nil ["BAR"]))
+           (table* :foo {:foo (assoc column-definition-stub
+                                :others ["BAR"])} {} {}))
         "Setting custom options")))
 
 (deftest test-typed-column
   (testing "Typed column definition"
-    (is (= (integer {} :foo)
-           {:columns (list (assoc column-definition-stub
-                             :data-type (data-type :integer)))})
+    (is (= (table :foo (integer :foo))
+           (table* :foo {:foo (assoc column-definition-stub
+                                :data-type (data-type :integer))} {} {}))
         "Integer")
-    (is (= (numeric {} :foo)
-           {:columns (list (assoc column-definition-stub
-                             :data-type (data-type :numeric)))})
+    (is (= (table :foo (numeric :foo))
+           (table* :foo {:foo (assoc column-definition-stub
+                                :data-type (data-type :numeric))} {} {}))
         "Numeric")
-    (is (= (numeric {} :foo 2)
-           {:columns (list (assoc column-definition-stub
-                             :data-type (data-type :numeric 2)))})
+    (is (= (table :foo (numeric :foo 2))
+           (table* :foo {:foo (assoc column-definition-stub
+                                :data-type (data-type :numeric 2))} {} {}))
         "Numeric with precision")
-    (is (= (numeric {} :foo 2 4)
-           {:columns (list (assoc column-definition-stub
-                             :data-type (data-type :numeric 2 4)))})
+    (is (= (table :foo (numeric :foo 2 4))
+           (table* :foo {:foo (assoc column-definition-stub
+                                :data-type (data-type :numeric 2 4))} {} {}))
         "Numeric with precision and scale")
-    (is (= (numeric {} :foo "BAR")
-           {:columns (list (assoc column-definition-stub
-                             :data-type (data-type :numeric)
-                             :others ["BAR"]))})
+    (is (= (table :foo (numeric :foo "BAR"))
+           (table* :foo {:foo (assoc column-definition-stub
+                                :data-type (data-type :numeric)
+                                :others ["BAR"])} {} {}))
         "Numeric with other option")
-    (is (= (float {} :foo)
-           {:columns (list (assoc column-definition-stub
-                             :data-type (data-type :float)))})
+    (is (= (table :foo (float :foo))
+           (table* :foo {:foo (assoc column-definition-stub
+                                :data-type (data-type :float))} {} {}))
         "Float")
-    (is (= (float {} :foo 1)
-           {:columns (list (assoc column-definition-stub
-                             :data-type (data-type :float 1)))})
+    (is (= (table :foo (float :foo 1))
+           (table* :foo {:foo (assoc column-definition-stub
+                                :data-type (data-type :float 1))} {} {}))
         "Float with precision")
-    (is (= (varchar {} :foo)
-           {:columns (list (assoc column-definition-stub
-                             :data-type (data-type :varchar)))})
+    (is (= (table :foo (varchar :foo))
+           (table* :foo {:foo (assoc column-definition-stub
+                                :data-type (data-type :varchar))} {} {}))
         "Varchar")
-    (is (= (varchar {} :foo 1)
-           {:columns (list (assoc column-definition-stub
-                             :data-type (data-type :varchar 1)))})
+    (is (= (table :foo (varchar :foo 1))
+           (table* :foo {:foo (assoc column-definition-stub
+                                :data-type (data-type :varchar 1))} {} {}))
         "Varchar with limit")
-    (is (= (varchar {} :foo "BAR")
-           {:columns (list (assoc column-definition-stub
-                             :data-type (data-type :varchar)
-                             :others ["BAR"]))})
+    (is (= (table :foo (varchar :foo "BAR"))
+           (table* :foo {:foo (assoc column-definition-stub
+                                :data-type (data-type :varchar)
+                                     :others ["BAR"])} {} {}))
         "Varchar with other option")
-    (is (= (timestamp {} :foo)
-           {:columns (list (assoc column-definition-stub
-                             :data-type (data-type :timestamp)))})
+    (is (= (table :foo (timestamp :foo))
+           (table* :foo {:foo (assoc column-definition-stub
+                                :data-type (data-type :timestamp))} {} {}))
         "Timestamp")))
 
 ;;;; Table definition tests
@@ -140,16 +142,16 @@
 
 (deftest test-table
   (is (= (table :foo)
-         (lobos.schema.Table. :foo [] [] {}))
+         (lobos.schema.Table. :foo {} {} {}))
       "Empty table")
   (is (= (table :foo (column :foo nil nil))
-         (lobos.schema.Table. :foo [column-definition-stub] [] {}))
+         (lobos.schema.Table. :foo {:foo column-definition-stub} {} {}))
       "Table with column")
   (is (= (table :foo (constraint :foo :bar :baz))
-         (lobos.schema.Table. :foo [] [(lobos.schema.Constraint.
-                                        :foo
-                                        :bar
-                                        :baz)] {}))
+         (lobos.schema.Table. :foo {} {:foo (lobos.schema.Constraint.
+                                             :foo
+                                             :bar
+                                             :baz)} {}))
       "Table with constraint"))
 
 ;;;; Schema definition tests
