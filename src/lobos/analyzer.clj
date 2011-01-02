@@ -39,14 +39,6 @@
        (binding [*db-meta* (.getMetaData (conn/connection))]
          ~@body))))
 
-;;;; Helpers
-
-(defn as-keyword [s]
-  (-> s lower-case (replace \_ \-) keyword))
-
-(defn identifier [kw] ; temporary hack until I sort this out
-  (name kw))
-
 ;;;; Constraints analysis
 
 (defn indexes
@@ -58,8 +50,8 @@
     (sort-by :ordinal_position
       (filter (or f identity)
         (resultset-seq (.getIndexInfo (db-meta) nil
-                                      (identifier sname)
-                                      (identifier tname)
+                                      (name sname)
+                                      (name tname)
                                       false
                                       false))))))
 
@@ -67,10 +59,10 @@
   "Returns primary key names as a set of keywords."
   [sname tname]
   (set
-   (map #(-> % :pk_name as-keyword)
+   (map #(-> % :pk_name keyword)
         (resultset-seq (.getPrimaryKeys (db-meta) nil
-                                        (identifier sname)
-                                        (identifier tname))))))
+                                        (name sname)
+                                        (name tname))))))
 
 (defn unique-constraints
   "Returns a list of unique constraints for the specified schema and
@@ -78,12 +70,12 @@
   [sname tname]
   (let [pkeys (primary-keys sname tname)]
     (map (fn [[cname cmeta]]
-           (lobos.schema.Constraint. (as-keyword cname)
-                                     (if (pkeys (as-keyword cname))
+           (lobos.schema.Constraint. (keyword cname)
+                                     (if (pkeys (keyword cname))
                                        :primary-key
                                        :unique)
                                      {:columns
-                                      (vec (map #(-> % :column_name as-keyword)
+                                      (vec (map #(-> % :column_name keyword)
                                                 cmeta))}))
          (indexes sname tname #(-> % :non_unique not)))))
 
@@ -109,7 +101,7 @@
 (defn analyze-data-type
   "Returns an abstract data-type definition given a column meta-data."
   [col-meta]
-  (let [dtype (-> col-meta :type_name as-keyword)
+  (let [dtype (-> col-meta :type_name keyword)
         dtype (dtypes-replace dtype)]
     (lobos.schema.DataType.
      dtype
@@ -123,7 +115,7 @@
   [expr]
   (when expr
     (if-let [[[_ func]] (re-seq #"(\w+)\(\)" expr)]
-      (as-keyword func)
+      (keyword func)
       (let [[_ & [value dtype]] (first (re-seq #"(.*)::(.*)" expr))]
         (read-string (replace (str value) \' \"))))))
 
@@ -131,7 +123,7 @@
   "Returns an abstract column definition given a column meta-data."
   [col-meta]
   (let [auto-inc (= (:is_autoincrement col-meta) "YES")]
-    (lobos.schema.Column. (-> col-meta :column_name as-keyword)
+    (lobos.schema.Column. (-> col-meta :column_name keyword)
                           (analyze-data-type col-meta)
                           (when-not auto-inc
                             (analyze-expression (:column_def col-meta)))
@@ -145,8 +137,8 @@
   [sname tname]
   (map analyze-column
        (resultset-seq (.getColumns (db-meta) nil
-                                   (identifier sname)
-                                   (identifier tname)
+                                   (name sname)
+                                   (name tname)
                                    nil))))
 
 ;;;; Tables analysis
@@ -163,9 +155,9 @@
 (defn tables
   "Returns a list of abstract table definitions for the specified schema name."
   [sname]
-  (map #(analyze-table sname (-> % :table_name as-keyword))
+  (map #(analyze-table sname (-> % :table_name keyword))
        (resultset-seq (.getTables (db-meta) nil
-                                  (identifier sname)
+                                  (name sname)
                                   nil
                                   (into-array ["TABLE"])))))
 
@@ -174,7 +166,7 @@
 (defn schemas
   "Returns a list of schema names as keywords."
   []
-  (map #(-> % :table_schem as-keyword)
+  (map #(-> % :table_schem keyword)
        (doall (resultset-seq (.getSchemas (db-meta))))))
 
 (defn analyze-schema
