@@ -23,7 +23,7 @@
           (conj (map (comp compiler/compile
                            #(assoc-in % [:db-spec :schema] sname))
                      elements)
-                (str "CREATE SCHEMA IF NOT EXISTS "
+                (str "CREATE SCHEMA "
                      (compiler/as-identifier db-spec sname))))))
 
 (defmethod compiler/compile [:h2 lobos.ast.DropStatement]
