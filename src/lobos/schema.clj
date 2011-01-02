@@ -66,15 +66,16 @@
   table."
   [table constraint-name constraint-type specification]
   (update-in table [:constraints] conj
-             (lobos.schema.Constraint. constraint-name
-                                       constraint-type
-                                       specification)))
+             [constraint-name
+              (lobos.schema.Constraint. constraint-name
+                                        constraint-type
+                                        specification)]))
 
 (defn unique-constraint
   "Constructs an abstract unique (or primary-key depending on the given
   type) constraint definition and add it to the given table."
   [table constraint-type name-or-column columns]
-  (let [named (contains? (-> table :columns set) name-or-column)
+  (let [named (contains? (-> table :columns) name-or-column)
         constraint-name (when named name-or-column)
         columns (if named
                   columns
@@ -121,27 +122,31 @@
      not-null
      others)))
 
+(defn column*
+  "Constructs an abstract column definition."
+  [column-name data-type options]
+  (let [default  (first (filter vector? options))
+        others   (vec (filter string? options))
+        not-null (clojure.core/boolean (:not-null options))
+        auto-inc (clojure.core/boolean (:auto-inc options))]
+    (lobos.schema.Column. column-name
+                          data-type
+                          (second default)
+                          auto-inc
+                          not-null
+                          others)))
+
 (defn column
   "Constructs an abstract column definition and add it to the given
   table."
   [table column-name data-type options]
-  (let [default nil
-        default  (first (filter vector? options))
-        others   (vec (filter string? options))
-        options  (set options)
-        not-null (clojure.core/boolean (options :not-null))
-        auto-inc (clojure.core/boolean (options :auto-inc))]
+  (let [options  (set options)]
     (name-required column-name "column")
     (#(cond (options :primary-key) (primary-key % column-name)
             (options :unique) (unique % column-name)
             :else %)
      (update-in table [:columns] conj
-                (lobos.schema.Column. column-name
-                                      data-type
-                                      (second default)
-                                      auto-inc
-                                      not-null
-                                      others)))))
+                [column-name (column* column-name data-type options)]))))
 
 ;;;; Typed column definition
 
@@ -258,7 +263,7 @@
     (lobos.ast.CreateTableStatement.
      db-spec
      name
-     (map #(build-definition % db-spec)
+     (map #(build-definition %2 db-spec)
           (concat columns constraints))))
 
   (build-drop-statement [this behavior db-spec]
@@ -274,7 +279,7 @@
   "Constructs an abstract table definition containing the given
   elements."
   [name & elements]
-  `(-> (table* ~name [] [] {}) ~@elements))
+  `(-> (table* ~name {} {} {}) ~@elements))
 
 ;;;; Schema definition
 

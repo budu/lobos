@@ -148,8 +148,10 @@
   table names."
   [sname tname]
   (schema/table* tname
-                 (vec (columns sname tname))
-                 (vec (constraints sname tname))
+                 (into {} (map #(vector (:cname %) %)
+                               (columns sname tname)))
+                 (into {} (map #(vector (:cname %) %)
+                               (constraints sname tname)))
                  {}))
 
 (defn tables
