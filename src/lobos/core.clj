@@ -162,7 +162,8 @@
                                 (when ~'schema
                                   {:schema (-> ~'schema :sname name)}))]
            ~@body
-           (when ~'schema (update-global-schema ~'schema))))
+           (when ~'schema (update-global-schema (:schema ~'db-spec)
+                                                ~'db-spec))))
        (.setMeta #'~name
                  (merge (.meta #'name)
                         {:arglists '(~(vec (conj params 'cnx-or-schema?)))})))))
