@@ -56,10 +56,9 @@
   `(do ~@(for [db-spec available-specs]
            (let [db (test-db-name db-spec)]
              `(deftest ~(symbol (str name "-" (:subprotocol db-spec)))
-                (if ((set (available-global-cnx)) ~db)
+                (when ((set (available-global-cnx)) ~db)
                   (binding [*db* ~db]
-                    ~@body)
-                  (is false "Connection not available!")))))))
+                    ~@body)))))))
 
 (defmacro with-schema [[var-name sname] & body]
   `(try
@@ -84,8 +83,16 @@
   (remove-tmp-files))
 
 (defn open-global-connections-fixture [f]
+  (doseq [db-spec db-specs]
+    (when-not (driver-available? db-spec)
+      (println (format "*** Driver for %s isn't available: %s missing ***"
+                       (:subprotocol db-spec)
+                       (:classname db-spec)))))
   (doseq [db-spec available-specs]
-    (open-global db-spec (test-db-name db-spec)))
+    (try
+      (open-global db-spec (test-db-name db-spec))
+      (catch Exception _
+        (println "*** Failed to connect to" (:subprotocol db-spec) "***"))))
   (f)
   (doseq [db (available-global-cnx)]
     (close-global db)))
@@ -95,13 +102,6 @@
   open-global-connections-fixture)
 
 ;;;; Tests
-
-(deftest test-available-drivers
-  (doseq [db-spec db-specs]
-    (is (driver-available? db-spec)
-        (format "Driver for %s isn't available: %s missing"
-                (:subprotocol db-spec)
-                (:classname db-spec)))))
 
 (def-db-test test-create-and-drop-schema
   (with-schema [lobos :lobos]
