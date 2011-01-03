@@ -84,6 +84,7 @@
 (def backends-hierarchy
   (atom (-> (make-hierarchy)
             (derive :h2 ::standard)
+            (derive :mysql ::standard)
             (derive :postgresql ::standard))))
 
 (defmulti compile
