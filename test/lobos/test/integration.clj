@@ -96,6 +96,13 @@
 
 ;;;; Tests
 
+(deftest test-available-drivers
+  (doseq [db-spec db-specs]
+    (is (driver-available? db-spec)
+        (format "Driver for %s isn't available: %s missing"
+                (:subprotocol db-spec)
+                (:classname db-spec)))))
+
 (def-db-test test-create-and-drop-schema
   (with-schema [lobos :lobos]
     (is (= lobos (schema :lobos {:db-spec (get-db-spec *db*)}))
