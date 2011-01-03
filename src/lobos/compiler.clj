@@ -13,7 +13,16 @@
   (:require (lobos [ast :as ast]))
   (:use (clojure [string :only [join
                                 replace
-                                upper-case]])))
+                                upper-case]]))
+  (:import (lobos.ast AutoIncClause
+                      ColumnDefinition
+                      CreateTableStatement
+                      CreateSchemaStatement
+                      DataTypeExpression
+                      DropStatement
+                      Identifier
+                      UniqueConstraintDefinition
+                      ValueExpression)))
 
 (declare compile)
 
@@ -56,7 +65,7 @@
 (defn as-identifier
   "Constructs an Identifier ast object and compile it."
   [db-spec name]
-  (compile (lobos.ast.Identifier. db-spec name)))
+  (compile (Identifier. db-spec name)))
 
 (defn as-schema-qualified-identifier
   "Constructs an schema qualified identifier ast object and compile it."
@@ -87,14 +96,14 @@
 
 ;;;; Default compiler
 
-(defmethod compile [::standard lobos.ast.Identifier]
+(defmethod compile [::standard Identifier]
   [identifier]
   (let [{:keys [value]} identifier]
     (as-str \" value \")))
 
 ;;; Expressions
 
-(defmethod compile [::standard lobos.ast.ValueExpression]
+(defmethod compile [::standard ValueExpression]
   [expression]
   (let [{:keys [specification]} expression]
     (cond (keyword? specification) (str (as-sql-keyword specification))
@@ -103,13 +112,13 @@
 
 ;;; Clauses
 
-(defmethod compile [::standard lobos.ast.AutoIncClause]
+(defmethod compile [::standard AutoIncClause]
   [_]
   "GENERATED ALWAYS AS IDENTITY")
 
 ;;; Definitions
 
-(defmethod compile [::standard lobos.ast.ColumnDefinition]
+(defmethod compile [::standard ColumnDefinition]
   [definition]
   (let [{:keys [db-spec cname data-type default
                 auto-inc not-null others]} definition]
@@ -123,7 +132,7 @@
        (when not-null ["NOT NULL"])
        others))))
 
-(defmethod compile [::standard lobos.ast.UniqueConstraintDefinition]
+(defmethod compile [::standard UniqueConstraintDefinition]
   [definition]
   (let [{:keys [db-spec cname ctype columns]} definition
         spec (join \space
@@ -135,14 +144,14 @@
 
 ;;; Statements
 
-(defmethod compile [::standard lobos.ast.CreateSchemaStatement]
+(defmethod compile [::standard CreateSchemaStatement]
   [statement]
   (let [{:keys [db-spec sname elements]} statement]
     (str "CREATE SCHEMA "
          (join "\n\n" (conj (map compile elements)
                             (as-identifier db-spec sname))))))
 
-(defmethod compile [::standard lobos.ast.CreateTableStatement]
+(defmethod compile [::standard CreateTableStatement]
   [statement]
   (let [{:keys [db-spec tname elements]} statement]
     (format "CREATE TABLE %s %s"
@@ -150,7 +159,7 @@
             (or (as-list (map compile elements))
                 "()"))))
 
-(defmethod compile [::standard lobos.ast.DropStatement]
+(defmethod compile [::standard DropStatement]
   [statement]
   (let [{:keys [db-spec otype oname behavior]} statement]
     (join \space
