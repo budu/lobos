@@ -92,3 +92,14 @@
     (let [lobos (drop lobos (table :foo))]
       (is (nil? (-> lobos :elements :foo))
           "Checking if the table has been dropped"))))
+
+(def-db-test test-data-types
+  (with-schema [lobos :lobos]
+    (doseq [dtype [:smallint :integer :bigint :numeric :decimal :real :float
+                   :double :char :varchar :clob :blob :boolean :timestamp]]
+      (let [lobos (create lobos
+                          (table :foo
+                                 (column :bar (data-type dtype) nil)))]
+        (is (= (-> lobos :elements :foo :columns :bar :data-type :dtype)
+               (-> (column* :bar (data-type dtype) []) :data-type :dtype)))
+        (drop lobos (table :foo))))))
