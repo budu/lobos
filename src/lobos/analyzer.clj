@@ -134,10 +134,13 @@
   stub currently."
   [expr]
   (when expr
-    (if-let [[[_ func]] (re-seq #"(\w+)\(\)" expr)]
-      (keyword func)
-      (let [[_ & [value dtype]] (first (re-seq #"(.*)::(.*)" expr))]
-        (read-string (replace (str value) \' \"))))))
+    (cond (re-find #"(.*)::(.*)" expr)
+          (let [[_ & [value dtype]] (first (re-seq #"(.*)::(.*)" expr))]
+            (read-string (replace (str value) \' \")))
+          (re-find #"(\w+)(\(\))?" expr)
+          (let [[[_ func]] (re-seq #"(\w+)(\(\))?" expr)]
+            (keyword func))
+          :else (str expr))))
 
 (defn analyze-column
   "Returns an abstract column definition given a column meta-data."
