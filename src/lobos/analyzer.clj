@@ -14,7 +14,8 @@
   (:use (clojure.contrib [def :only [defvar defvar-]])
         (clojure [string :only [lower-case
                                 replace
-                                upper-case]]))
+                                upper-case]])
+        lobos.utils)
   (:import (lobos.schema Column
                          Constraint
                          DataType)))
@@ -95,22 +96,18 @@
 
 ;;;; Columns analysis
 
-(defvar- dtypes-alias
-  {:int4 :integer})
-
-(defn dtypes-replace
-  "Replaces the given data-type keyword if there's an alias found in
-  dtypes-alias."
-  [dtype]
-  (if (contains? dtypes-alias dtype)
-    (dtypes-alias dtype)
-    dtype))
+(defvar- dtypes-aliases
+  {:int2 :smallint
+   :int4 :integer
+   :int8 :bigint
+   :float4 :real
+   :float8 :float})
 
 (defn analyze-data-type
   "Returns an abstract data-type definition given a column meta-data."
   [col-meta]
   (let [dtype (-> col-meta :type_name as-keyword)
-        dtype (dtypes-replace dtype)]
+        dtype (dtypes-replace dtypes-aliases dtype)]
     (DataType.
      dtype
      (case dtype
