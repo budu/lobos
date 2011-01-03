@@ -19,6 +19,11 @@
                          Constraint
                          DataType)))
 
+;;;; Helpers
+
+(defn as-keyword [s]
+  (-> s lower-case (replace \_ \-) keyword))
+
 ;;;; Metadata
 
 (defvar *db-meta* nil)
@@ -104,7 +109,7 @@
 (defn analyze-data-type
   "Returns an abstract data-type definition given a column meta-data."
   [col-meta]
-  (let [dtype (-> col-meta :type_name keyword)
+  (let [dtype (-> col-meta :type_name as-keyword)
         dtype (dtypes-replace dtype)]
     (DataType.
      dtype
