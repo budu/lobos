@@ -122,10 +122,14 @@
 (def-db-test test-data-types
   (with-schema [lobos :lobos]
     (doseq [dtype [:smallint :integer :bigint :numeric :decimal :real :float
-                   :double :char :varchar :clob :blob :boolean :timestamp]]
+                   :double :char :clob :blob :boolean :timestamp]]
       (let [lobos (create lobos
                           (table :foo
                                  (column :bar (data-type dtype) nil)))]
         (is (= (-> lobos :elements :foo :columns :bar :data-type :dtype)
                (-> (column* :bar (data-type dtype) []) :data-type :dtype)))
-        (drop lobos (table :foo))))))
+        (drop lobos (table :foo))))
+    (let [lobos (create lobos (table :foo (varchar :bar 1)))]
+        (is (= (-> lobos :elements :foo :columns :bar :data-type :dtype)
+               (-> (column* :bar (data-type :varchar 1) []) :data-type :dtype)))
+        (drop lobos (table :foo)))))

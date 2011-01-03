@@ -117,17 +117,13 @@
            (table* :foo {:foo (assoc column-definition-stub
                                 :data-type (data-type :float 1))} {} {}))
         "Float with precision")
-    (is (= (table :foo (varchar :foo))
-           (table* :foo {:foo (assoc column-definition-stub
-                                :data-type (data-type :varchar))} {} {}))
-        "Varchar")
     (is (= (table :foo (varchar :foo 1))
            (table* :foo {:foo (assoc column-definition-stub
                                 :data-type (data-type :varchar 1))} {} {}))
         "Varchar with limit")
-    (is (= (table :foo (varchar :foo "BAR"))
+    (is (= (table :foo (varchar :foo 1 "BAR"))
            (table* :foo {:foo (assoc column-definition-stub
-                                :data-type (data-type :varchar)
+                                :data-type (data-type :varchar 1)
                                      :others ["BAR"])} {} {}))
         "Varchar with other option")
     (is (= (table :foo (timestamp :foo))
