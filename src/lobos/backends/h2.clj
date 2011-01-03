@@ -9,30 +9,33 @@
 (ns lobos.backends.h2
   "Compiler implementation for H2."
   (:refer-clojure :exclude [compile])
-  (:require (lobos [compiler :as compiler]))
-  (:use (clojure [string :only [join]])))
+  (:use (clojure [string :only [join]])
+        lobos.compiler)
+  (:import (lobos.ast AutoIncClause
+                      CreateSchemaStatement
+                      DropStatement)))
 
-(defmethod compiler/compile [:h2 lobos.ast.AutoIncClause]
+(defmethod compile [:h2 AutoIncClause]
   [_]
   "AUTO_INCREMENT")
 
-(defmethod compiler/compile [:h2 lobos.ast.CreateSchemaStatement]
+(defmethod compile [:h2 CreateSchemaStatement]
   [statement]
   (let [{:keys [db-spec sname elements]} statement]
     (join ";\n\n"
-          (conj (map (comp compiler/compile
+          (conj (map (comp compile
                            #(assoc-in % [:db-spec :schema] sname))
                      elements)
                 (str "CREATE SCHEMA "
-                     (compiler/as-identifier db-spec sname))))))
+                     (as-identifier db-spec sname))))))
 
-(defmethod compiler/compile [:h2 lobos.ast.DropStatement]
+(defmethod compile [:h2 DropStatement]
   [statement]
   (let [{:keys [db-spec otype oname behavior]} statement]
     (join \space
       (concat
        ["DROP"
-        (compiler/as-sql-keyword otype)
-        (compiler/as-schema-qualified-identifier db-spec oname)]
+        (as-sql-keyword otype)
+        (as-schema-qualified-identifier db-spec oname)]
        (when (and behavior (#{:table} otype))
-         [(compiler/as-sql-keyword behavior)])))))
+         [(as-sql-keyword behavior)])))))
