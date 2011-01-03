@@ -13,14 +13,21 @@
         (clojure.contrib [io :only [delete-file
                                     file]])
         (lobos schema analyzer compiler core connectivity)
-        (lobos.backends h2 postgresql)))
+        (lobos.backends h2 mysql postgresql)))
 
 ;;;; DB connection specifications
 
 (def h2-spec
-  {:classname "org.h2.Driver"
+  {:classname   "org.h2.Driver"
    :subprotocol "h2"
-   :subname "./lobos"})
+   :subname     "./lobos"})
+
+(def mysql-spec
+  {:classname   "com.mysql.jdbc.Driver"
+   :subprotocol "mysql"
+   :user        "lobos"
+   :password    "lobos"
+   :subname     "//localhost:3306/"})
 
 (def postgresql-spec
   {:classname   "org.postgresql.Driver"
@@ -29,9 +36,16 @@
    :password    "lobos"
    :subname     "//localhost:5432/lobos"})
 
-(def db-specs [h2-spec
-               postgresql-spec])
+(def sqlite3
+  {:classname   "org.sqlite.JDBC"
+   :subprotocol "sqlite"
+   :subname     "./lobos.sqlite3"
+   :create      true})
 
+(def db-specs [h2-spec
+               mysql-spec
+               postgresql-spec
+               sqlite3])
 
 (defn driver-available? [db-spec]
   (try
