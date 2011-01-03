@@ -48,6 +48,14 @@
        (binding [*db-meta* (.getMetaData (conn/connection))]
          ~@body))))
 
+;;;; Database features analysis
+
+(defn supports-schemas
+  "Returns the term used for schemas if the underlying database supports
+  that concept."
+  []
+  (not-empty (.getSchemaTerm (db-meta))))
+
 ;;;; Constraints analysis
 
 (defn indexes
@@ -58,20 +66,24 @@
   (group-by :index_name
     (sort-by :ordinal_position
       (filter (or f identity)
-        (resultset-seq (.getIndexInfo (db-meta) nil
-                                      (name sname)
-                                      (name tname)
-                                      false
-                                      false))))))
+        (resultset-seq
+         (.getIndexInfo (db-meta)
+                        (when-not (supports-schemas) (name sname))
+                        (when (supports-schemas) (name sname))
+                        (name tname)
+                        false
+                        false))))))
 
 (defn primary-keys
   "Returns primary key names as a set of keywords."
   [sname tname]
   (set
    (map #(-> % :pk_name keyword)
-        (resultset-seq (.getPrimaryKeys (db-meta) nil
-                                        (name sname)
-                                        (name tname))))))
+        (resultset-seq
+         (.getPrimaryKeys (db-meta)
+                          (when-not (supports-schemas) (name sname))
+                          (when (supports-schemas) (name sname))
+                          (name tname))))))
 
 (defn unique-constraints
   "Returns a list of unique constraints for the specified schema and
@@ -144,10 +156,12 @@
   schema and table names."
   [sname tname]
   (map analyze-column
-       (resultset-seq (.getColumns (db-meta) nil
-                                   (name sname)
-                                   (name tname)
-                                   nil))))
+       (resultset-seq
+        (.getColumns (db-meta)
+                     (when-not (supports-schemas) (name sname))
+                     (when (supports-schemas) (name sname))
+                     (name tname)
+                     nil))))
 
 ;;;; Tables analysis
 
@@ -166,18 +180,30 @@
   "Returns a list of abstract table definitions for the specified schema name."
   [sname]
   (map #(analyze-table sname (-> % :table_name keyword))
-       (resultset-seq (.getTables (db-meta) nil
-                                  (name sname)
-                                  nil
-                                  (into-array ["TABLE"])))))
+       (resultset-seq
+        (.getTables (db-meta)
+                    (when-not (supports-schemas) (name sname))
+                    (when (supports-schemas) (name sname))
+                    nil
+                    (into-array ["TABLE"])))))
+
+;;;; Catalogs analysis
+
+(defn catalogs
+  "Returns a list of catalog names as keywords."
+  []
+  (map #(-> % :table_cat keyword)
+       (doall (resultset-seq (.getCatalogs (db-meta))))))
 
 ;;;; Schemas analysis
 
 (defn schemas
   "Returns a list of schema names as keywords."
   []
-  (map #(-> % :table_schem keyword)
-       (doall (resultset-seq (.getSchemas (db-meta))))))
+  (if (supports-schemas)
+    (map #(-> % :table_schem keyword)
+         (doall (resultset-seq (.getSchemas (db-meta)))))
+    (catalogs)))
 
 (defn analyze-schema
   "Returns the abstract schema definition for the specified schema name
