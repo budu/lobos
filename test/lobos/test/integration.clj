@@ -12,7 +12,7 @@
         (clojure [string :only [join]])
         (clojure.contrib [io :only [delete-file
                                     file]])
-        (lobos schema analyzer compiler core)
+        (lobos schema analyzer compiler core connectivity)
         (lobos.backends h2 postgresql)))
 
 ;;;; DB connection specifications
@@ -41,21 +41,31 @@
 
 (def available-specs (filter driver-available? db-specs))
 
-(def *db-spec* nil)
+(defn available-global-cnx []
+  (filter #(re-find #":test-.*" (str %))
+    (keys @global-connections)))
+
+(defn test-db-name [db-spec]
+  (keyword (str "test-" (:subprotocol db-spec))))
+
+(def *db* nil)
 
 ;;;; Helpers
 
 (defmacro def-db-test [name & body]
   `(do ~@(for [db-spec available-specs]
-           `(deftest ~(symbol (str name "-" (:subprotocol db-spec)))
-              (binding [*db-spec* ~db-spec]
-                ~@body)))))
+           (let [db (test-db-name db-spec)]
+             `(deftest ~(symbol (str name "-" (:subprotocol db-spec)))
+                (if ((set (available-global-cnx)) ~db)
+                  (binding [*db* ~db]
+                    ~@body)
+                  (is false "Connection not available!")))))))
 
 (defmacro with-schema [[var-name sname] & body]
   `(try
-     (let [~var-name (create-schema ~sname *db-spec*)]
+     (let [~var-name (create-schema ~sname *db*)]
        ~@body)
-     (finally (drop-schema ~sname :cascade *db-spec*))))
+     (finally (drop-schema ~sname :cascade *db*))))
 
 ;;;; Fixtures
 
@@ -73,15 +83,24 @@
   (f)
   (remove-tmp-files))
 
-(use-fixtures :once remove-tmp-files-fixture)
+(defn open-global-connections-fixture [f]
+  (doseq [db-spec available-specs]
+    (open-global db-spec (test-db-name db-spec)))
+  (f)
+  (doseq [db (available-global-cnx)]
+    (close-global db)))
+
+(use-fixtures :once
+  remove-tmp-files-fixture
+  open-global-connections-fixture)
 
 ;;;; Tests
 
 (def-db-test test-create-and-drop-schema
   (with-schema [lobos :lobos]
-    (is (= lobos (schema :lobos {:db-spec *db-spec*}))
+    (is (= lobos (schema :lobos {:db-spec (get-db-spec *db*)}))
         "Checking if the schema has been created"))
-  (is (nil? (analyze-schema :lobos *db-spec*))
+  (is (nil? (analyze-schema :lobos *db*))
       "Checking if the schema has been dropped"))
 
 (def-db-test test-create-and-drop-table
