@@ -9,7 +9,15 @@
 (ns lobos.test.compiler
   (:refer-clojure :exclude [compile])
   (:use [lobos.compiler] :reload)
-  (:use [clojure.test]))
+  (:use [clojure.test])
+  (:import (lobos.ast AutoIncClause
+                      ColumnDefinition
+                      CreateTableStatement
+                      CreateSchemaStatement
+                      DataTypeExpression
+                      DropStatement
+                      UniqueConstraintDefinition
+                      ValueExpression)))
 
 ;;;; Helpers
 
@@ -38,38 +46,32 @@
 ;;;; Default compiler
 
 (deftest test-compile-value-expression
-  (is (= (compile (lobos.ast.ValueExpression. nil :foo))
+  (is (= (compile (ValueExpression. nil :foo))
          "FOO")
       "Compiling a parameter-less function")
-  (is (= (compile (lobos.ast.ValueExpression. nil "foo"))
+  (is (= (compile (ValueExpression. nil "foo"))
          "'foo'")
       "Compiling a string value"))
 
 (deftest test-compile-auto-inc-clause
-  (is (= (compile (lobos.ast.AutoIncClause. nil))
+  (is (= (compile (AutoIncClause. nil))
          "GENERATED ALWAYS AS IDENTITY")
       "Compiling an auto-incrementing clause"))
 
 (def column-definition-stub
-     (lobos.ast.ColumnDefinition.
-      nil
-      :foo
-      (lobos.ast.DataTypeExpression. nil :integer nil)
-      nil
-      false
-      false
-      []))
+  (let [data-type (DataTypeExpression. nil :integer nil)]
+    (ColumnDefinition. nil :foo data-type nil false false [])))
 
 (deftest test-compile-column-definition
   (is (= (compile column-definition-stub)
          "\"foo\" INTEGER")
       "Compiling a simple column definition")
   (is (= (compile (assoc column-definition-stub
-                    :default (lobos.ast.ValueExpression. nil 0)))
+                    :default (ValueExpression. nil 0)))
          "\"foo\" INTEGER DEFAULT 0")
       "Compiling a column definition with default value")
   (is (= (compile (assoc column-definition-stub
-                    :auto-inc (lobos.ast.AutoIncClause. nil)))
+                    :auto-inc (AutoIncClause. nil)))
          "\"foo\" INTEGER GENERATED ALWAYS AS IDENTITY")
       "Compiling a column definition with auto-incrementing clause")
   (is (= (compile (assoc column-definition-stub
@@ -82,11 +84,7 @@
       "Compiling a column definition with custom options"))
 
 (def unique-constraint-definition-stub
-     (lobos.ast.UniqueConstraintDefinition.
-      nil
-      nil
-      :unique
-      [:foo :bar :baz]))
+  (UniqueConstraintDefinition. nil nil :unique [:foo :bar :baz]))
 
 (deftest test-compile-unique-constraint-definition
   (is (= (compile unique-constraint-definition-stub)
@@ -102,16 +100,10 @@
       "Compiling an unnamed primary key constraint definition"))
 
 (def create-schema-statement-stub
-     (lobos.ast.CreateSchemaStatement.
-      nil
-      :foo
-      []))
+  (CreateSchemaStatement. nil :foo []))
 
 (def create-table-statement-stub
-     (lobos.ast.CreateTableStatement.
-      nil
-      :foo
-      []))
+  (CreateTableStatement. nil :foo []))
 
 (deftest test-compile-create-schema-statement
   (is (= (compile create-schema-statement-stub)
@@ -128,11 +120,7 @@
       "Compiling a create table statement"))
 
 (def drop-statement-stub
-     (lobos.ast.DropStatement.
-      nil
-      :schema
-      :foo
-      nil))
+  (DropStatement. nil :schema :foo nil))
 
 (deftest test-compile-drop-statement
   (is (= (compile drop-statement-stub)
