@@ -52,9 +52,10 @@
                 ~@body)))))
 
 (defmacro with-schema [[var-name sname] & body]
-  `(let [~var-name (create-schema ~sname *db-spec*)]
-     ~@body
-     (drop-schema ~var-name)))
+  `(try
+     (let [~var-name (create-schema ~sname *db-spec*)]
+       ~@body)
+     (finally (drop-schema ~sname :cascade *db-spec*))))
 
 ;;;; Fixtures
 
