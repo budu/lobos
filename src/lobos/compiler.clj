@@ -110,6 +110,11 @@
           (string? specification) (str "'" specification "'")
           :else specification)))
 
+(defmethod compile [::standard DataTypeExpression]
+  [expression]
+  (let [{:keys [dtype args]} expression]
+    (str (as-sql-keyword dtype) (as-list args))))
+
 ;;; Clauses
 
 (defmethod compile [::standard AutoIncClause]
@@ -125,8 +130,7 @@
     (join \space
       (concat
        [(as-identifier db-spec cname)
-        (str (as-sql-keyword (:dtype data-type))
-             (as-list (:args data-type)))]
+        (compile data-type)]
        (when default  ["DEFAULT" (compile default)])
        (when auto-inc [(compile auto-inc)])
        (when not-null ["NOT NULL"])
