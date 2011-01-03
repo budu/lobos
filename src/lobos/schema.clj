@@ -245,7 +245,7 @@
   varchar)
 
 (def-simple-typed-columns
-  text)
+  clob)
 
 ;;; Binary data type
 

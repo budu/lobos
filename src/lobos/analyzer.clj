@@ -97,11 +97,14 @@
 ;;;; Columns analysis
 
 (defvar- dtypes-aliases
-  {:int2 :smallint
-   :int4 :integer
-   :int8 :bigint
+  {:bool   :boolean
+   :bytea  :blob
    :float4 :real
-   :float8 :float})
+   :float8 :float
+   :int2   :smallint
+   :int4   :integer
+   :int8   :bigint
+   :text   :clob})
 
 (defn analyze-data-type
   "Returns an abstract data-type definition given a column meta-data."

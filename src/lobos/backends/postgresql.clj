@@ -18,6 +18,7 @@
 
 (defvar- dtypes-aliases
   {:blob :bytea
+   :clob :text
    :double :double-precision})
 
 (defmethod compile [:postgresql DataTypeExpression]
