@@ -9,19 +9,24 @@
 (ns lobos.test.schema
   (:refer-clojure :exclude [bigint boolean char double float])
   (:use [lobos.schema] :reload)
-  (:use [clojure.test]))
+  (:use [clojure.test])
+  (:import (lobos.schema Column
+                         Constraint
+                         DataType
+                         Table
+                         Schema)))
 
 ;;;; Constraint definition tests
 
 (deftest test-constraint
   (is (= (table :foo (constraint :foo :bar :baz))
-         (table* :foo {} {:foo (lobos.schema.Constraint. :foo :bar :baz)} {}))
+         (table* :foo {} {:foo (Constraint. :foo :bar :baz)} {}))
       "Constraint definition"))
 
 (deftest test-unique-constraint
   (is (= (table :foo (unique-constraint :foo :bar (list :baz)))
          (table* :foo {}
-                 {nil (lobos.schema.Constraint.
+                 {nil (Constraint.
                        nil
                        :foo
                        {:columns [:bar :baz]})} {}))
@@ -29,7 +34,7 @@
   (is (= (table :foo (column :bar nil nil)
                 (unique-constraint :foo :bar (list :baz)))
          (table* :foo {:bar (column* :bar nil nil)}
-                 {:bar (lobos.schema.Constraint.
+                 {:bar (Constraint.
                         :bar
                         :foo
                         {:columns [:baz]})} {}))
@@ -37,7 +42,7 @@
 
 (deftest test-primary-key
   (is (= (table :foo (primary-key :foo :bar :baz))
-         (table* :foo {} {nil (lobos.schema.Constraint.
+         (table* :foo {} {nil (Constraint.
                                nil
                                :primary-key
                                {:columns [:foo :bar :baz]})} {}))
@@ -45,7 +50,7 @@
 
 (deftest test-unique
   (is (= (table :foo (unique :foo :bar :baz))
-         (table* :foo {} {nil (lobos.schema.Constraint.
+         (table* :foo {} {nil (Constraint.
                                nil
                                :unique
                                {:columns [:foo :bar :baz]})} {}))
@@ -54,7 +59,7 @@
 ;;;; Column definition tests
 
 (def column-definition-stub
-     (lobos.schema.Column. :foo nil nil false false []))
+     (Column. :foo nil nil false false []))
 
 (deftest test-column
   (testing "Column definition"
@@ -137,21 +142,21 @@
                (table* nil nil nil nil))
       "Invalid table definition")
   (is (= (table* :foo nil nil nil)
-         (lobos.schema.Table. :foo nil nil nil))
+         (Table. :foo nil nil nil))
       "Table definition"))
 
 (deftest test-table
   (is (= (table :foo)
-         (lobos.schema.Table. :foo {} {} {}))
+         (Table. :foo {} {} {}))
       "Empty table")
   (is (= (table :foo (column :foo nil nil))
-         (lobos.schema.Table. :foo {:foo column-definition-stub} {} {}))
+         (Table. :foo {:foo column-definition-stub} {} {}))
       "Table with column")
   (is (= (table :foo (constraint :foo :bar :baz))
-         (lobos.schema.Table. :foo {} {:foo (lobos.schema.Constraint.
-                                             :foo
-                                             :bar
-                                             :baz)} {}))
+         (Table. :foo {} {:foo (Constraint.
+                                :foo
+                                :bar
+                                :baz)} {}))
       "Table with constraint"))
 
 ;;;; Schema definition tests
@@ -161,22 +166,22 @@
                (schema nil))
       "Invalid schema definition")
   (is (= (schema :foo)
-         (lobos.schema.Schema. :foo {} {}))
+         (Schema. :foo {} {}))
       "Empty schema")
   (is (= (schema :foo {:bar nil :baz nil})
-         (lobos.schema.Schema. :foo {} {:bar nil
-                                        :baz nil}))
+         (Schema. :foo {} {:bar nil
+                           :baz nil}))
       "Empty schema with option.")
   (is (= (schema :foo (table :bar) (table :baz))
-         (lobos.schema.Schema. :foo {:bar (table :bar)
+         (Schema. :foo {:bar (table :bar)
                                      :baz (table :baz)} {}))
       "Schema with elements")
   (is (= (schema :foo {:bar nil :baz nil}
                  (table :bar)
                  (table :baz))
-         (lobos.schema.Schema. :foo
-                               {:bar (table :bar)
-                                :baz (table :baz)}
-                               {:bar nil
-                                :baz nil}))
+         (Schema. :foo
+                  {:bar (table :bar)
+                   :baz (table :baz)}
+                  {:bar nil
+                   :baz nil}))
       "Schema with elements and options."))
