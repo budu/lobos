@@ -10,7 +10,15 @@
   "The abstract schema data-structure and some function to help creating
   one."
   (:refer-clojure :exclude [bigint boolean char double float])
-  (:require (lobos [ast :as ast])))
+  (:require (lobos [ast :as ast]))
+  (:import (lobos.ast AutoIncClause
+                      ColumnDefinition
+                      CreateTableStatement
+                      CreateSchemaStatement
+                      DataTypeExpression
+                      DropStatement
+                      UniqueConstraintDefinition
+                      ValueExpression)))
 
 ;;;; Helpers
 
@@ -55,7 +63,7 @@
   (build-definition [this db-spec]
     (condp contains? ctype
       #{:unique :primary-key}
-      (lobos.ast.UniqueConstraintDefinition.
+      (UniqueConstraintDefinition.
        db-spec
        cname
        ctype
@@ -67,9 +75,9 @@
   [table constraint-name constraint-type specification]
   (update-in table [:constraints] conj
              [constraint-name
-              (lobos.schema.Constraint. constraint-name
-                                        constraint-type
-                                        specification)]))
+              (Constraint. constraint-name
+                           constraint-type
+                           specification)]))
 
 (defn unique-constraint
   "Constructs an abstract unique (or primary-key depending on the given
@@ -102,7 +110,7 @@
 (defrecord DataType [dtype args])
 
 (defn data-type [dtype & args]
-  (lobos.schema.DataType. dtype (vec args)))
+  (DataType. dtype (vec args)))
 
 ;;;; Column definition
 
@@ -110,15 +118,15 @@
   Buildable
   
   (build-definition [this db-spec]
-    (lobos.ast.ColumnDefinition.
+    (ColumnDefinition.
      db-spec
      cname
-     (lobos.ast.DataTypeExpression.
+     (DataTypeExpression.
       db-spec
       (:dtype data-type)
       (:args data-type))
-     (when default (lobos.ast.ValueExpression. db-spec default))
-     (when auto-inc (lobos.ast.AutoIncClause. db-spec))
+     (when default (ValueExpression. db-spec default))
+     (when auto-inc (AutoIncClause. db-spec))
      not-null
      others)))
 
@@ -129,12 +137,12 @@
         others   (vec (filter string? options))
         not-null (clojure.core/boolean (:not-null options))
         auto-inc (clojure.core/boolean (:auto-inc options))]
-    (lobos.schema.Column. column-name
-                          data-type
-                          (second default)
-                          auto-inc
-                          not-null
-                          others)))
+    (Column. column-name
+             data-type
+             (second default)
+             auto-inc
+             not-null
+             others)))
 
 (defn column
   "Constructs an abstract column definition and add it to the given
@@ -260,20 +268,20 @@
   Creatable Dropable
   
   (build-create-statement [this db-spec]
-    (lobos.ast.CreateTableStatement.
+    (CreateTableStatement.
      db-spec
      name
-     (map #(build-definition %2 db-spec)
+     (map #(build-definition (second %) db-spec)
           (concat columns constraints))))
 
   (build-drop-statement [this behavior db-spec]
-    (lobos.ast.DropStatement. db-spec :table name behavior)))
+    (DropStatement. db-spec :table name behavior)))
 
 (defn table*
   "Constructs an abstract table definition."
   [table-name columns constraints options]
   (name-required table-name "table")
-  (lobos.schema.Table. table-name columns constraints options))
+  (Table. table-name columns constraints options))
 
 (defmacro table
   "Constructs an abstract table definition containing the given
@@ -287,18 +295,18 @@
   Creatable Dropable
   
   (build-create-statement [this db-spec]
-    (lobos.ast.CreateSchemaStatement.
+    (CreateSchemaStatement.
      db-spec
      sname
      (map #(build-create-statement (second %) db-spec) elements)))
 
   (build-drop-statement [this behavior db-spec]
-    (lobos.ast.DropStatement. db-spec :schema sname behavior)))
+    (DropStatement. db-spec :schema sname behavior)))
 
 (defn schema?
   "Returns true if the given object is a Schema."
   [o]
-  (isa? (type o) lobos.schema.Schema))
+  (isa? (type o) Schema))
 
 (defn schema
   "Constructs an abstract schema definition."
@@ -310,7 +318,7 @@
                    elements
                    (when elements
                      (conj elements options-or-element)))]
-    (lobos.schema.Schema.
+    (Schema.
      schema-name
      (into (sorted-map)
            (map #(vector (:name %) %) elements))
@@ -318,8 +326,8 @@
 
 ;;;; Definitions hierarchy
 
-(derive lobos.schema.Constraint ::definition)
-(derive lobos.schema.DataType ::definition)
-(derive lobos.schema.Column ::definition)
-(derive lobos.schema.Table ::definition)
-(derive lobos.schema.Schema ::definition)
+(derive Constraint ::definition)
+(derive DataType ::definition)
+(derive Column ::definition)
+(derive Table ::definition)
+(derive Schema ::definition)
