@@ -9,9 +9,22 @@
 (ns lobos.backends.postgresql
   "Compiler implementation for PostgreSQL."
   (:refer-clojure :exclude [compile])
-  (:use (clojure [string :only [join]])
-        lobos.compiler)
-  (:import (lobos.ast ColumnDefinition)))
+  (:use (clojure.contrib [def :only [defvar-]])
+        (clojure [string :only [join]])
+        lobos.compiler
+        lobos.utils)
+  (:import (lobos.ast ColumnDefinition
+                      DataTypeExpression)))
+
+(defvar- dtypes-aliases
+  {:blob :bytea
+   :double :double-precision})
+
+(defmethod compile [:postgresql DataTypeExpression]
+  [expression]
+  (let [{:keys [dtype args]} expression]
+    (str (as-sql-keyword (dtypes-replace dtypes-aliases dtype))
+         (as-list args))))
 
 (defmethod compile [:postgresql ColumnDefinition]
   [definition]
@@ -22,8 +35,7 @@
        [(as-identifier db-spec cname)
         (if auto-inc
           "SERIAL"
-          (str (as-sql-keyword (:dtype data-type))
-               (as-list (:args data-type))))]
+          (compile data-type))]
        (when default  ["DEFAULT" (compile default)])
        (when not-null ["NOT NULL"])
        others))))
