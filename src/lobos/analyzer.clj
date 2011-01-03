@@ -14,7 +14,10 @@
   (:use (clojure.contrib [def :only [defvar defvar-]])
         (clojure [string :only [lower-case
                                 replace
-                                upper-case]])))
+                                upper-case]]))
+  (:import (lobos.schema Column
+                         Constraint
+                         DataType)))
 
 ;;;; Metadata
 
@@ -70,13 +73,13 @@
   [sname tname]
   (let [pkeys (primary-keys sname tname)]
     (map (fn [[cname cmeta]]
-           (lobos.schema.Constraint. (keyword cname)
-                                     (if (pkeys (keyword cname))
-                                       :primary-key
-                                       :unique)
-                                     {:columns
-                                      (vec (map #(-> % :column_name keyword)
-                                                cmeta))}))
+           (Constraint. (keyword cname)
+                        (if (pkeys (keyword cname))
+                          :primary-key
+                          :unique)
+                        {:columns
+                         (vec (map #(-> % :column_name keyword)
+                                   cmeta))}))
          (indexes sname tname #(-> % :non_unique not)))))
 
 (defn constraints
@@ -103,7 +106,7 @@
   [col-meta]
   (let [dtype (-> col-meta :type_name keyword)
         dtype (dtypes-replace dtype)]
-    (lobos.schema.DataType.
+    (DataType.
      dtype
      (case dtype
        :varchar [(:column_size col-meta)]
@@ -123,13 +126,13 @@
   "Returns an abstract column definition given a column meta-data."
   [col-meta]
   (let [auto-inc (= (:is_autoincrement col-meta) "YES")]
-    (lobos.schema.Column. (-> col-meta :column_name keyword)
-                          (analyze-data-type col-meta)
-                          (when-not auto-inc
-                            (analyze-expression (:column_def col-meta)))
-                          auto-inc
-                          (= (:is_nullable col-meta) "NO")
-                          [])))
+    (Column. (-> col-meta :column_name keyword)
+             (analyze-data-type col-meta)
+             (when-not auto-inc
+               (analyze-expression (:column_def col-meta)))
+             auto-inc
+             (= (:is_nullable col-meta) "NO")
+             [])))
 
 (defn columns
   "Returns a list of abstract column definitions for the specified
