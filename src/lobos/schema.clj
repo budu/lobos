@@ -201,12 +201,26 @@
                  (apply data-type ~(keyword %) ~'dargs)
                  ~'options)))))
 
+(defmacro def-optionally-length-bounded-typed-columns
+  "Defines optionally length-bounded typed columns."
+  [& names]
+  (def-typed-columns*
+    names
+    '[table column-name & [length & options]]
+    #(list
+      `(let ~'[dargs (conj-when [] (integer? length) length)
+               options (conj-when options (not (integer? length)) length)]
+         (column ~'table
+                 ~'column-name
+                 (apply data-type ~(keyword %) ~'dargs)
+                 ~'options)))))
+
 (defmacro def-length-bounded-typed-columns
   "Defines length-bounded typed columns."
   [& names]
   (def-typed-columns*
     names
-    '[table column-name & [length & options]]
+    '[table column-name length & options]
     #(list
       `(let ~'[dargs (conj-when [] (integer? length) length)
                options (conj-when options (not (integer? length)) length)]
@@ -240,12 +254,14 @@
 
 ;;; Character types
 
-(def-length-bounded-typed-columns
+(def-optionally-length-bounded-typed-columns
   char
-  varchar)
-
-(def-simple-typed-columns
+  nchar
   clob)
+
+(def-length-bounded-typed-columns  
+  varchar
+  nvarchar)
 
 ;;; Binary data type
 
