@@ -9,11 +9,14 @@
 (ns lobos.backends.mysql
   "Compiler implementation for MySQL."
   (:refer-clojure :exclude [compile])
-  (:use (clojure [string :only [join]])
-        lobos.compiler)
+  (:use (clojure.contrib [def :only [defvar-]])
+        (clojure [string :only [join]])
+        lobos.compiler
+        lobos.utils)
   (:import (lobos.ast AutoIncClause
                       CreateSchemaStatement
                       CreateTableStatement
+                      DataTypeExpression
                       DropStatement
                       Identifier)))
 
@@ -21,6 +24,15 @@
   [identifier]
   (let [{:keys [value]} identifier]
     (as-str \` value \`)))
+
+(defvar- dtypes-aliases
+  {:clob :text})
+
+(defmethod compile [:mysql DataTypeExpression]
+  [expression]
+  (let [{:keys [dtype args]} expression]
+    (str (as-sql-keyword (dtypes-replace dtypes-aliases dtype))
+         (as-list args))))
 
 (defmethod compile [:mysql AutoIncClause]
   [_]
@@ -33,7 +45,7 @@
           (conj (map (comp compile
                            #(assoc-in % [:db-spec :schema] sname))
                      elements)
-                (str "CREATE SCHEMA IF NOT EXISTS "
+                (str "CREATE SCHEMA "
                      (as-identifier db-spec sname))))))
 
 (defmethod compile [:mysql DropStatement]

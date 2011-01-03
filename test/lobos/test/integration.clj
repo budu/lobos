@@ -126,8 +126,8 @@
 
 (def-db-test test-create-and-drop-table
   (with-schema [lobos :lobos]
-    (let [lobos (create lobos (table :foo))]
-      (is (= (-> lobos :elements :foo) (table :foo))
+    (let [lobos (create lobos (table :foo (integer :bar)))]
+      (is (= (-> lobos :elements :foo) (table :foo (integer :bar)))
           "Checking if the table has been created"))
     (let [lobos (drop lobos (table :foo))]
       (is (nil? (-> lobos :elements :foo))

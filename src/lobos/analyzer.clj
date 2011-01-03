@@ -109,10 +109,12 @@
 ;;;; Columns analysis
 
 (defvar- dtypes-aliases
-  {:bool   :boolean
+  {:bit    :boolean
+   :bool   :boolean
    :bytea  :blob
    :float4 :real
    :float8 :float
+   :int    :integer
    :int2   :smallint
    :int4   :integer
    :int8   :bigint
