@@ -57,15 +57,8 @@
 
 (defn as-identifier
   "Constructs an Identifier ast object and compile it."
-  [db-spec name]
-  (compile (Identifier. db-spec name)))
-
-(defn as-schema-qualified-identifier
-  "Constructs an schema qualified identifier ast object and compile it."
-  [db-spec name]
-  (let [schema (:schema db-spec)]
-    (str (when schema (str (as-identifier db-spec schema) "."))
-         (as-identifier db-spec name))))
+  [db-spec name & [level]]
+  (compile (Identifier. db-spec name level)))
 
 (defn unsupported
   "Throws an UnsupportedOperationException using the given message."
@@ -92,8 +85,12 @@
 
 (defmethod compile [::standard Identifier]
   [identifier]
-  (let [{:keys [value]} identifier]
-    (as-str \" value \")))
+  (let [{:keys [db-spec value level]} identifier
+        schema (:schema db-spec)]
+    (if (and (= level :schema) schema)
+      (str (when schema (str (as-identifier db-spec schema) "."))
+           (as-identifier db-spec value))
+      (as-str \" value \"))))
 
 ;;; Expressions
 
@@ -153,7 +150,7 @@
   [statement]
   (let [{:keys [db-spec tname elements]} statement]
     (format "CREATE TABLE %s %s"
-            (as-schema-qualified-identifier db-spec tname)
+            (as-identifier db-spec tname :schema)
             (or (as-list (map compile elements))
                 "()"))))
 
@@ -164,5 +161,5 @@
       (concat
        ["DROP"
         (as-sql-keyword otype)
-        (as-schema-qualified-identifier db-spec oname)]
+        (as-identifier db-spec oname :schema)]
        (when behavior [(as-sql-keyword behavior)])))))

@@ -36,6 +36,6 @@
       (concat
        ["DROP"
         (as-sql-keyword otype)
-        (as-schema-qualified-identifier db-spec oname)]
+        (as-identifier db-spec oname :schema)]
        (when (and behavior (#{:table} otype))
          [(as-sql-keyword behavior)])))))

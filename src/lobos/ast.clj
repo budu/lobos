@@ -12,7 +12,7 @@
 ;;;; Atomic records
 
 (defrecord Identifier
-  [db-spec value])
+  [db-spec value level])
 
 (defrecord Literal
   [db-spec value])

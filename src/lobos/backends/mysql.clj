@@ -22,8 +22,12 @@
 
 (defmethod compile [:mysql Identifier]
   [identifier]
-  (let [{:keys [value]} identifier]
-    (as-str \` value \`)))
+  (let [{:keys [db-spec value level]} identifier
+        schema (:schema db-spec)]
+    (if (and (= level :schema) schema)
+      (str (when schema (str (as-identifier db-spec schema) "."))
+           (as-identifier db-spec value))
+      (as-str \` value \`))))
 
 (defvar- dtypes-aliases
   {:clob :text})
@@ -55,6 +59,6 @@
       (concat
        ["DROP"
         (as-sql-keyword otype)
-        (as-schema-qualified-identifier db-spec oname)]
+        (as-identifier db-spec oname :schema)]
        (when (and behavior (#{:table} otype))
          [(as-sql-keyword behavior)])))))
