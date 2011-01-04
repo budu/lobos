@@ -50,11 +50,19 @@
 
 ;;;; Database features analysis
 
+(defn supports-catalogs
+  "Returns the term used for catalogs if the underlying database supports
+  that concept."
+  []
+  (when (.supportsCatalogsInDataManipulation (db-meta))
+    (.getCatalogTerm (db-meta))))
+
 (defn supports-schemas
   "Returns the term used for schemas if the underlying database supports
   that concept."
   []
-  (not-empty (.getSchemaTerm (db-meta))))
+  (when (.supportsSchemasInDataManipulation (db-meta))
+    (.getSchemaTerm (db-meta))))
 
 ;;;; Constraints analysis
 
@@ -63,16 +71,18 @@
   are sorted by ordinal position, grouped by index name and can be
   filtered by the given function f."
   [sname tname & [f]]
-  (group-by :index_name
-    (sort-by :ordinal_position
-      (filter (or f identity)
-        (resultset-seq
-         (.getIndexInfo (db-meta)
-                        (when-not (supports-schemas) (name sname))
-                        (when (supports-schemas) (name sname))
-                        (name tname)
-                        false
-                        false))))))
+  (try
+    (group-by :index_name
+      (sort-by :ordinal_position
+        (filter (or f identity)
+          (resultset-seq
+           (.getIndexInfo (db-meta)
+                          (when-not (supports-schemas) (name sname))
+                          (when (supports-schemas) (name sname))
+                          (name tname)
+                          false
+                          false)))))
+    (catch java.sql.SQLException _ nil)))
 
 (defn primary-keys
   "Returns primary key names as a set of keywords."
@@ -205,10 +215,10 @@
 (defn schemas
   "Returns a list of schema names as keywords."
   []
-  (if (supports-schemas)
-    (map #(-> % :table_schem keyword)
-         (doall (resultset-seq (.getSchemas (db-meta)))))
-    (catalogs)))
+  (cond (supports-schemas)
+        (map #(-> % :table_schem keyword)
+             (doall (resultset-seq (.getSchemas (db-meta)))))
+        (supports-catalogs) (catalogs)))
 
 (defn analyze-schema
   "Returns the abstract schema definition for the specified schema name
@@ -216,7 +226,10 @@
   [sname & [connection-info]]
   (let [sname (keyword sname)
         db-spec (conn/get-db-spec connection-info)
-        options {:db-spec db-spec}]
+        options {:db-spec db-spec}
+        analyze-schema* #(apply schema/schema sname options (tables sname))]
     (with-db-meta connection-info
-      (when ((set (schemas)) sname)
-        (apply schema/schema sname options (tables sname))))))
+      (if-let [schemas (schemas)]
+        (when ((set schemas) sname)
+          (analyze-schema*))
+        (analyze-schema*)))))
