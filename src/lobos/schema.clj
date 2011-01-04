@@ -11,6 +11,7 @@
   one."
   (:refer-clojure :exclude [bigint boolean char double float])
   (:require (lobos [ast :as ast]))
+  (:use (clojure [string :only [join]]))
   (:import (lobos.ast AutoIncClause
                       ColumnDefinition
                       CreateTableStatement
@@ -83,11 +84,16 @@
   "Constructs an abstract unique (or primary-key depending on the given
   type) constraint definition and add it to the given table."
   [table constraint-type name-or-column columns]
-  (let [named (contains? (-> table :columns) name-or-column)
+  (let [named (not (contains? (:columns table) name-or-column))
         constraint-name (when named name-or-column)
         columns (if named
                   columns
-                  (conj columns name-or-column))]
+                  (conj columns name-or-column))
+        constraint-name (or constraint-name
+                            (keyword
+                             (join "_"
+                               (conj (map name columns)
+                                (name constraint-type)))))]
     (constraint table
                 constraint-name
                 constraint-type

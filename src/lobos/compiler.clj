@@ -135,7 +135,9 @@
                [(as-sql-keyword ctype)
                 (as-list (map (partial as-identifier db-spec) columns))])]
     (if cname
-      (join \space [(as-identifier db-spec cname) spec])
+      (join \space ["CONSTRAINT"
+                    (as-identifier db-spec cname)
+                    spec])
       spec)))
 
 ;;; Statements
