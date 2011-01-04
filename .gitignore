@@ -10,3 +10,4 @@ pom.xml
 *.jar
 *.org
 *.db
+*.sqlite3
