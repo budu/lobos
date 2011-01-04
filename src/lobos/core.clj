@@ -126,7 +126,9 @@
   "Execute the given statement using the specified connection
   information or the bound one."
   [statement & [connection-info]]
-  (let [sql-string (compiler/compile statement)]
+  (when-let [sql-string (not-empty (if (string? statement)
+                                     statement
+                                     (compiler/compile statement)))]
     (when (= :sql @debug-level)
       (println sql-string))
     (conn/with-connection connection-info
