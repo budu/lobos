@@ -13,7 +13,7 @@
         (clojure.contrib [io :only [delete-file
                                     file]])
         (lobos schema analyzer compiler core connectivity)
-        (lobos.backends h2 mysql postgresql)))
+        (lobos.backends h2 mysql postgresql sqlite)))
 
 ;;;; DB connection specifications
 
@@ -36,7 +36,7 @@
    :password    "lobos"
    :subname     "//localhost:5432/lobos"})
 
-(def sqlite3
+(def sqlite
   {:classname   "org.sqlite.JDBC"
    :subprotocol "sqlite"
    :subname     "./lobos.sqlite3"
@@ -45,7 +45,7 @@
 (def db-specs [h2-spec
                mysql-spec
                postgresql-spec
-               sqlite3])
+               #_sqlite]) ; disabled until JDBC driver is fixed
 
 (defn driver-available? [db-spec]
   (try
@@ -78,11 +78,12 @@
   `(try
      (let [~var-name (create-schema ~sname *db*)]
        ~@body)
-     (finally (drop-schema ~sname :cascade *db*))))
+     (finally (try (drop-schema ~sname :cascade *db*)
+                   (catch Exception _#)))))
 
 ;;;; Fixtures
 
-(def tmp-files-ext '(db))
+(def tmp-files-ext '(db sqlite3))
 
 (defn remove-tmp-files []
   (let [current-dir (file-seq (file "."))
@@ -119,10 +120,14 @@
 
 (def-db-test test-create-and-drop-schema
   (with-schema [lobos :lobos]
-    (is (= lobos (schema :lobos {:db-spec (get-db-spec *db*)}))
-        "Checking if the schema has been created"))
-  (is (nil? (analyze-schema :lobos *db*))
-      "Checking if the schema has been dropped"))
+    (when (with-db-meta (-> lobos :options :db-spec)
+            (or (supports-schemas)
+                (supports-catalogs)))
+      (is (= lobos (schema :lobos {:db-spec (get-db-spec *db*)}))
+          "Checking if the schema has been created")
+      (drop-schema lobos)
+      (is (nil? (analyze-schema :lobos *db*))
+          "Checking if the schema has been dropped"))))
 
 (def-db-test test-create-and-drop-table
   (with-schema [lobos :lobos]
