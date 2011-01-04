@@ -24,16 +24,17 @@
       "Constraint definition"))
 
 (deftest test-unique-constraint
-  (is (= (table :foo (unique-constraint :foo :bar (list :baz)))
-         (table* :foo {}
-                 {nil (Constraint.
-                       nil
-                       :foo
-                       {:columns [:bar :baz]})} {}))
-      "Unnamed unique constraint definition")
   (is (= (table :foo (column :bar nil nil)
                 (unique-constraint :foo :bar (list :baz)))
          (table* :foo {:bar (column* :bar nil nil)}
+                 {:foo_bar_baz (Constraint.
+                                :foo_bar_baz
+                                :foo
+                                {:columns [:bar :baz]})} {}))
+      "Unnamed unique constraint definition")
+  (is (= (table :foo (column :baz nil nil)
+                (unique-constraint :foo :bar (list :baz)))
+         (table* :foo {:baz (column* :baz nil nil)}
                  {:bar (Constraint.
                         :bar
                         :foo
@@ -42,18 +43,18 @@
 
 (deftest test-primary-key
   (is (= (table :foo (primary-key :foo :bar :baz))
-         (table* :foo {} {nil (Constraint.
-                               nil
+         (table* :foo {} {:foo (Constraint.
+                               :foo
                                :primary-key
-                               {:columns [:foo :bar :baz]})} {}))
+                               {:columns [:bar :baz]})} {}))
       "Primary key constraint definition"))
 
 (deftest test-unique
   (is (= (table :foo (unique :foo :bar :baz))
-         (table* :foo {} {nil (Constraint.
-                               nil
+         (table* :foo {} {:foo (Constraint.
+                               :foo
                                :unique
-                               {:columns [:foo :bar :baz]})} {}))
+                               {:columns [:bar :baz]})} {}))
       "Unique constraint definition"))
 
 ;;;; Column definition tests

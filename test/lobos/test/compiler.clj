@@ -88,7 +88,7 @@
       "Compiling an unnamed unique constraint definition")
   (is (= (compile (assoc unique-constraint-definition-stub
                     :cname :foo))
-         "\"foo\" UNIQUE (\"foo\", \"bar\", \"baz\")")
+         "CONSTRAINT \"foo\" UNIQUE (\"foo\", \"bar\", \"baz\")")
       "Compiling a named unique constraint definition")
   (is (= (compile (assoc unique-constraint-definition-stub
                     :ctype :primary-key))
