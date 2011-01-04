@@ -55,13 +55,6 @@
   [s]
   (replace (-> s as-str upper-case) \- \space))
 
-(defn as-schema-qualified-name
-  "Returns a schema qualified name if db-spec contains a :schema key,
-  else it act the same as as-str."
-  [db-spec name]
-  (let [schema (:schema db-spec)]
-    (as-str (when schema (as-str (:schema db-spec) ".")) name)))
-
 (defn as-identifier
   "Constructs an Identifier ast object and compile it."
   [db-spec name]

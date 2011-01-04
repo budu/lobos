@@ -34,10 +34,6 @@
 (deftest test-as-sql-keyword
   (is (= (as-sql-keyword :foo-bar) "FOO BAR")))
 
-(deftest test-as-schema-qualified-name
-  (is (= (as-schema-qualified-name nil :foo) "foo"))
-  (is (= (as-schema-qualified-name {:schema :foo} :foo) "foo.foo")))
-
 (deftest test-unsupported
   (is (thrown-with-msg? java.lang.UnsupportedOperationException
         #"foo"
