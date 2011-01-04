@@ -71,7 +71,8 @@
   (atom (-> (make-hierarchy)
             (derive :h2 ::standard)
             (derive :mysql ::standard)
-            (derive :postgresql ::standard))))
+            (derive :postgresql ::standard)
+            (derive :sqlite ::standard))))
 
 (defmulti compile
   "Compile the given statement."
