@@ -72,7 +72,8 @@
             (derive :h2 ::standard)
             (derive :mysql ::standard)
             (derive :postgresql ::standard)
-            (derive :sqlite ::standard))))
+            (derive :sqlite ::standard)
+            (derive :sqlserver ::standard))))
 
 (defmulti compile
   "Compile the given statement."
