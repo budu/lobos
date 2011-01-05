@@ -1,5 +1,13 @@
 # Lobos History
 
+## 0.4
+
+ * Added a comprehensive set of data types
+ * Improve integration testing
+ * Minor compiler improvements
+ * Implementation of some more backends (MySQL, SQLite and SQL Server)
+ * Bug fixing
+
 ## 0.3
 
  * Unit tests for compiler, connectivity and schema namespaces

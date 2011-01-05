@@ -1,21 +1,17 @@
 # Lobos Roadmap
 
-## 0.7
+## 0.8
 
  * Support for declarative schema definition
- * Support for more database backends
 
-## 0.6
+## 0.7
 
  * Support for migration
 
-## 0.5
+## 0.6
 
  * Support for altering tables
- 
-## 0.4
 
- * Complete set of features to create simple schemas, including:
-   * Table constraints definition
-   * A comprehensive set of data types
- * Improve integration testing
+## 0.5
+
+ * Analyzer rewrite, will probably change the compiler multi-method
