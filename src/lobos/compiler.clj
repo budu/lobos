@@ -21,6 +21,7 @@
                       DataTypeExpression
                       DropStatement
                       Identifier
+                      Mode
                       UniqueConstraintDefinition
                       ValueExpression)))
 
@@ -65,6 +66,8 @@
   [msg]
   (throw (java.lang.UnsupportedOperationException. msg)))
 
+(defn mode [db-spec] (Mode. db-spec))
+
 ;;;; Compiler
 
 (def backends-hierarchy
@@ -84,6 +87,8 @@
   :hierarchy backends-hierarchy)
 
 ;;;; Default compiler
+
+(defmethod compile [::standard Mode] [_] nil)
 
 (defmethod compile [::standard Identifier]
   [identifier]

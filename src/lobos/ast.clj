@@ -9,6 +9,11 @@
 (ns lobos.ast
   "Abstract SQL syntax tree for the DDL part of the language.")
 
+;;;; Special records
+
+(defrecord Mode
+  [db-spec])
+
 ;;;; Atomic records
 
 (defrecord Identifier

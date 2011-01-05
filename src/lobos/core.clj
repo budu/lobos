@@ -131,10 +131,15 @@
                                      (compiler/compile statement)))]
     (when (= :sql @debug-level)
       (println sql-string))
-    (conn/with-connection connection-info
-      (with-open [stmt (.createStatement (conn/connection))]
-        (.execute stmt sql-string))))
-  nil)
+    (let [db-spec (conn/get-db-spec connection-info)
+          mode (compiler/compile (compiler/mode db-spec))]
+      (conn/with-connection connection-info
+        (when mode
+          (with-open [stmt (.createStatement (conn/connection))]
+            (.execute stmt mode)))
+        (with-open [stmt (.createStatement (conn/connection))]
+          (.execute stmt sql-string))))
+    nil))
 
 (defmacro defaction
   "Define an action applicable to an optional abstract schema."
