@@ -11,7 +11,8 @@
   one."
   (:refer-clojure :exclude [bigint boolean char double float])
   (:require (lobos [ast :as ast]))
-  (:use (clojure [string :only [join]]))
+  (:use (clojure.contrib [def :only [defalias]])
+        (clojure [string :only [join]]))
   (:import (lobos.ast AutoIncClause
                       ColumnDefinition
                       CreateTableStatement
@@ -248,11 +249,13 @@
 
 (def-simple-typed-columns
   real
-  double)
+  double-precision)
+
+(defalias double double-precision)
 
 (defn float
   "Constructs an abstract float column definition and add it to the
-  given table."
+  given table. The optional precision argument is impletation specific."
   [table column-name & [precision & options]]
   (let [dargs (conj-when [] (integer? precision) precision)
         options (conj-when options (not (integer? precision)) precision)]
