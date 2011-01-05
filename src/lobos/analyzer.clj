@@ -74,7 +74,8 @@
   (try
     (group-by :index_name
       (sort-by :ordinal_position
-        (filter (or f identity)
+        (filter #(and (> (:type %) 0)
+                      ((or f identity) %))
           (resultset-seq
            (.getIndexInfo (db-meta)
                           (when-not (supports-schemas) (name sname))
