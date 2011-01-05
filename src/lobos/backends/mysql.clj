@@ -35,6 +35,8 @@
 (defmethod compile [:mysql DataTypeExpression]
   [expression]
   (let [{:keys [dtype args]} expression]
+    (unsupported (= dtype :real)
+      "Use double instead.")
     (str (as-sql-keyword (dtypes-replace dtypes-aliases dtype))
          (as-list args))))
 
