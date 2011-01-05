@@ -30,7 +30,8 @@
       (as-str \` value \`))))
 
 (defvar- dtypes-aliases
-  {:clob :text})
+  {:clob :text
+   :nclob :text-character-set-utf8})
 
 (defmethod compile [:mysql DataTypeExpression]
   [expression]

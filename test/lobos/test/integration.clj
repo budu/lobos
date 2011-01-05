@@ -168,7 +168,7 @@
     (doseq [dtype [:smallint :integer :bigint
                    :numeric :decimal
                    :real :float :double
-                   :char :clob
+                   :char :nchar :clob :nclob
                    :blob
                    :boolean
                    :timestamp]]

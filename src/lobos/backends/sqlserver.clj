@@ -31,6 +31,7 @@
   {:blob :image
    :boolean :bit
    :clob :text
+   :nclob :ntext
    :timestamp :datetime})
 
 (defmethod compile [:sqlserver DataTypeExpression]

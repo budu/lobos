@@ -132,6 +132,7 @@
    :int2   :smallint
    :int4   :integer
    :int8   :bigint
+   :ntext  :nclob
    :text   :clob})
 
 (defn analyze-data-type
