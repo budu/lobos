@@ -14,7 +14,8 @@
   (:use (clojure [string :only [join
                                 replace
                                 upper-case]]))
-  (:import (lobos.ast AutoIncClause
+  (:import (java.lang UnsupportedOperationException)
+           (lobos.ast AutoIncClause
                       ColumnDefinition
                       CreateTableStatement
                       CreateSchemaStatement
@@ -63,8 +64,9 @@
 
 (defn unsupported
   "Throws an UnsupportedOperationException using the given message."
-  [msg]
-  (throw (java.lang.UnsupportedOperationException. msg)))
+  [test & [msg]]
+  (when test
+    (throw (UnsupportedOperationException. (str msg)))))
 
 (defn mode [db-spec] (Mode. db-spec))
 

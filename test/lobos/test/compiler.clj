@@ -37,7 +37,7 @@
 (deftest test-unsupported
   (is (thrown-with-msg? java.lang.UnsupportedOperationException
         #"foo"
-        (unsupported "foo"))))
+        (unsupported true "foo"))))
 
 ;;;; Default compiler
 
