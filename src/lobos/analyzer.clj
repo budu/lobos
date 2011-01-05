@@ -122,9 +122,12 @@
 (defvar- dtypes-aliases
   {:bit    :boolean
    :bool   :boolean
+   :bpchar :char
    :bytea  :blob
+   :datetime :timestamp
    :float4 :real
    :float8 :float
+   :image  :blob
    :int    :integer
    :int2   :smallint
    :int4   :integer
