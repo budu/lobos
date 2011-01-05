@@ -12,8 +12,9 @@
         (clojure [string :only [join]])
         (clojure.contrib [io :only [delete-file
                                     file]])
-        (lobos schema analyzer compiler core connectivity)
-        (lobos.backends h2 mysql postgresql sqlite sqlserver)))
+        (lobos analyzer compiler connectivity core schema utils)
+        (lobos.backends h2 mysql postgresql sqlite sqlserver))
+  (:import (java.lang UnsupportedOperationException)))
 
 ;;;; DB connection specifications
 
@@ -74,6 +75,21 @@
 (def *db* nil)
 
 ;;;; Helpers
+
+(defn first-non-runtime-cause [e]
+  (if (isa? (type e) RuntimeException)
+    (if-let [c (.getCause e)]
+      (first-non-runtime-cause c)
+      e)
+    e))
+
+(defmacro ignore-unsupported [& body]
+  `(try (doall (do ~@body))
+        (catch Exception e#
+          (if (isa? (type (first-non-runtime-cause e#))
+                    UnsupportedOperationException)
+            nil
+            (throw e#)))))
 
 (defmacro def-db-test [name & body]
   `(do ~@(for [db-spec available-specs]
@@ -149,14 +165,23 @@
 
 (def-db-test test-data-types
   (with-schema [lobos :lobos]
-    (doseq [dtype [:smallint :integer :bigint :numeric :decimal :real :float
-                   :double :char :clob :blob :boolean :timestamp]]
-      (let [lobos (create lobos
-                          (table :foo
-                                 (column :bar (data-type dtype) nil)))]
-        (is (= (-> lobos :elements :foo :columns :bar :data-type :dtype)
-               (-> (column* :bar (data-type dtype) []) :data-type :dtype)))
-        (drop lobos (table :foo))))
+    (doseq [dtype [:smallint :integer :bigint
+                   :numeric :decimal
+                   :real :float :double
+                   :char :clob
+                   :blob
+                   :boolean
+                   :timestamp]]
+       (let [eq #(dtypes-replace {:float :double
+                                  :numeric :decimal} %)
+             lobos (ignore-unsupported
+                    (create lobos
+                            (table :foo
+                                   (column :bar (data-type dtype) nil))))]
+         (when lobos
+           (is (= (eq (-> lobos :elements :foo :columns :bar :data-type :dtype))
+                  (eq (-> (column* :bar (data-type dtype) []) :data-type :dtype))))
+           (drop lobos (table :foo)))))
     (let [lobos (create lobos (table :foo (varchar :bar 100)))]
       (is (= (-> lobos :elements :foo :columns :bar :data-type :dtype)
              (-> (column* :bar (data-type :varchar 100) []) :data-type :dtype)))
