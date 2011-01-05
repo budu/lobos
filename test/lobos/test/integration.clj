@@ -13,7 +13,7 @@
         (clojure.contrib [io :only [delete-file
                                     file]])
         (lobos schema analyzer compiler core connectivity)
-        (lobos.backends h2 mysql postgresql sqlite)))
+        (lobos.backends h2 mysql postgresql sqlite sqlserver)))
 
 ;;;; DB connection specifications
 
@@ -36,16 +36,25 @@
    :password    "lobos"
    :subname     "//localhost:5432/lobos"})
 
-(def sqlite
+(def sqlite-spec
   {:classname   "org.sqlite.JDBC"
    :subprotocol "sqlite"
    :subname     "./lobos.sqlite3"
    :create      true})
 
+(def sqlserver-spec
+  {:classname    "com.microsoft.sqlserver.jdbc.SQLServerDriver"
+   :subprotocol  "sqlserver"
+   :user         "lobos"
+   :password     "lobos"
+   :subname      "//localhost:1433"
+   :databaseName "lobos"})
+
 (def db-specs [h2-spec
                mysql-spec
                postgresql-spec
-               #_sqlite]) ; disabled until JDBC driver is fixed
+               sqlite-spec
+               sqlserver-spec])
 
 (defn driver-available? [db-spec]
   (try
@@ -148,7 +157,7 @@
         (is (= (-> lobos :elements :foo :columns :bar :data-type :dtype)
                (-> (column* :bar (data-type dtype) []) :data-type :dtype)))
         (drop lobos (table :foo))))
-    (let [lobos (create lobos (table :foo (varchar :bar 1)))]
-        (is (= (-> lobos :elements :foo :columns :bar :data-type :dtype)
-               (-> (column* :bar (data-type :varchar 1) []) :data-type :dtype)))
-        (drop lobos (table :foo)))))
+    (let [lobos (create lobos (table :foo (varchar :bar 100)))]
+      (is (= (-> lobos :elements :foo :columns :bar :data-type :dtype)
+             (-> (column* :bar (data-type :varchar 100) []) :data-type :dtype)))
+      (drop lobos (table :foo)))))
