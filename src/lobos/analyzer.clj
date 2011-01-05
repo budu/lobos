@@ -126,7 +126,7 @@
    :bytea  :blob
    :datetime :timestamp
    :float4 :real
-   :float8 :float
+   :float8 :double
    :image  :blob
    :int    :integer
    :int2   :smallint
