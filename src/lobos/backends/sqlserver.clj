@@ -28,11 +28,17 @@
       (as-str \[ value \]))))
 
 (defvar- dtypes-aliases
-  {:timestamp :datetime})
+  {:blob :image
+   :boolean :bit
+   :clob :text
+   :timestamp :datetime})
 
 (defmethod compile [:sqlserver DataTypeExpression]
   [expression]
-  (let [{:keys [dtype args]} expression]
+  (let [{:keys [dtype args]} expression
+        [dtype args] (if (= dtype :double)
+                       [:float [53]]
+                       [dtype args])]
     (str (as-sql-keyword (dtypes-replace dtypes-aliases dtype))
          (as-list args))))
 
