@@ -206,7 +206,16 @@
          (conj-when (not (integer? precision)) precision)
          (conj-when (not (integer? scale)) scale))))
 
-(defmacro def-optionally-length-bounded-typed-columns
+(defmacro def-optional-precision-typed-columns
+  "Defines typed columns with optional precision."
+  [& names]
+  (def-typed-columns*
+    names
+    '[table column-name & [precision & options]]
+    '(conj-when [] (integer? precision) precision)
+    '(conj-when options (not (integer? precision)) precision)))
+
+(defmacro def-optional-length-typed-columns
   "Defines optionally length-bounded typed columns."
   [& names]
   (def-typed-columns*
@@ -241,20 +250,16 @@
 
 (defalias double double-precision)
 
-(defn float
-  "Constructs an abstract float column definition and add it to the
-  given table. The optional precision argument is impletation specific."
-  [table column-name & [precision & options]]
-  (let [dargs (conj-when [] (integer? precision) precision)
-        options (conj-when options (not (integer? precision)) precision)]
-    (column table column-name (apply data-type :float dargs) options)))
+(def-optional-precision-typed-columns
+  float)
 
 ;;; Character types
 
-(def-optionally-length-bounded-typed-columns
+(def-optional-length-typed-columns
   char
   nchar
-  clob)
+  clob
+  nclob)
 
 (def-length-bounded-typed-columns  
   varchar
@@ -262,7 +267,8 @@
 
 ;;; Binary data type
 
-(def-simple-typed-columns
+(def-optional-length-typed-columns
+  binary
   blob)
 
 ;;; Boolean type
@@ -273,7 +279,9 @@
 ;;; Data/time types
 
 (def-simple-typed-columns
-  date
+  date)
+
+(def-optional-precision-typed-columns
   time
   timestamp)
 
