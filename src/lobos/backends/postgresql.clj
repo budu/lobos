@@ -46,19 +46,23 @@
 ;;;; Compiler
 
 (defvar- compiler-data-type-aliases
-  {:blob :bytea
+  {:binary :bytea
+   :blob :bytea
    :clob :text
    :double :double-precision
-   :nclob :text})
+   :nclob :text
+   :nvarchar :varchar
+   :varbinary :bytea})
 
 (defmethod compile [:postgresql DataTypeExpression]
   [expression]
   (let [{:keys [dtype args options]} expression
-        {:keys [time-zone]} options]
+        {:keys [time-zone]} options
+        dtype (first (replace compiler-data-type-aliases [dtype]))
+        args (if (#{:bytea :text} dtype) [] args)]
     (join \space
       (concat
-       [(str (as-sql-keyword
-              (first (replace compiler-data-type-aliases [dtype])))
+       [(str (as-sql-keyword dtype)
              (as-list args))]
        (when time-zone ["WITH TIME ZONE"])))))
 

@@ -54,18 +54,20 @@
 
 (defvar- compiler-data-type-aliases
   {:clob :text
-   :nclob :text-character-set-utf8})
+   :nclob :text})
 
 (defmethod compile [:mysql DataTypeExpression]
   [expression]
   (let [{:keys [dtype args options]} expression
-        {:keys [encoding collate]} options]
+        {:keys [encoding collate]} options
+        encoding (when (= dtype :nclob) "UTF8")
+        dtype (first (replace compiler-data-type-aliases [dtype]))
+        args (if (#{:time :timestamp} dtype) [] args)]
     (unsupported (= dtype :real)
       "Use double instead.")
     (join \space
       (concat
-       [(str (as-sql-keyword
-              (first (replace compiler-data-type-aliases [dtype])))
+       [(str (as-sql-keyword dtype)
              (as-list args))]
        (when encoding ["CHARACTER SET" (as-str encoding)])
        (when collate ["COLLATE" (as-str collate)])))))

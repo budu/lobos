@@ -64,11 +64,12 @@
 (defmethod compile [:sqlserver DataTypeExpression]
   [expression]
   (let [{:keys [dtype args options]} expression
-        {:keys [collate]} options]
+        {:keys [collate]} options
+        dtype (first (replace compiler-data-type-aliases [dtype]))
+        args (if (#{:image :datetime :ntext :text} dtype) [] args)]
     (join \space
       (concat
-       [(str (as-sql-keyword
-              (first (replace compiler-data-type-aliases [dtype])))
+       [(str (as-sql-keyword dtype)
              (as-list args))]
        (when collate ["COLLATE" (as-str collate)])))))
 
