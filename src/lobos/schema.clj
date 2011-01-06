@@ -271,6 +271,9 @@
   binary
   blob)
 
+(def-length-bounded-typed-columns
+  varbinary)
+
 ;;; Boolean type
 
 (def-simple-typed-columns
