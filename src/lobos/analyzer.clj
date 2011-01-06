@@ -68,14 +68,23 @@
   (map (fn [[cname meta]] (analyze UniqueConstraint sname tname cname meta))
        (indexes-meta sname tname #(-> % :non_unique not))))
 
+(defn analyze-data-type-args
+  "Returns a vector containing the data type arguments for the given
+  column meta data."
+  [dtype column-meta]
+  (condp contains? dtype
+    #{:nvarchar :varbinary :varchar} [(:column_size column-meta)]
+    #{:binary :blob :char :clob :nchar :nclob
+      :decimal :float :numeric
+      :time :timestamp} [(:column_size column-meta)]
+    []))
+
 (defmethod analyze [::standard DataType]
   [_ column-meta]
   (let [dtype (-> column-meta :type_name as-keyword)]
     (apply schema/data-type
            dtype
-           (case dtype
-                 :varchar [(:column_size column-meta)]
-                 []))))
+           (analyze-data-type-args dtype column-meta))))
 
 (defmethod analyze [::standard Column]
   [_ column-meta]

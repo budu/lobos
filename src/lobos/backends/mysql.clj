@@ -28,7 +28,9 @@
 (defvar- analyzer-data-type-aliases
   {:bit :boolean
    :int :integer
-   :text :clob})
+   :text :clob
+   :tinyblob :blob
+   :tinytext :clob})
 
 (defmethod analyze [:mysql DataType]
   [_ column-meta]
@@ -37,9 +39,9 @@
                               [dtype]))]
     (apply schema/data-type
            dtype
-           (case dtype
-                 :varchar [(:column_size column-meta)]
-                 []))))
+           (if (#{:time :timestamp} dtype)
+             []
+             (analyze-data-type-args dtype column-meta)))))
 
 ;;;; Compiler
 

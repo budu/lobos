@@ -15,9 +15,23 @@
         lobos.utils)
   (:import (lobos.ast AutoIncClause
                       CreateSchemaStatement
+                      DataTypeExpression
                       DropStatement)))
 
 ;;;; Compiler
+
+(defmethod compile [:h2 DataTypeExpression]
+  [expression]
+  (let [{:keys [dtype args options]} expression
+        {:keys [encoding collate time-zone]} options]
+    (unsupported (= dtype :binary)
+      "Use varbinary instead.")
+    (join \space
+      (concat
+       [(str (as-sql-keyword dtype) (as-list args))]
+       (when encoding ["CHARACTER SET" (as-str encoding)])
+       (when collate ["COLLATE" (as-str collate)])
+       (when time-zone ["WITH TIME ZONE"])))))
 
 (defmethod compile [:h2 AutoIncClause]
   [_]

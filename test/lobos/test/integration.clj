@@ -125,14 +125,14 @@
 (defn open-global-connections-fixture [f]
   (doseq [db-spec db-specs]
     (when-not (driver-available? db-spec)
-      (println (format "*** Driver for %s isn't available: %s missing ***"
+      (println (format "WARNING: Driver for %s isn't available: %s missing"
                        (:subprotocol db-spec)
                        (:classname db-spec)))))
   (doseq [db-spec available-specs]
     (try
       (open-global db-spec (test-db-name db-spec))
       (catch Exception _
-        (println "*** Failed to connect to" (:subprotocol db-spec) "***"))))
+        (println "WARNING: Failed to connect to" (:subprotocol db-spec)))))
   (f)
   (doseq [db (available-global-cnx)]
     (close-global db)))
@@ -177,7 +177,7 @@
                    :numeric :decimal
                    :real :float :double
                    :char :nchar :clob :nclob
-                   :blob
+                   :binary :blob
                    :boolean
                    :date :time :timestamp]]
       (let [dtype (data-type dtype)
@@ -187,11 +187,24 @@
                                   (column :bar dtype nil))))]
         (when lobos
           (is (= (eq (-> lobos :elements :foo :columns :bar :data-type :dtype))
-                 (eq (-> (column* :bar dtype []) :data-type :dtype))))
+                 (eq (-> (column* :bar dtype []) :data-type :dtype)))
+              (str "Data type not matching for " (-> dtype :dtype name)))
           (drop lobos (table :foo)))))
-    (let [lobos (create lobos (table :foo (varchar :bar 100)))]
-      (is (= (eq (-> lobos :elements :foo :columns :bar :data-type :dtype))
-             (eq (-> (column* :bar (data-type :varchar 100) [])
-                     :data-type
-                     :dtype))))
-      (drop lobos (table :foo)))))
+    (doseq [dtype [:char :nchar :varchar :nvarchar
+                   :binary :varbinary
+                   :numeric :decimal]]
+      (let [dtype (data-type dtype 3)
+            lobos (ignore-unsupported
+                   (create lobos
+                           (table :foo
+                                  (column :bar dtype nil))))]
+        (when lobos
+          (is (= (eq (-> lobos :elements :foo :columns :bar :data-type :dtype))
+                 (eq (-> (column* :bar dtype []) :data-type :dtype)))
+              (str "Data type not matching for " (-> dtype :dtype name)))
+          (is (= (-> lobos :elements :foo :columns :bar :data-type :args)
+                 (-> (column* :bar dtype []) :data-type :args))
+              (format "Data type arguments not matching for %s %s"
+                      (-> dtype :dtype name)
+                      (:args dtype)))
+          (drop lobos (table :foo)))))))

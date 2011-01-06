@@ -39,20 +39,16 @@
                               [dtype]))]
     (apply schema/data-type
            dtype
-           (case dtype
-                 :varchar [(:column_size column-meta)]
-                 []))))
+           (analyze-data-type-args dtype column-meta))))
 
 ;;;; Compiler
 
 (defvar- compiler-data-type-aliases
-  {:binary :bytea
-   :blob :bytea
+  {:blob :bytea
    :clob :text
    :double :double-precision
    :nclob :text
-   :nvarchar :varchar
-   :varbinary :bytea})
+   :nvarchar :varchar})
 
 (defmethod compile [:postgresql DataTypeExpression]
   [expression]
@@ -60,6 +56,8 @@
         {:keys [time-zone]} options
         dtype (first (replace compiler-data-type-aliases [dtype]))
         args (if (#{:bytea :text} dtype) [] args)]
+    (unsupported (#{:binary :varbinary} dtype)
+      "Use blob instead.")
     (join \space
       (concat
        [(str (as-sql-keyword dtype)

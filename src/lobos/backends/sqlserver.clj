@@ -38,9 +38,7 @@
                               [dtype]))]
     (apply schema/data-type
            dtype
-           (case dtype
-                 :varchar [(:column_size column-meta)]
-                 []))))
+           (analyze-data-type-args dtype column-meta))))
 
 ;;;; Compiler
 
