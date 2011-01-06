@@ -9,9 +9,7 @@
 (ns lobos.test.integration
   (:refer-clojure :exclude [bigint boolean char compile double drop float time])
   (:use clojure.test
-        (clojure [string :only [join]])
-        (clojure.contrib [io :only [delete-file
-                                    file]])
+        (clojure.contrib [io :only [delete-file file]])
         (lobos analyzer compiler connectivity core metadata schema utils)
         (lobos.backends h2 mysql postgresql sqlite sqlserver))
   (:import (java.lang UnsupportedOperationException)))

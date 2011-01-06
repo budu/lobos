@@ -10,7 +10,6 @@
   "Compiler implementation for H2."
   (:refer-clojure :exclude [compile])
   (:use (clojure.contrib [def :only [defvar-]])
-        (clojure [string :only [join]])
         lobos.compiler
         lobos.utils)
   (:import (lobos.ast AutoIncClause

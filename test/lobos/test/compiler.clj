@@ -21,19 +21,6 @@
 
 ;;;; Helpers
 
-(deftest test-as-str
-  (are [s] (= s "foo")
-       (as-str :foo)
-       (as-str 'foo)
-       (as-str "foo"))
-  (is (= (as-str :foo 'bar "baz") "foobarbaz")))
-
-(deftest test-as-list
-  (is (= (as-list [:foo :bar :baz]) "(foo, bar, baz)")))
-
-(deftest test-as-sql-keyword
-  (is (= (as-sql-keyword :foo-bar) "FOO BAR")))
-
 (deftest test-unsupported
   (is (thrown-with-msg? java.lang.UnsupportedOperationException
         #"foo"

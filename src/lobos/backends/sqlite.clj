@@ -10,8 +10,7 @@
   "Compiler implementation for SQLite."
   (:refer-clojure :exclude [compile])
   (:require (lobos [schema :as schema]))
-  (:use (clojure [string :only [join]])
-        lobos.analyzer
+  (:use lobos.analyzer
         lobos.compiler
         lobos.utils)
   (:import (lobos.ast AutoIncClause

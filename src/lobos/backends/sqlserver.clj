@@ -11,7 +11,6 @@
   (:refer-clojure :exclude [compile])
   (:require (lobos [schema :as schema]))
   (:use (clojure.contrib [def :only [defvar-]])
-        (clojure [string :only [join]])
         lobos.analyzer
         lobos.compiler
         lobos.utils)

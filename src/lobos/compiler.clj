@@ -9,11 +9,9 @@
 (ns lobos.compiler
   "The compiler multimethod definition, an default implementation and
   some helpers functions."
-  (:refer-clojure :exclude [compile replace])
+  (:refer-clojure :exclude [compile])
   (:require (lobos [ast :as ast]))
-  (:use (clojure [string :only [join
-                                replace
-                                upper-case]]))
+  (:use lobos.utils)
   (:import (java.lang UnsupportedOperationException)
            (lobos.ast AutoIncClause
                       ColumnDefinition
@@ -29,33 +27,6 @@
 (declare compile)
 
 ;;;; Helpers
-
-(defn as-str ; taken from clojure.contrib.string
-  "Like clojure.core/str, but if an argument is a keyword or symbol,
-  its name will be used instead of its literal representation."
-  ([] "")
-  ([x] (if (instance? clojure.lang.Named x)
-         (name x)
-         (str x)))
-  ([x & ys]
-     ((fn [^StringBuilder sb more]
-        (if more
-          (recur (. sb (append (as-str (first more)))) (next more))
-          (str sb)))
-      (new StringBuilder ^String (as-str x)) ys)))
-
-(defn as-list
-  "Returns the given collection parenthesized string with its items
-  separated by commas. Apply as-str to coll items."
-  [coll]
-  (when (not-empty coll)
-    (format "(%s)" (join ", " (map as-str coll)))))
-
-(defn as-sql-keyword
-  "Returns the given string, symbol or keyword as an upper-cased string
-  and replace dashes with spaces."
-  [s]
-  (replace (-> s as-str upper-case) \- \space))
 
 (defn as-identifier
   "Constructs an Identifier ast object and compile it."
@@ -178,5 +149,5 @@
       (concat
        ["DROP"
         (as-sql-keyword otype)
-        (as-identifier db-spec oname :schema)]
-       (when behavior [(as-sql-keyword behavior)])))))
+        (as-identifier db-spec oname :schema)
+        (as-sql-keyword behavior)]))))
