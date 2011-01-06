@@ -12,7 +12,7 @@
         (clojure [string :only [join]])
         (clojure.contrib [io :only [delete-file
                                     file]])
-        (lobos analyzer compiler connectivity core schema utils)
+        (lobos analyzer compiler connectivity core metadata schema utils)
         (lobos.backends h2 mysql postgresql sqlite sqlserver))
   (:import (java.lang UnsupportedOperationException)))
 
@@ -172,16 +172,17 @@
                    :blob
                    :boolean
                    :timestamp]]
-       (let [eq #(dtypes-replace {:float :double
-                                  :numeric :decimal} %)
-             lobos (ignore-unsupported
-                    (create lobos
-                            (table :foo
-                                   (column :bar (data-type dtype) nil))))]
-         (when lobos
-           (is (= (eq (-> lobos :elements :foo :columns :bar :data-type :dtype))
-                  (eq (-> (column* :bar (data-type dtype) []) :data-type :dtype))))
-           (drop lobos (table :foo)))))
+      (let [eq #(dtypes-replace {:float :double
+                                 :numeric :decimal} %)
+            dtype (data-type dtype)
+            lobos (ignore-unsupported
+                   (create lobos
+                           (table :foo
+                                  (column :bar dtype nil))))]
+        (when lobos
+          (is (= (eq (-> lobos :elements :foo :columns :bar :data-type :dtype))
+                 (eq (-> (column* :bar dtype []) :data-type :dtype))))
+          (drop lobos (table :foo)))))
     (let [lobos (create lobos (table :foo (varchar :bar 100)))]
       (is (= (-> lobos :elements :foo :columns :bar :data-type :dtype)
              (-> (column* :bar (data-type :varchar 100) []) :data-type :dtype)))

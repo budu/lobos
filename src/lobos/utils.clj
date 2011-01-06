@@ -7,7 +7,10 @@
 ;; You must not remove this notice, or any other, from this software.
 
 (ns lobos.utils
-  "Helpers used in unrelated namespaces.")
+  "Helpers used in unrelated namespaces."
+  (:refer-clojure :exclude [replace])
+  (:use (clojure [string :only [lower-case]])
+        (clojure [string :only [replace]])))
 
 (defn dtypes-replace
   "Replaces the given data-type keyword if there's an alias found in
@@ -16,3 +19,6 @@
   (if (contains? aliases dtype)
     (aliases dtype)
     dtype))
+
+(defn as-keyword [s]
+  (-> s lower-case (replace \_ \-) keyword))

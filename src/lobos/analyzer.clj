@@ -9,60 +9,14 @@
 (ns lobos.analyzer
   "Analyze a database's meta-data to contruct an abstract schema."
   (:refer-clojure :exclude [replace])
-  (:require (lobos [connectivity :as conn]
-                   [schema :as schema]))
-  (:use (clojure.contrib [def :only [defvar defvar-]])
-        (clojure [string :only [lower-case
-                                replace
-                                upper-case]])
+  (:require (lobos [schema :as schema]))
+  (:use (clojure.contrib [def :only [defvar-]])
+        (clojure [string :only [replace]])
+        lobos.metadata
         lobos.utils)
   (:import (lobos.schema Column
                          Constraint
                          DataType)))
-
-;;;; Helpers
-
-(defn as-keyword [s]
-  (-> s lower-case (replace \_ \-) keyword))
-
-;;;; Metadata
-
-(defvar *db-meta* nil)
-
-(defn db-meta
-  "Returns the binded DatabaseMetaData object found in *db-meta* or get
-  one from the default connection if not available."
-  []
-  (or *db-meta*
-      (conn/with-connection :default-connection
-        (.getMetaData (conn/connection)))))
-
-(defmacro with-db-meta
-  "Evaluates body in the context of a new connection or a named global
-  connection to a database then closes the connection while binding its
-  DatabaseMetaData object to *db-meta*."
-  [db-spec & body]
-  `(if *db-meta*
-     (do ~@body)
-     (conn/with-connection ~db-spec
-       (binding [*db-meta* (.getMetaData (conn/connection))]
-         ~@body))))
-
-;;;; Database features analysis
-
-(defn supports-catalogs
-  "Returns the term used for catalogs if the underlying database supports
-  that concept."
-  []
-  (when (.supportsCatalogsInDataManipulation (db-meta))
-    (.getCatalogTerm (db-meta))))
-
-(defn supports-schemas
-  "Returns the term used for schemas if the underlying database supports
-  that concept."
-  []
-  (when (.supportsSchemasInDataManipulation (db-meta))
-    (.getSchemaTerm (db-meta))))
 
 ;;;; Constraints analysis
 
@@ -230,9 +184,7 @@
   using the given connection-info if specified or the default one."
   [sname & [connection-info]]
   (let [sname (keyword sname)
-        db-spec (conn/get-db-spec connection-info)
-        options {:db-spec db-spec}
-        analyze-schema* #(apply schema/schema sname options (tables sname))]
+        analyze-schema* #(apply schema/schema sname {} (tables sname))]
     (with-db-meta connection-info
       (if-let [schemas (schemas)]
         (when ((set schemas) sname)

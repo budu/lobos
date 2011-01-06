@@ -64,8 +64,11 @@
   ([schema] (set-global-schema schema))
   ([schema-name db-spec]
      (set-global-schema
-      (analyzer/analyze-schema schema-name
-                               db-spec))))
+      (assoc-in
+       (analyzer/analyze-schema schema-name
+                                db-spec)
+       [:options :db-spec]
+       db-spec))))
 
 (defn remove-global-schema
   "Removes the given schema from the global schema map."
