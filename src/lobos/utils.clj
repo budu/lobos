@@ -21,4 +21,4 @@
     dtype))
 
 (defn as-keyword [s]
-  (-> s lower-case (replace \_ \-) keyword))
+  (-> s lower-case (replace #"[_ ]" "-") keyword))
