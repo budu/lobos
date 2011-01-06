@@ -169,7 +169,7 @@
 
 (defn def-typed-columns*
   "Helper for macros that create typed columns definitions."
-  [names args body]
+  [names args dargs options]
   `(do
      ~@(for [n names]
          `(defn ~n
@@ -177,7 +177,12 @@
                           " add it to the given table.")
                      (name n))
             ~args
-            ~@(body n)))))
+            (let [dargs# ~dargs
+                  options# ~options]
+              (column ~'table
+                      ~'column-name
+                      (apply data-type ~(keyword n) dargs#)
+                      options#))))))
 
 (defmacro def-simple-typed-columns
   "Defines typed columns for simple data-types taking no arguments."
@@ -185,10 +190,8 @@
   (def-typed-columns*
     names
     '[table column-name & options]
-    #(list `(column ~'table
-                    ~'column-name
-                    (data-type ~(keyword %))
-                    ~'options))))
+    '[]
+    'options))
 
 (defmacro def-numeric-like-typed-columns
   "Defines numeric-like typed columns."
@@ -196,17 +199,12 @@
   (def-typed-columns*
     names
     '[table column-name & [precision scale & options]]
-    #(list
-      `(let ~'[dargs (-> []
-                         (conj-when (integer? precision) precision)
-                         (conj-when (integer? scale) scale))
-               options (-> options
-                           (conj-when (not (integer? precision)) precision)
-                           (conj-when (not (integer? scale)) scale))]
-         (column ~'table
-                 ~'column-name
-                 (apply data-type ~(keyword %) ~'dargs)
-                 ~'options)))))
+    '(-> []
+         (conj-when (integer? precision) precision)
+         (conj-when (integer? scale) scale))
+    '(-> options
+         (conj-when (not (integer? precision)) precision)
+         (conj-when (not (integer? scale)) scale))))
 
 (defmacro def-optionally-length-bounded-typed-columns
   "Defines optionally length-bounded typed columns."
@@ -214,13 +212,8 @@
   (def-typed-columns*
     names
     '[table column-name & [length & options]]
-    #(list
-      `(let ~'[dargs (conj-when [] (integer? length) length)
-               options (conj-when options (not (integer? length)) length)]
-         (column ~'table
-                 ~'column-name
-                 (apply data-type ~(keyword %) ~'dargs)
-                 ~'options)))))
+    '(conj-when [] (integer? length) length)
+    '(conj-when options (not (integer? length)) length)))
 
 (defmacro def-length-bounded-typed-columns
   "Defines length-bounded typed columns."
@@ -228,13 +221,8 @@
   (def-typed-columns*
     names
     '[table column-name length & options]
-    #(list
-      `(let ~'[dargs (conj-when [] (integer? length) length)
-               options (conj-when options (not (integer? length)) length)]
-         (column ~'table
-                 ~'column-name
-                 (apply data-type ~(keyword %) ~'dargs)
-                 ~'options)))))
+    '(conj-when [] (integer? length) length)
+    '(conj-when options (not (integer? length)) length)))
 
 ;;; Numeric types
 
