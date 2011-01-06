@@ -7,7 +7,7 @@
 ;; You must not remove this notice, or any other, from this software.
 
 (ns lobos.test.schema
-  (:refer-clojure :exclude [bigint boolean char double float])
+  (:refer-clojure :exclude [bigint boolean char double float time])
   (:use clojure.test
         lobos.schema)
   (:import (lobos.schema Column

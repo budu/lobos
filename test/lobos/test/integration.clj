@@ -7,7 +7,7 @@
 ;; You must not remove this notice, or any other, from this software.
 
 (ns lobos.test.integration
-  (:refer-clojure :exclude [bigint boolean char compile double drop float])
+  (:refer-clojure :exclude [bigint boolean char compile double drop float time])
   (:use clojure.test
         (clojure [string :only [join]])
         (clojure.contrib [io :only [delete-file
@@ -179,7 +179,7 @@
                    :char :nchar :clob :nclob
                    :blob
                    :boolean
-                   :timestamp]]
+                   :date :time :timestamp]]
       (let [dtype (data-type dtype)
             lobos (ignore-unsupported
                    (create lobos

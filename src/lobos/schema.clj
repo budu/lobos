@@ -9,7 +9,7 @@
 (ns lobos.schema
   "The abstract schema data-structure and some function to help creating
   one."
-  (:refer-clojure :exclude [bigint boolean char double float])
+  (:refer-clojure :exclude [bigint boolean char double float time])
   (:require (lobos [ast :as ast]))
   (:use (clojure.contrib [def :only [defalias]])
         (clojure [string :only [join]]))
@@ -285,6 +285,8 @@
 ;;; Data/time types
 
 (def-simple-typed-columns
+  date
+  time
   timestamp)
 
 ;;;; Table definition
