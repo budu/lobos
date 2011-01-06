@@ -75,8 +75,11 @@
   (condp contains? dtype
     #{:nvarchar :varbinary :varchar} [(:column_size column-meta)]
     #{:binary :blob :char :clob :nchar :nclob
-      :decimal :float :numeric
-      :time :timestamp} [(:column_size column-meta)]
+      :float :time :timestamp} [(:column_size column-meta)]
+    #{:decimal :numeric} (let [scale (:decimal_digits column-meta)]
+                           (if (= scale 0)
+                           [(:column_size column-meta)]
+                           [(:column_size column-meta) scale]))
     []))
 
 (defmethod analyze [::standard DataType]

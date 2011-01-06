@@ -207,4 +207,19 @@
               (format "Data type arguments not matching for %s %s"
                       (-> dtype :dtype name)
                       (:args dtype)))
-          (drop lobos (table :foo)))))))
+          (drop lobos (table :foo)))))
+    (let [dtype (data-type :numeric 8 3)
+          lobos (ignore-unsupported
+                 (create lobos
+                         (table :foo
+                                (column :bar dtype nil))))]
+      (when lobos
+        (is (= (eq (-> lobos :elements :foo :columns :bar :data-type :dtype))
+               (eq (-> (column* :bar dtype []) :data-type :dtype)))
+            (str "Data type not matching for " (-> dtype :dtype name)))
+        (is (= (-> lobos :elements :foo :columns :bar :data-type :args)
+               (-> (column* :bar dtype []) :data-type :args))
+            (format "Data type arguments not matching for %s %s"
+                    (-> dtype :dtype name)
+                    (:args dtype)))
+        (drop lobos (table :foo))))))

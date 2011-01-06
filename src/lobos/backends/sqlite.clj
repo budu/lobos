@@ -9,21 +9,49 @@
 (ns lobos.backends.sqlite
   "Compiler implementation for SQLite."
   (:refer-clojure :exclude [compile])
-  (:use (clojure.contrib [def :only [defvar-]])
-        (clojure [string :only [join]])
+  (:require (lobos [schema :as schema]))
+  (:use (clojure [string :only [join]])
+        lobos.analyzer
         lobos.compiler
         lobos.utils)
   (:import (lobos.ast AutoIncClause
                       CreateSchemaStatement
                       CreateTableStatement
+                      DataTypeExpression
                       DropStatement
-                      Identifier)))
+                      Identifier)
+           (lobos.schema DataType)))
+
+;;;; Analyzer
+
+(defmethod analyze [:sqlite DataType]
+  [_ column-meta]
+  (let [dtype (-> column-meta :type_name as-keyword)
+        args (analyze-data-type-args dtype column-meta)]
+    (apply schema/data-type
+           dtype
+           (if (#{:decimal :numeric} dtype)
+             [(first args)]
+             args))))
 
 ;;;; Compiler
 
 (defmethod compile [:sqlite Identifier]
   [identifier]
   (as-str (:value identifier)))
+
+(defmethod compile [:sqlite DataTypeExpression]
+  [expression]
+  (let [{:keys [dtype args options]} expression
+        {:keys [encoding collate time-zone]} options]
+    (unsupported (and (#{:decimal :numeric} dtype) (= (count args) 2))
+      "Doesn't support scale argument.")
+    (join \space
+      (concat
+       [(str (as-sql-keyword dtype) (as-list args))]
+       (when encoding ["CHARACTER SET" (as-str encoding)])
+       (when collate ["COLLATE" (as-str collate)])
+       (when time-zone ["WITH TIME ZONE"])))))
 
 (defmethod compile [:sqlite AutoIncClause]
   [_]
