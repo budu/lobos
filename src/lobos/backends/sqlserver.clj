@@ -11,12 +11,37 @@
   (:refer-clojure :exclude [compile])
   (:use (clojure.contrib [def :only [defvar-]])
         (clojure [string :only [join]])
+        lobos.analyzer
         lobos.compiler
         lobos.utils)
   (:import (lobos.ast AutoIncClause
                       DataTypeExpression
                       DropStatement
-                      Identifier)))
+                      Identifier)
+           (lobos.schema DataType)))
+
+;;;; Analyzer
+
+(defvar- analyzer-data-type-aliases
+  {:bit :boolean
+   :datetime :timestamp
+   :image :blob
+   :int :integer
+   :ntext :nclob
+   :text :clob})
+
+(defmethod analyze [:microsoft-sql-server DataType]
+  [_ column-meta]
+  (let [dtype (-> column-meta :type_name as-keyword)
+        dtype (first (replace analyzer-data-type-aliases
+                              [dtype]))]
+    (DataType.
+     dtype
+     (case dtype
+       :varchar [(:column_size column-meta)]
+       []))))
+
+;;;; Compiler
 
 (defmethod compile [:sqlserver Identifier]
   [identifier]
@@ -27,20 +52,19 @@
            (as-identifier db-spec value))
       (as-str \[ value \]))))
 
-(defvar- dtypes-aliases
-  {:blob :image
-   :boolean :bit
-   :clob :text
-   :nclob :ntext
+(defvar- compiler-data-type-aliases
+  {:blob      :image
+   :boolean   :bit
+   :clob      :text
+   :double    :float
+   :nclob     :ntext
    :timestamp :datetime})
 
 (defmethod compile [:sqlserver DataTypeExpression]
   [expression]
-  (let [{:keys [dtype args]} expression
-        [dtype args] (if (= dtype :double)
-                       [:float [53]]
-                       [dtype args])]
-    (str (as-sql-keyword (dtypes-replace dtypes-aliases dtype))
+  (let [{:keys [dtype args]} expression]
+    (str (as-sql-keyword
+          (first (replace compiler-data-type-aliases [dtype])))
          (as-list args))))
 
 (defmethod compile [:sqlserver AutoIncClause]

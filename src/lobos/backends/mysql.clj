@@ -11,6 +11,7 @@
   (:refer-clojure :exclude [compile])
   (:use (clojure.contrib [def :only [defvar-]])
         (clojure [string :only [join]])
+        lobos.analyzer
         lobos.compiler
         lobos.utils)
   (:import (lobos.ast AutoIncClause
@@ -18,7 +19,28 @@
                       CreateTableStatement
                       DataTypeExpression
                       DropStatement
-                      Identifier)))
+                      Identifier)
+           (lobos.schema DataType)))
+
+;;;; Analyzer
+
+(defvar- analyzer-data-type-aliases
+  {:bit :boolean
+   :int :integer
+   :text :clob})
+
+(defmethod analyze [:mysql DataType]
+  [_ column-meta]
+  (let [dtype (-> column-meta :type_name as-keyword)
+        dtype (first (replace analyzer-data-type-aliases
+                              [dtype]))]
+    (DataType.
+     dtype
+     (case dtype
+       :varchar [(:column_size column-meta)]
+       []))))
+
+;;;; Compiler
 
 (defmethod compile [:mysql Identifier]
   [identifier]
@@ -29,7 +51,7 @@
            (as-identifier db-spec value))
       (as-str \` value \`))))
 
-(defvar- dtypes-aliases
+(defvar- compiler-data-type-aliases
   {:clob :text
    :nclob :text-character-set-utf8})
 
@@ -38,7 +60,8 @@
   (let [{:keys [dtype args]} expression]
     (unsupported (= dtype :real)
       "Use double instead.")
-    (str (as-sql-keyword (dtypes-replace dtypes-aliases dtype))
+    (str (as-sql-keyword
+          (first (replace compiler-data-type-aliases [dtype])))
          (as-list args))))
 
 (defmethod compile [:mysql AutoIncClause]

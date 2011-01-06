@@ -7,8 +7,8 @@
 ;; You must not remove this notice, or any other, from this software.
 
 (ns lobos.test.connectivity
-  (:use [lobos.connectivity] :reload)
-  (:use [clojure.test]))
+  (:use clojure.test
+        lobos.connectivity))
 
 (def *cnx*)
 

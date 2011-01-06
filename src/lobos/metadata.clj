@@ -11,7 +11,7 @@
   (:require (lobos [connectivity :as conn]))
   (:use (clojure.contrib [def :only [defvar-]])))
 
-;;;; Metadata
+;;;; Database metadata
 
 (defvar- *db-meta* nil)
 
@@ -49,3 +49,71 @@
   []
   (when (.supportsSchemasInDataManipulation (db-meta))
     (.getSchemaTerm (db-meta))))
+
+;;;; Database objects
+
+(defn catalogs
+  "Returns a list of catalog names as keywords."
+  []
+  (map #(-> % :table_cat keyword)
+       (doall (resultset-seq (.getCatalogs (db-meta))))))
+
+(defn schemas
+  "Returns a list of schema names as keywords."
+  []
+  (cond (supports-schemas)
+        (map #(-> % :table_schem keyword)
+             (doall (resultset-seq (.getSchemas (db-meta)))))
+        (supports-catalogs) (catalogs)))
+
+(defn tables
+  "Returns a list of table names as keywords for the specified schema."
+  [sname]
+  (map #(-> % :table_name keyword)
+       (resultset-seq
+        (.getTables (db-meta)
+                    (when-not (supports-schemas) (name sname))
+                    (when (supports-schemas) (name sname))
+                    nil
+                    (into-array ["TABLE"])))))
+
+(defn primary-keys
+  "Returns primary key names as a set of keywords for the specified
+  table."
+  [sname tname]
+  (set
+   (map #(-> % :pk_name keyword)
+        (resultset-seq
+         (.getPrimaryKeys (db-meta)
+                          (when-not (supports-schemas) (name sname))
+                          (when (supports-schemas) (name sname))
+                          (name tname))))))
+
+(defn indexes-meta
+  "Returns metadata maps for indexes of the specified table. Results are
+  sorted by ordinal position, grouped by index name and can be filtered
+  by the given function f."
+  [sname tname & [f]]
+  (try
+    (group-by :index_name
+      (sort-by :ordinal_position
+        (filter #(and (> (:type %) 0)
+                      ((or f identity) %))
+          (resultset-seq
+           (.getIndexInfo (db-meta)
+                          (when-not (supports-schemas) (name sname))
+                          (when (supports-schemas) (name sname))
+                          (name tname)
+                          false
+                          false)))))
+    (catch java.sql.SQLException _ nil)))
+
+(defn columns-meta
+  "Returns metadata maps for each columns of the specified table."
+  [sname tname]
+  (resultset-seq
+   (.getColumns (db-meta)
+                (when-not (supports-schemas) (name sname))
+                (when (supports-schemas) (name sname))
+                (name tname)
+                nil)))

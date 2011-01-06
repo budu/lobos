@@ -15,95 +15,33 @@
         lobos.metadata
         lobos.utils)
   (:import (lobos.schema Column
-                         Constraint
-                         DataType)))
+                         UniqueConstraint
+                         DataType
+                         Schema
+                         Table)))
 
-;;;; Constraints analysis
+;;;; Analyzer
 
-(defn indexes
-  "Returns all indexes for the specified schema and table names, results
-  are sorted by ordinal position, grouped by index name and can be
-  filtered by the given function f."
-  [sname tname & [f]]
-  (try
-    (group-by :index_name
-      (sort-by :ordinal_position
-        (filter #(and (> (:type %) 0)
-                      ((or f identity) %))
-          (resultset-seq
-           (.getIndexInfo (db-meta)
-                          (when-not (supports-schemas) (name sname))
-                          (when (supports-schemas) (name sname))
-                          (name tname)
-                          false
-                          false)))))
-    (catch java.sql.SQLException _ nil)))
+(def db-hierarchy
+  (atom (-> (make-hierarchy)
+            (derive :h2 ::standard)
+            (derive :mysql ::standard)
+            (derive :postgresql ::standard)
+            (derive :sqlite ::standard)
+            (derive :microsoft-sql-server ::standard))))
 
-(defn primary-keys
-  "Returns primary key names as a set of keywords."
-  [sname tname]
-  (set
-   (map #(-> % :pk_name keyword)
-        (resultset-seq
-         (.getPrimaryKeys (db-meta)
-                          (when-not (supports-schemas) (name sname))
-                          (when (supports-schemas) (name sname))
-                          (name tname))))))
+(defmulti analyze
+  "Analyzes the specified part of a schema and returns its abstract
+  equivalent."
+  (fn [klass & args]
+    [(as-keyword (.getDatabaseProductName (db-meta)))
+     klass])
+  :hierarchy db-hierarchy)
 
-(defn unique-constraints
-  "Returns a list of unique constraints for the specified schema and
-  table names."
-  [sname tname]
-  (let [pkeys (primary-keys sname tname)]
-    (map (fn [[cname cmeta]]
-           (Constraint. (keyword cname)
-                        (if (pkeys (keyword cname))
-                          :primary-key
-                          :unique)
-                        {:columns
-                         (vec (map #(-> % :column_name keyword)
-                                   cmeta))}))
-         (indexes sname tname #(-> % :non_unique not)))))
+;;;; Default analyzer
 
-(defn constraints
-  "Returns a list of constraints for the specified schema and table
-  names. Supports only unique constraints at the moment."
-  [sname tname]
-  (unique-constraints sname tname))
-
-;;;; Columns analysis
-
-(defvar- dtypes-aliases
-  {:bit    :boolean
-   :bool   :boolean
-   :bpchar :char
-   :bytea  :blob
-   :datetime :timestamp
-   :float4 :real
-   :float8 :double
-   :image  :blob
-   :int    :integer
-   :int2   :smallint
-   :int4   :integer
-   :int8   :bigint
-   :ntext  :nclob
-   :text   :clob})
-
-(defn analyze-data-type
-  "Returns an abstract data-type definition given a column meta-data."
-  [col-meta]
-  (let [dtype (-> col-meta :type_name as-keyword)
-        dtype (dtypes-replace dtypes-aliases dtype)]
-    (DataType.
-     dtype
-     (case dtype
-       :varchar [(:column_size col-meta)]
-       []))))
-
-(defn analyze-expression
-  "Returns the Clojure equivalent of the given SQL expression. Just a
-  stub currently."
-  [expr]
+(defmethod analyze [::standard Object]
+  [_ expr]
   (when expr
     (cond (re-find #"(.*)::(.*)" expr)
           (let [[_ & [value dtype]] (first (re-seq #"(.*)::(.*)" expr))]
@@ -113,80 +51,63 @@
             (keyword func))
           :else (str expr))))
 
-(defn analyze-column
-  "Returns an abstract column definition given a column meta-data."
-  [col-meta]
-  (let [auto-inc (= (:is_autoincrement col-meta) "YES")]
-    (Column. (-> col-meta :column_name keyword)
-             (analyze-data-type col-meta)
+
+(defmethod analyze [::standard UniqueConstraint]
+  [_ sname tname cname index-meta]
+  (let [pkeys (primary-keys sname tname)]
+    (UniqueConstraint.
+     (keyword cname)
+     (if (pkeys (keyword cname))
+       :primary-key
+       :unique)
+     {:columns
+      (vec (map #(-> % :column_name keyword)
+                index-meta))})))
+
+(defn constraints [sname tname]
+  (map (fn [[cname meta]] (analyze UniqueConstraint sname tname cname meta))
+       (indexes-meta sname tname #(-> % :non_unique not))))
+
+(defmethod analyze [::standard DataType]
+  [_ column-meta]
+  (let [dtype (-> column-meta :type_name as-keyword)]
+    (DataType.
+     dtype
+     (case dtype
+       :varchar [(:column_size column-meta)]
+       []))))
+
+(defmethod analyze [::standard Column]
+  [_ column-meta]
+  (let [auto-inc (= (:is_autoincrement column-meta) "YES")]
+    (Column. (-> column-meta :column_name keyword)
+             (analyze DataType column-meta)
              (when-not auto-inc
-               (analyze-expression (:column_def col-meta)))
+               (analyze Object (:column_def column-meta)))
              auto-inc
-             (= (:is_nullable col-meta) "NO")
+             (= (:is_nullable column-meta) "NO")
              [])))
 
-(defn columns
-  "Returns a list of abstract column definitions for the specified
-  schema and table names."
-  [sname tname]
-  (map analyze-column
-       (resultset-seq
-        (.getColumns (db-meta)
-                     (when-not (supports-schemas) (name sname))
-                     (when (supports-schemas) (name sname))
-                     (name tname)
-                     nil))))
-
-;;;; Tables analysis
-
-(defn analyze-table
-  "Returns the abstract table definition for the specified schema and
-  table names."
-  [sname tname]
+(defmethod analyze [::standard Table]
+  [_ sname tname]
   (schema/table* tname
+                 (into {} (map #(let [c (analyze Column %)]
+                                  [(:cname c) c])
+                               (columns-meta sname tname)))
                  (into {} (map #(vector (:cname %) %)
-                               (columns sname tname)))
-                 (into {} (map #(vector (:cname %) %)
-                               (constraints sname tname)))
-                 {}))
+                               (constraints sname tname)))))
 
-(defn tables
-  "Returns a list of abstract table definitions for the specified schema name."
-  [sname]
-  (map #(analyze-table sname (-> % :table_name keyword))
-       (resultset-seq
-        (.getTables (db-meta)
-                    (when-not (supports-schemas) (name sname))
-                    (when (supports-schemas) (name sname))
-                    nil
-                    (into-array ["TABLE"])))))
-
-;;;; Catalogs analysis
-
-(defn catalogs
-  "Returns a list of catalog names as keywords."
-  []
-  (map #(-> % :table_cat keyword)
-       (doall (resultset-seq (.getCatalogs (db-meta))))))
-
-;;;; Schemas analysis
-
-(defn schemas
-  "Returns a list of schema names as keywords."
-  []
-  (cond (supports-schemas)
-        (map #(-> % :table_schem keyword)
-             (doall (resultset-seq (.getSchemas (db-meta)))))
-        (supports-catalogs) (catalogs)))
+(defmethod analyze [::standard Schema]
+  [_ sname]
+  (apply schema/schema sname {}
+         (map #(analyze Table sname %)
+              (tables sname))))
 
 (defn analyze-schema
-  "Returns the abstract schema definition for the specified schema name
-  using the given connection-info if specified or the default one."
   [sname & [connection-info]]
-  (let [sname (keyword sname)
-        analyze-schema* #(apply schema/schema sname {} (tables sname))]
+  (let [sname (keyword sname)]
     (with-db-meta connection-info
       (if-let [schemas (schemas)]
         (when ((set schemas) sname)
-          (analyze-schema*))
-        (analyze-schema*)))))
+          (analyze Schema sname))
+        (analyze Schema sname)))))

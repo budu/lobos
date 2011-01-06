@@ -8,8 +8,8 @@
 
 (ns lobos.test.compiler
   (:refer-clojure :exclude [compile])
-  (:use [lobos.compiler] :reload)
-  (:use [clojure.test])
+  (:use clojure.test
+        lobos.compiler)
   (:import (lobos.ast AutoIncClause
                       ColumnDefinition
                       CreateTableStatement

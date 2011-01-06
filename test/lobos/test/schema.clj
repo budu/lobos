@@ -8,53 +8,48 @@
 
 (ns lobos.test.schema
   (:refer-clojure :exclude [bigint boolean char double float])
-  (:use [lobos.schema] :reload)
-  (:use [clojure.test])
+  (:use clojure.test
+        lobos.schema)
   (:import (lobos.schema Column
-                         Constraint
+                         UniqueConstraint
                          DataType
                          Table
                          Schema)))
 
 ;;;; Constraint definition tests
 
-(deftest test-constraint
-  (is (= (table :foo (constraint :foo :bar :baz))
-         (table* :foo {} {:foo (Constraint. :foo :bar :baz)} {}))
-      "Constraint definition"))
-
 (deftest test-unique-constraint
   (is (= (table :foo (column :bar nil nil)
-                (unique-constraint :foo :bar (list :baz)))
+                (unique-constraint :unique :bar (list :baz)))
          (table* :foo {:bar (column* :bar nil nil)}
-                 {:foo_bar_baz (Constraint.
-                                :foo_bar_baz
-                                :foo
-                                {:columns [:bar :baz]})} {}))
+                 {:unique_bar_baz (UniqueConstraint.
+                                :unique_bar_baz
+                                :unique
+                                [:bar :baz])} {}))
       "Unnamed unique constraint definition")
   (is (= (table :foo (column :baz nil nil)
-                (unique-constraint :foo :bar (list :baz)))
+                (unique-constraint :unique :bar (list :baz)))
          (table* :foo {:baz (column* :baz nil nil)}
-                 {:bar (Constraint.
+                 {:bar (UniqueConstraint.
                         :bar
-                        :foo
-                        {:columns [:baz]})} {}))
+                        :unique
+                        [:baz])} {}))
       "Named unique constraint definition"))
 
 (deftest test-primary-key
   (is (= (table :foo (primary-key :foo :bar :baz))
-         (table* :foo {} {:foo (Constraint.
-                               :foo
-                               :primary-key
-                               {:columns [:bar :baz]})} {}))
+         (table* :foo {} {:foo (UniqueConstraint.
+                                :foo
+                                :primary-key
+                                [:bar :baz])} {}))
       "Primary key constraint definition"))
 
 (deftest test-unique
   (is (= (table :foo (unique :foo :bar :baz))
-         (table* :foo {} {:foo (Constraint.
-                               :foo
-                               :unique
-                               {:columns [:bar :baz]})} {}))
+         (table* :foo {} {:foo (UniqueConstraint.
+                                :foo
+                                :unique
+                                [:bar :baz])} {}))
       "Unique constraint definition"))
 
 ;;;; Column definition tests
@@ -139,7 +134,7 @@
                (table* nil nil nil nil))
       "Invalid table definition")
   (is (= (table* :foo nil nil nil)
-         (Table. :foo nil nil nil))
+         (Table. :foo {} {} {}))
       "Table definition"))
 
 (deftest test-table
@@ -149,12 +144,12 @@
   (is (= (table :foo (column :foo nil nil))
          (Table. :foo {:foo column-definition-stub} {} {}))
       "Table with column")
-  (is (= (table :foo (constraint :foo :bar :baz))
-         (Table. :foo {} {:foo (Constraint.
+  (is (= (table :foo (unique :foo :bar :baz))
+         (Table. :foo {} {:foo (UniqueConstraint.
                                 :foo
-                                :bar
-                                :baz)} {}))
-      "Table with constraint"))
+                                :unique
+                                [:bar :baz])} {}))
+      "Table with unique constraint"))
 
 ;;;; Schema definition tests
 

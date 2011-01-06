@@ -20,20 +20,11 @@
                       DropStatement
                       Identifier)))
 
+;;;; Compiler
+
 (defmethod compile [:sqlite Identifier]
   [identifier]
   (as-str (:value identifier)))
-
-#_(
-(defvar- dtypes-aliases ;; TMP
-  {:clob :text})
-
-(defmethod compile [:sqlite DataTypeExpression] ;; TMP
-  [expression]
-  (let [{:keys [dtype args]} expression]
-    (str (as-sql-keyword (dtypes-replace dtypes-aliases dtype))
-         (as-list args))))
-)
 
 (defmethod compile [:sqlite AutoIncClause]
   [_]

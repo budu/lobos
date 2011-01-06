@@ -11,12 +11,40 @@
   (:refer-clojure :exclude [compile])
   (:use (clojure.contrib [def :only [defvar-]])
         (clojure [string :only [join]])
+        lobos.analyzer
         lobos.compiler
         lobos.utils)
   (:import (lobos.ast ColumnDefinition
-                      DataTypeExpression)))
+                      DataTypeExpression)
+           (lobos.schema DataType)))
 
-(defvar- dtypes-aliases
+;;;; Analyzer
+
+(defvar- analyzer-data-type-aliases
+  {:bool :boolean
+   :bpchar :char
+   :bytea :blob
+   :float4 :real
+   :float8 :double
+   :int2 :smallint
+   :int4 :integer
+   :int8 :bigint
+   :text :nclob})
+
+(defmethod analyze [:postgresql DataType]
+  [_ column-meta]
+  (let [dtype (-> column-meta :type_name as-keyword)
+        dtype (first (replace analyzer-data-type-aliases
+                              [dtype]))]
+    (DataType.
+     dtype
+     (case dtype
+       :varchar [(:column_size column-meta)]
+       []))))
+
+;;;; Compiler
+
+(defvar- compiler-data-type-aliases
   {:blob :bytea
    :clob :text
    :double :double-precision
@@ -25,7 +53,8 @@
 (defmethod compile [:postgresql DataTypeExpression]
   [expression]
   (let [{:keys [dtype args]} expression]
-    (str (as-sql-keyword (dtypes-replace dtypes-aliases dtype))
+    (str (as-sql-keyword
+          (first (replace compiler-data-type-aliases [dtype])))
          (as-list args))))
 
 (defmethod compile [:postgresql ColumnDefinition]

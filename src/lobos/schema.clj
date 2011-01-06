@@ -59,17 +59,15 @@
 
 ;;;; Constraint definition
 
-(defrecord Constraint [cname ctype specification]
+(defrecord UniqueConstraint [cname ctype columns]
   Buildable
   
   (build-definition [this db-spec]
-    (condp contains? ctype
-      #{:unique :primary-key}
-      (UniqueConstraintDefinition.
-       db-spec
-       cname
-       ctype
-       (:columns specification)))))
+    (UniqueConstraintDefinition.
+     db-spec
+     cname
+     ctype
+     columns)))
 
 (defn constraint
   "Constructs an abstract constraint definition and add it to the given
@@ -77,9 +75,11 @@
   [table constraint-name constraint-type specification]
   (update-in table [:constraints] conj
              [constraint-name
-              (Constraint. constraint-name
-                           constraint-type
-                           specification)]))
+              (condp contains? constraint-type
+                #{:unique :primary-key}
+                (UniqueConstraint. constraint-name
+                                   constraint-type
+                                   specification))]))
 
 (defn unique-constraint
   "Constructs an abstract unique (or primary-key depending on the given
@@ -98,7 +98,7 @@
     (constraint table
                 constraint-name
                 constraint-type
-                {:columns (vec columns)})))
+                (vec columns))))
 
 (defn primary-key
   "Constructs an abstract primary key constraint definition and add it
@@ -304,9 +304,12 @@
 
 (defn table*
   "Constructs an abstract table definition."
-  [table-name columns constraints options]
+  [table-name & [columns constraints options]]
   (name-required table-name "table")
-  (Table. table-name columns constraints options))
+  (Table. table-name
+          (or columns {})
+          (or constraints {})
+          (or options {})))
 
 (defmacro table
   "Constructs an abstract table definition containing the given
@@ -351,7 +354,7 @@
 
 ;;;; Definitions hierarchy
 
-(derive Constraint ::definition)
+(derive UniqueConstraint ::definition)
 (derive DataType ::definition)
 (derive Column ::definition)
 (derive Table ::definition)

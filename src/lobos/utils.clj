@@ -12,13 +12,5 @@
   (:use (clojure [string :only [lower-case]])
         (clojure [string :only [replace]])))
 
-(defn dtypes-replace
-  "Replaces the given data-type keyword if there's an alias found in
-  the specified aliases."
-  [aliases dtype]
-  (if (contains? aliases dtype)
-    (aliases dtype)
-    dtype))
-
 (defn as-keyword [s]
   (-> s lower-case (replace #"[_ ]" "-") keyword))

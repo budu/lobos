@@ -163,6 +163,14 @@
       (is (nil? (-> lobos :elements :foo))
           "Checking if the table has been dropped"))))
 
+(defn- eq [dtype]
+  (first (replace {:float :double
+                   :numeric :decimal
+                   :char :nchar
+                   :clob :nclob
+                   :varchar :nvarchar}
+                  [dtype])))
+
 (def-db-test test-data-types
   (with-schema [lobos :lobos]
     (doseq [dtype [:smallint :integer :bigint
@@ -172,9 +180,7 @@
                    :blob
                    :boolean
                    :timestamp]]
-      (let [eq #(dtypes-replace {:float :double
-                                 :numeric :decimal} %)
-            dtype (data-type dtype)
+      (let [dtype (data-type dtype)
             lobos (ignore-unsupported
                    (create lobos
                            (table :foo
@@ -184,6 +190,8 @@
                  (eq (-> (column* :bar dtype []) :data-type :dtype))))
           (drop lobos (table :foo)))))
     (let [lobos (create lobos (table :foo (varchar :bar 100)))]
-      (is (= (-> lobos :elements :foo :columns :bar :data-type :dtype)
-             (-> (column* :bar (data-type :varchar 100) []) :data-type :dtype)))
+      (is (= (eq (-> lobos :elements :foo :columns :bar :data-type :dtype))
+             (eq (-> (column* :bar (data-type :varchar 100) [])
+                     :data-type
+                     :dtype))))
       (drop lobos (table :foo)))))
