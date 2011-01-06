@@ -9,6 +9,7 @@
 (ns lobos.backends.mysql
   "Compiler implementation for MySQL."
   (:refer-clojure :exclude [compile])
+  (:require (lobos [schema :as schema]))
   (:use (clojure.contrib [def :only [defvar-]])
         (clojure [string :only [join]])
         lobos.analyzer
@@ -34,11 +35,11 @@
   (let [dtype (-> column-meta :type_name as-keyword)
         dtype (first (replace analyzer-data-type-aliases
                               [dtype]))]
-    (DataType.
-     dtype
-     (case dtype
-       :varchar [(:column_size column-meta)]
-       []))))
+    (apply schema/data-type
+           dtype
+           (case dtype
+                 :varchar [(:column_size column-meta)]
+                 []))))
 
 ;;;; Compiler
 
@@ -57,12 +58,17 @@
 
 (defmethod compile [:mysql DataTypeExpression]
   [expression]
-  (let [{:keys [dtype args]} expression]
+  (let [{:keys [dtype args options]} expression
+        {:keys [encoding collate]} options]
     (unsupported (= dtype :real)
       "Use double instead.")
-    (str (as-sql-keyword
-          (first (replace compiler-data-type-aliases [dtype])))
-         (as-list args))))
+    (join \space
+      (concat
+       [(str (as-sql-keyword
+              (first (replace compiler-data-type-aliases [dtype])))
+             (as-list args))]
+       (when encoding ["CHARACTER SET" (as-str encoding)])
+       (when collate ["COLLATE" (as-str collate)])))))
 
 (defmethod compile [:mysql AutoIncClause]
   [_]

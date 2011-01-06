@@ -16,7 +16,6 @@
   (:import (lobos.ast AutoIncClause
                       CreateSchemaStatement
                       CreateTableStatement
-                      DataTypeExpression
                       DropStatement
                       Identifier)))
 

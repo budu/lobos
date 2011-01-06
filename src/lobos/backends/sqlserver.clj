@@ -9,6 +9,7 @@
 (ns lobos.backends.sqlserver
   "Compiler implementation for SQL Server."
   (:refer-clojure :exclude [compile])
+  (:require (lobos [schema :as schema]))
   (:use (clojure.contrib [def :only [defvar-]])
         (clojure [string :only [join]])
         lobos.analyzer
@@ -35,11 +36,11 @@
   (let [dtype (-> column-meta :type_name as-keyword)
         dtype (first (replace analyzer-data-type-aliases
                               [dtype]))]
-    (DataType.
-     dtype
-     (case dtype
-       :varchar [(:column_size column-meta)]
-       []))))
+    (apply schema/data-type
+           dtype
+           (case dtype
+                 :varchar [(:column_size column-meta)]
+                 []))))
 
 ;;;; Compiler
 
@@ -62,10 +63,14 @@
 
 (defmethod compile [:sqlserver DataTypeExpression]
   [expression]
-  (let [{:keys [dtype args]} expression]
-    (str (as-sql-keyword
-          (first (replace compiler-data-type-aliases [dtype])))
-         (as-list args))))
+  (let [{:keys [dtype args options]} expression
+        {:keys [collate]} options]
+    (join \space
+      (concat
+       [(str (as-sql-keyword
+              (first (replace compiler-data-type-aliases [dtype])))
+             (as-list args))]
+       (when collate ["COLLATE" (as-str collate)])))))
 
 (defmethod compile [:sqlserver AutoIncClause]
   [_]

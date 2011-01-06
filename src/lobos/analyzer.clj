@@ -71,11 +71,11 @@
 (defmethod analyze [::standard DataType]
   [_ column-meta]
   (let [dtype (-> column-meta :type_name as-keyword)]
-    (DataType.
-     dtype
-     (case dtype
-       :varchar [(:column_size column-meta)]
-       []))))
+    (apply schema/data-type
+           dtype
+           (case dtype
+                 :varchar [(:column_size column-meta)]
+                 []))))
 
 (defmethod analyze [::standard Column]
   [_ column-meta]

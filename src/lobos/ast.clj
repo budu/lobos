@@ -25,7 +25,7 @@
 ;;;; Expression records
 
 (defrecord DataTypeExpression
-  [db-spec dtype args])
+  [db-spec dtype args options])
 
 ;; not going down the rabbit hole yet!
 (defrecord ValueExpression

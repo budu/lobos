@@ -55,7 +55,7 @@
       "Compiling an auto-incrementing clause"))
 
 (def column-definition-stub
-  (let [data-type (DataTypeExpression. nil :integer nil)]
+  (let [data-type (DataTypeExpression. nil :integer nil nil)]
     (ColumnDefinition. nil :foo data-type nil false false [])))
 
 (deftest test-compile-column-definition

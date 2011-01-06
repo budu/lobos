@@ -112,8 +112,14 @@
 
 (defmethod compile [::standard DataTypeExpression]
   [expression]
-  (let [{:keys [dtype args]} expression]
-    (str (as-sql-keyword dtype) (as-list args))))
+  (let [{:keys [dtype args options]} expression
+        {:keys [encoding collate time-zone]} options]
+    (join \space
+      (concat
+       [(str (as-sql-keyword dtype) (as-list args))]
+       (when encoding ["CHARACTER SET" (as-str encoding)])
+       (when collate ["COLLATE" (as-str collate)])
+       (when time-zone ["WITH TIME ZONE"])))))
 
 ;;; Clauses
 

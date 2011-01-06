@@ -114,10 +114,13 @@
 
 ;;;; Data-type definition
 
-(defrecord DataType [dtype args])
+(defrecord DataType [dtype args options])
 
 (defn data-type [dtype & args]
-  (DataType. dtype (vec args)))
+  (DataType. dtype (vec args)
+             {:time-zone nil
+              :collate nil
+              :encoding nil}))
 
 ;;;; Column definition
 
@@ -131,7 +134,8 @@
      (DataTypeExpression.
       db-spec
       (:dtype data-type)
-      (:args data-type))
+      (:args data-type)
+      (:options data-type))
      (when default (ValueExpression. db-spec default))
      (when auto-inc (AutoIncClause. db-spec))
      not-null
@@ -140,13 +144,19 @@
 (defn column*
   "Constructs an abstract column definition."
   [column-name data-type options]
-  (let [default  (first (filter vector? options))
-        others   (vec (filter string? options))
-        not-null (clojure.core/boolean (:not-null options))
-        auto-inc (clojure.core/boolean (:auto-inc options))]
+  (let [{:keys [default encoding collate]}
+        (into {} (filter vector? options))
+        data-type (when data-type
+                    (update-in data-type [:options] assoc
+                               :encoding encoding
+                               :collate collate
+                               :time-zone ((set options) :time-zone)))
+        others    (vec (filter string? options))
+        not-null  (clojure.core/boolean (:not-null options))
+        auto-inc  (clojure.core/boolean (:auto-inc options))]
     (Column. column-name
              data-type
-             (second default)
+             default
              auto-inc
              not-null
              others)))
