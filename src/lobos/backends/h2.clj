@@ -26,7 +26,7 @@
       "Use varbinary instead.")
     (unsupported (:time-zone options)
       "Time zones not supported.")
-    (join \space [(str (as-sql-keyword dtype) (as-list args))])))
+    (str (as-sql-keyword dtype) (as-list args))))
 
 (defmethod compile [:h2 AutoIncClause]
   [_]
@@ -35,20 +35,19 @@
 (defmethod compile [:h2 CreateSchemaStatement]
   [statement]
   (let [{:keys [db-spec sname elements]} statement]
-    (join ";\n\n"
-          (conj (map (comp compile
-                           #(assoc-in % [:db-spec :schema] sname))
-                     elements)
-                (str "CREATE SCHEMA "
-                     (as-identifier db-spec sname))))))
+    (apply join ";\n\n"
+      (conj (map (comp compile
+                       #(assoc-in % [:db-spec :schema] sname))
+                 elements)
+            (str "CREATE SCHEMA "
+                 (as-identifier db-spec sname))))))
 
 (defmethod compile [:h2 DropStatement]
   [statement]
   (let [{:keys [db-spec otype oname behavior]} statement]
     (join \space
-      (concat
-       ["DROP"
-        (as-sql-keyword otype)
-        (as-identifier db-spec oname :schema)]
-       (when (and behavior (#{:table} otype))
-         [(as-sql-keyword behavior)])))))
+      "DROP"
+      (as-sql-keyword otype)
+      (as-identifier db-spec oname :schema)
+      (when (and behavior (#{:table} otype))
+        [(as-sql-keyword behavior)]))))

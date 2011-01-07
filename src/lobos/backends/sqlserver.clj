@@ -74,10 +74,8 @@
     (unsupported (and (= dtype :time) time-zone)
       "Time zone unsupported for time data type.")
     (join \space
-      (concat
-       [(str (as-sql-keyword dtype)
-             (as-list args))]
-       (when collate ["COLLATE" (as-str collate)])))))
+      (str (as-sql-keyword dtype) (as-list args))
+      (when collate (str "COLLATE " (as-str collate))))))
 
 (defmethod compile [:sqlserver AutoIncClause]
   [_]
@@ -87,17 +85,16 @@
   [statement]
   (let [{:keys [db-spec otype oname behavior]} statement
         sql-string (join \space
-                         ["DROP"
-                          (as-sql-keyword otype)
-                          (as-identifier db-spec oname :schema)])]
-    (join \;
-      (concat
-       (when (and (= otype :schema)
-                  (= behavior :cascade))
-         (for [element (with-db-meta db-spec
-                         (-> (analyze-schema oname) :elements keys))]
-           (compile (schema/build-drop-statement
-                     (schema/table element)
-                     :cascade
-                     (assoc db-spec :schema oname)))))
-       [sql-string]))))
+                     "DROP"
+                     (as-sql-keyword otype)
+                     (as-identifier db-spec oname :schema))]
+    (apply join \;
+      (conj (when (and (= otype :schema)
+                       (= behavior :cascade))
+              (vec (for [element (with-db-meta db-spec
+                                   (-> (analyze-schema oname) :elements keys))]
+                     (compile (schema/build-drop-statement
+                               (schema/table element)
+                               :cascade
+                               (assoc db-spec :schema oname))))))
+            sql-string))))

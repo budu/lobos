@@ -110,7 +110,7 @@
 
 (defn remove-tmp-files []
   (let [current-dir (file-seq (file "."))
-        p (str ".*\\." (join "|" tmp-files-ext))
+        p (str ".*\\." (apply join "|" tmp-files-ext))
         tmp? #(re-find (re-pattern p) (str %))]
     (doseq [tmp-file (filter tmp? current-dir)]
       (delete-file tmp-file true))))

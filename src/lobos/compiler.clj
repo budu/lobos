@@ -87,11 +87,10 @@
   (let [{:keys [dtype args options]} expression
         {:keys [encoding collate time-zone]} options]
     (join \space
-      (concat
-       [(str (as-sql-keyword dtype) (as-list args))]
-       (when encoding ["CHARACTER SET" (as-str encoding)])
-       (when collate ["COLLATE" (as-str collate)])
-       (when time-zone ["WITH TIME ZONE"])))))
+      (str (as-sql-keyword dtype) (as-list args))
+      (when encoding ["CHARACTER SET" (as-str encoding)])
+      (when collate ["COLLATE" (as-str collate)])
+      (when time-zone ["WITH TIME ZONE"]))))
 
 ;;; Clauses
 
@@ -105,25 +104,25 @@
   [definition]
   (let [{:keys [db-spec cname data-type default
                 auto-inc not-null others]} definition]
-    (join \space
-      (concat
-       [(as-identifier db-spec cname)
-        (compile data-type)]
-       (when default  ["DEFAULT" (compile default)])
-       (when auto-inc [(compile auto-inc)])
-       (when not-null ["NOT NULL"])
-       others))))
+    (apply join \space
+      (as-identifier db-spec cname)
+      (compile data-type)
+      (when default  (str "DEFAULT " (compile default)))
+      (when auto-inc (compile auto-inc))
+      (when not-null "NOT NULL")
+      others)))
 
 (defmethod compile [::standard UniqueConstraintDefinition]
   [definition]
   (let [{:keys [db-spec cname ctype columns]} definition
         spec (join \space
-               [(as-sql-keyword ctype)
-                (as-list (map (partial as-identifier db-spec) columns))])]
+               (as-sql-keyword ctype)
+               (as-list (map (partial as-identifier db-spec) columns)))]
     (if cname
-      (join \space ["CONSTRAINT"
-                    (as-identifier db-spec cname)
-                    spec])
+      (join \space
+        "CONSTRAINT"
+        (as-identifier db-spec cname)
+        spec)
       spec)))
 
 (defmethod compile [::standard ForeignKeyConstraintDefinition]
@@ -131,18 +130,18 @@
   (let [{:keys [db-spec cname columns foreign-table foreign-columns match
                 triggered-actions]} definition]
     (join \space
-      ["CONSTRAINT"
-       (as-identifier db-spec cname)
-       "FOREIGN KEY"
-       (as-list (map (partial as-identifier db-spec) columns))
-       "REFERENCES"
-       (as-identifier db-spec foreign-table :schema)
-       (as-list (map (partial as-identifier db-spec) foreign-columns))
-       (when match (as-sql-keyword match))
-       (when (contains? triggered-actions :on-delete)
-         (str "ON DELETE " (as-sql-keyword (:on-delete triggered-actions))))
-       (when (contains? triggered-actions :on-update)
-         (str "ON UPDATE " (as-sql-keyword (:on-update triggered-actions))))])))
+      "CONSTRAINT"
+      (as-identifier db-spec cname)
+      "FOREIGN KEY"
+      (as-list (map (partial as-identifier db-spec) columns))
+      "REFERENCES"
+      (as-identifier db-spec foreign-table :schema)
+      (as-list (map (partial as-identifier db-spec) foreign-columns))
+      (when match (as-sql-keyword match))
+      (when (contains? triggered-actions :on-delete)
+        (str "ON DELETE " (as-sql-keyword (:on-delete triggered-actions))))
+      (when (contains? triggered-actions :on-update)
+        (str "ON UPDATE " (as-sql-keyword (:on-update triggered-actions)))))))
 
 ;;; Statements
 
@@ -150,8 +149,8 @@
   [statement]
   (let [{:keys [db-spec sname elements]} statement]
     (str "CREATE SCHEMA "
-         (join "\n\n" (conj (map compile elements)
-                            (as-identifier db-spec sname))))))
+         (apply join "\n\n" (conj (map compile elements)
+                                  (as-identifier db-spec sname))))))
 
 (defmethod compile [::standard CreateTableStatement]
   [statement]
@@ -165,8 +164,7 @@
   [statement]
   (let [{:keys [db-spec otype oname behavior]} statement]
     (join \space
-      (concat
-       ["DROP"
-        (as-sql-keyword otype)
-        (as-identifier db-spec oname :schema)
-        (as-sql-keyword behavior)]))))
+      "DROP"
+      (as-sql-keyword otype)
+      (as-identifier db-spec oname :schema)
+      (as-sql-keyword behavior))))

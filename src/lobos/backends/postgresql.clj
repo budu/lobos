@@ -62,21 +62,16 @@
     (unsupported (#{:binary :varbinary} dtype)
       "Use blob instead.")
     (join \space
-      (concat
-       [(str (as-sql-keyword dtype)
-             (as-list args))]
-       (when time-zone ["WITH TIME ZONE"])))))
+      (str (as-sql-keyword dtype) (as-list args))
+      (when time-zone "WITH TIME ZONE"))))
 
 (defmethod compile [:postgresql ColumnDefinition]
   [definition]
   (let [{:keys [db-spec cname data-type default
                 auto-inc not-null others]} definition]
-    (join \space
-      (concat
-       [(as-identifier db-spec cname)
-        (if auto-inc
-          "SERIAL"
-          (compile data-type))]
-       (when default  ["DEFAULT" (compile default)])
-       (when not-null ["NOT NULL"])
-       others))))
+    (apply join \space
+      (as-identifier db-spec cname)
+      (if auto-inc "SERIAL" (compile data-type))
+      (when default (str "DEFAULT " (compile default)))
+      (when not-null "NOT NULL")
+      others)))

@@ -53,15 +53,13 @@
 (defmethod compile [:sqlite DataTypeExpression]
   [expression]
   (let [{:keys [dtype args options]} expression
-        {:keys [encoding collate time-zone]} options]
+        {:keys [collate time-zone]} options]
     (unsupported (and (#{:decimal :numeric} dtype) (= (count args) 2))
       "Doesn't support scale argument.")
     (join \space
-      (concat
-       [(str (as-sql-keyword dtype) (as-list args))]
-       (when encoding ["CHARACTER SET" (as-str encoding)])
-       (when collate ["COLLATE" (as-str collate)])
-       (when time-zone ["WITH TIME ZONE"])))))
+      (str (as-sql-keyword dtype) (as-list args))
+      (when collate (str "COLLATE " (as-str collate)))
+      (when time-zone "WITH TIME ZONE"))))
 
 (defmethod compile [:sqlite AutoIncClause]
   [_]
@@ -70,16 +68,16 @@
 (defmethod compile [:sqlite CreateSchemaStatement]
   [statement]
   (let [{:keys [db-spec sname elements]} statement]
-    (join ";\n\n"
-          (map (comp compile
-                     #(assoc-in % [:db-spec :schema] sname))
-               elements))))
+    (apply join ";\n\n"
+      (map (comp compile
+                 #(assoc-in % [:db-spec :schema] sname))
+           elements))))
 
 (defmethod compile [:sqlite DropStatement]
   [statement]
   (let [{:keys [db-spec otype oname behavior]} statement]
     (when (#{:table} otype)
       (join \space
-        ["DROP"
-         (as-sql-keyword otype)
-         (as-identifier db-spec oname)]))))
+        "DROP"
+        (as-sql-keyword otype)
+        (as-identifier db-spec oname)))))

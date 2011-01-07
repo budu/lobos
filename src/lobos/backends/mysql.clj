@@ -68,11 +68,9 @@
     (unsupported (:time-zone options)
       "Time zones not supported.")
     (join \space
-      (concat
-       [(str (as-sql-keyword dtype)
-             (as-list args))]
-       (when encoding ["CHARACTER SET" (as-str encoding)])
-       (when collate ["COLLATE" (as-str collate)])))))
+      (str (as-sql-keyword dtype) (as-list args))
+      (when encoding (str "CHARACTER SET " (as-str encoding)))
+      (when collate (str "COLLATE " (as-str collate))))))
 
 (defmethod compile [:mysql AutoIncClause]
   [_]
@@ -81,20 +79,19 @@
 (defmethod compile [:mysql CreateSchemaStatement]
   [statement]
   (let [{:keys [db-spec sname elements]} statement]
-    (join ";\n\n"
-          (conj (map (comp compile
-                           #(assoc-in % [:db-spec :schema] sname))
-                     elements)
-                (str "CREATE SCHEMA "
-                     (as-identifier db-spec sname))))))
+    (apply join ";\n\n"
+      (conj (map (comp compile
+                       #(assoc-in % [:db-spec :schema] sname))
+                 elements)
+            (str "CREATE SCHEMA "
+                 (as-identifier db-spec sname))))))
 
 (defmethod compile [:mysql DropStatement]
   [statement]
   (let [{:keys [db-spec otype oname behavior]} statement]
     (join \space
-      (concat
-       ["DROP"
-        (as-sql-keyword otype)
-        (as-identifier db-spec oname :schema)]
-       (when (and behavior (#{:table} otype))
-         [(as-sql-keyword behavior)])))))
+      "DROP"
+      (as-sql-keyword otype)
+      (as-identifier db-spec oname :schema)
+      (when (and behavior (#{:table} otype))
+        [(as-sql-keyword behavior)]))))

@@ -13,7 +13,7 @@
                                 replace
                                 upper-case]])))
 
-(defn join [separator coll]
+(defn join [separator & coll]
   (clojure.string/join separator (filter identity coll)))
 
 (defn as-str ; taken from clojure.contrib.string
@@ -35,7 +35,7 @@
   separated by commas. Apply as-str to coll items."
   [coll]
   (when (not-empty coll)
-    (format "(%s)" (join ", " (map as-str coll)))))
+    (format "(%s)" (apply join ", " (map as-str coll)))))
 
 (defn as-sql-keyword
   "Returns the given string, symbol or keyword as an upper-cased string
@@ -48,9 +48,9 @@
 
 (defn make-constraint-name [table ctype columns]
   (keyword
-   (replace (join "_" (conj (map name columns)
-                            (name ctype)
-                            (-> table :name name)))
+   (replace (apply join "_" (conj (map name columns)
+                                  (name ctype)
+                                  (-> table :name name)))
              \- \_)))
 
 (defn optional [pred? args]
