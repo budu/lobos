@@ -11,6 +11,7 @@
   (:use clojure.test
         lobos.schema)
   (:import (lobos.schema Column
+                         ForeignKeyConstraint
                          UniqueConstraint
                          DataType
                          Table
@@ -23,9 +24,9 @@
                 (unique-constraint :unique :bar (list :baz)))
          (table* :foo {:bar (column* :bar nil nil)}
                  {:unique_bar_baz (UniqueConstraint.
-                                :unique_bar_baz
-                                :unique
-                                [:bar :baz])} {}))
+                                   :unique_bar_baz
+                                   :unique
+                                   [:bar :baz])} {}))
       "Unnamed unique constraint definition")
   (is (= (table :foo (column :baz nil nil)
                 (unique-constraint :unique :bar (list :baz)))
@@ -51,6 +52,51 @@
                                 :unique
                                 [:bar :baz])} {}))
       "Unique constraint definition"))
+
+(def foreign-key-stub
+  (ForeignKeyConstraint. :fkey_bar_a_b_c [:a :b :c] :bar [:a :b :c] nil {}))
+
+(deftest test-foreign-key
+  (is (= (table :foo (foreign-key [:a :b :c] :bar))
+         (table* :foo {} {:fkey_bar_a_b_c foreign-key-stub}))
+      "Foreign key definition")
+  (is (= (table :foo (foreign-key :foobar [:a :b :c] :bar))
+         (table* :foo {} {:foobar (assoc foreign-key-stub
+                                    :cname :foobar)}))
+      "Foreign key definition with name")
+  (is (= (table :foo (foreign-key [:a :b :c] :bar [:d :e :f]))
+         (table* :foo {} {:fkey_bar_a_b_c (assoc foreign-key-stub
+                                            :foreign-columns [:d :e :f])}))
+      "Foreign key definition with foreign columns")
+  (is (= (table :foo (foreign-key [:a :b :c] :bar :full))
+         (table* :foo {} {:fkey_bar_a_b_c (assoc foreign-key-stub
+                                            :match :full)}))
+      "Foreign key definition with match")
+  (is (= (table :foo (foreign-key [:a :b :c] :bar :on-delete :cascade))
+         (table* :foo {} {:fkey_bar_a_b_c (assoc foreign-key-stub
+                                            :triggered-actions
+                                            {:on-delete :cascade})}))
+      "Foreign key definition with one triggered action")
+  (is (= (table :foo (foreign-key [:a :b :c] :bar :on-delete :cascade
+                                                  :on-update :restrict))
+         (table* :foo {} {:fkey_bar_a_b_c (assoc foreign-key-stub
+                                            :triggered-actions
+                                            {:on-delete :cascade
+                                             :on-update :restrict})}))
+      "Foreign key definition with two triggered actions")
+  (is (= (table :foo (foreign-key :foobar [:a :b :c]
+                                  :bar [:d :e :f]
+                                  :full
+                                  :on-delete :cascade
+                                  :on-update :restrict))
+         (table* :foo {} {:foobar (assoc foreign-key-stub
+                                    :cname :foobar
+                                    :foreign-columns [:d :e :f]
+                                    :match :full
+                                    :triggered-actions
+                                    {:on-delete :cascade
+                                     :on-update :restrict})}))
+      "Foreign key definition with everything"))
 
 ;;;; Column definition tests
 

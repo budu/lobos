@@ -45,3 +45,8 @@
 
 (defn as-keyword [s]
   (-> s lower-case (replace #"[_ ]" "-") keyword))
+
+(defn optional [pred? args]
+  (if (pred? (first args))
+    [(first args) (next args)]
+    [nil args]))

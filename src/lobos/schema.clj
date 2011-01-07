@@ -12,7 +12,7 @@
   (:refer-clojure :exclude [bigint boolean char double float time])
   (:require (lobos [ast :as ast]))
   (:use (clojure.contrib [def :only [defalias]])
-        (clojure [string :only [join]]))
+        lobos.utils)
   (:import (lobos.ast AutoIncClause
                       ColumnDefinition
                       CreateTableStatement
@@ -82,7 +82,7 @@
                             (keyword
                              (join "_"
                                (conj (map name columns)
-                                (name constraint-type)))))]
+                                     (name constraint-type)))))]
     (update-in table [:constraints] conj
                [constraint-name
                 (UniqueConstraint. constraint-name
@@ -100,6 +100,38 @@
   given table."
   [table name-or-column & columns]
   (unique-constraint table :unique name-or-column columns))
+
+(defrecord ForeignKeyConstraint
+  [cname columns foreign-table foreign-columns match triggered-actions])
+
+(defn foreign-key
+  "Constructs an abstract foreign key constraint definition and add it
+  to the given table"
+  {:arglists '([table name? columns foreign-table foreign-columns? match?
+                & triggered-actions])}
+  [table & args]
+  (let [[constraint-name args] (optional keyword? args)
+        columns                (first args)
+        foreign-table          (second args)
+        constraint-name        (or constraint-name
+                                   (keyword
+                                    (join "_"
+                                      (conj (map name columns)
+                                            (name foreign-table)
+                                            "fkey"))))
+        args                   (nnext args)
+        [foreign-columns args] (optional vector? args)
+        foreign-columns        (or foreign-columns columns)
+        [match args]           (optional #{:full :partial :simple} args)
+        triggered-actions      (apply hash-map args)]
+    (update-in table [:constraints] conj
+               [constraint-name
+                (ForeignKeyConstraint. constraint-name
+                                       columns
+                                       foreign-table
+                                       foreign-columns
+                                       match
+                                       triggered-actions)])))
 
 ;;;; Data-type definition
 
