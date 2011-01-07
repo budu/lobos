@@ -379,14 +379,10 @@
 
 (defn schema
   "Constructs an abstract schema definition."
-  [schema-name & [options-or-element & elements]]
+  {:arglists '([schema-name options? & elements])}
+  [schema-name & args]
   (name-required schema-name "schema")
-  (let [options (when-not (definition? options-or-element)
-                  options-or-element)
-        elements (if options
-                   elements
-                   (when elements
-                     (conj elements options-or-element)))]
+  (let [[options elements] (optional (comp not definition?) args)]
     (Schema.
      schema-name
      (into (sorted-map)

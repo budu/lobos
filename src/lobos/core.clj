@@ -14,7 +14,8 @@
                    [connectivity :as conn]
                    [schema :as schema]))
   (:use (clojure.contrib [def :only [name-with-attributes]])
-        (clojure [pprint :only [pprint]])))
+        (clojure [pprint :only [pprint]])
+        lobos.utils))
 
 ;;;; Globals
 
@@ -89,22 +90,22 @@
 (defmacro defschema
   "Defines a var containing the specified schema constructed from
   database meta-data."
-  [var-name schema-name & [connection-info & elements]]
-  `(let [schema-name# ~schema-name
-         connection-info# ~connection-info
-         elements# ~elements
-         [connection-info# elements#]
-         (if (schema/definition? connection-info#)
-           [nil (conj elements# connection-info#)]
-           [connection-info# elements#])
-         db-spec# (conn/get-db-spec connection-info#)
-         options# {:db-spec db-spec#}
-         schema# (if elements#
-                   (update-global-schema
-                    (apply schema/schema schema-name# options# elements#))
-                   (update-global-schema schema-name# db-spec#))]
-         (defn ~var-name []
-           (@global-schemas (schema-key schema#)))))
+  {:arglists '([connection-info? var-name schema-name & elements])}
+  [& args]
+  (let [[connection-info args] (optional map? args)
+        var-name (first args)
+        schema-name (second args)
+        elements (nnext args)]
+    `(let [db-spec# (conn/get-db-spec ~connection-info)
+           options# {:db-spec db-spec#}
+           elements# (list ~@elements)]
+       (defn ~var-name []
+         (@global-schemas
+          (schema-key
+           (if elements#
+             (update-global-schema
+              (apply schema/schema ~schema-name options# elements#))
+             (update-global-schema ~schema-name db-spec#))))))))
 
 ;;;; Actions
 
