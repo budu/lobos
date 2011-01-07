@@ -13,6 +13,7 @@
   (:use (clojure.contrib [def :only [defvar-]])
         lobos.analyzer
         lobos.compiler
+        lobos.metadata
         lobos.utils)
   (:import (lobos.ast AutoIncClause
                       DataTypeExpression
@@ -84,8 +85,19 @@
 
 (defmethod compile [:sqlserver DropStatement]
   [statement]
-  (let [{:keys [db-spec otype oname behavior]} statement]
-    (join \space
-      ["DROP"
-       (as-sql-keyword otype)
-       (as-identifier db-spec oname :schema)])))
+  (let [{:keys [db-spec otype oname behavior]} statement
+        sql-string (join \space
+                         ["DROP"
+                          (as-sql-keyword otype)
+                          (as-identifier db-spec oname :schema)])]
+    (join \;
+      (concat
+       (when (and (= otype :schema)
+                  (= behavior :cascade))
+         (for [element (with-db-meta db-spec
+                         (-> (analyze-schema oname) :elements keys))]
+           (compile (schema/build-drop-statement
+                     (schema/table element)
+                     :cascade
+                     (assoc db-spec :schema oname)))))
+       [sql-string]))))
