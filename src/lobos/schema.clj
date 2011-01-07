@@ -69,18 +69,6 @@
      ctype
      columns)))
 
-(defn constraint
-  "Constructs an abstract constraint definition and add it to the given
-  table."
-  [table constraint-name constraint-type specification]
-  (update-in table [:constraints] conj
-             [constraint-name
-              (condp contains? constraint-type
-                #{:unique :primary-key}
-                (UniqueConstraint. constraint-name
-                                   constraint-type
-                                   specification))]))
-
 (defn unique-constraint
   "Constructs an abstract unique (or primary-key depending on the given
   type) constraint definition and add it to the given table."
@@ -95,10 +83,11 @@
                              (join "_"
                                (conj (map name columns)
                                 (name constraint-type)))))]
-    (constraint table
-                constraint-name
-                constraint-type
-                (vec columns))))
+    (update-in table [:constraints] conj
+               [constraint-name
+                (UniqueConstraint. constraint-name
+                                   constraint-type
+                                   (vec columns))])))
 
 (defn primary-key
   "Constructs an abstract primary key constraint definition and add it
