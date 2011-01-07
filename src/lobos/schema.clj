@@ -19,6 +19,7 @@
                       CreateSchemaStatement
                       DataTypeExpression
                       DropStatement
+                      ForeignKeyConstraintDefinition
                       UniqueConstraintDefinition
                       ValueExpression)))
 
@@ -102,7 +103,18 @@
   (unique-constraint table :unique name-or-column columns))
 
 (defrecord ForeignKeyConstraint
-  [cname columns foreign-table foreign-columns match triggered-actions])
+  [cname columns foreign-table foreign-columns match triggered-actions]
+  Buildable
+
+  (build-definition [this db-spec]
+    (ForeignKeyConstraintDefinition.
+     db-spec
+     cname
+     columns
+     foreign-table
+     foreign-columns
+     match
+     triggered-actions)))
 
 (defn foreign-key
   "Constructs an abstract foreign key constraint definition and add it

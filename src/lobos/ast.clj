@@ -45,7 +45,7 @@
   [db-spec cname ctype columns])
 
 (defrecord ForeignKeyConstraintDefinition
-  [db-spec cname columns refered match-type triggered-action])
+  [db-spec cname columns foreign-table foreign-columns match triggered-actions])
 
 (defrecord CheckConstraintDefinition
   [db-spec cname predicate])
