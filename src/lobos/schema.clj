@@ -116,11 +116,12 @@
 
 (defrecord DataType [dtype args options])
 
-(defn data-type [dtype & args]
+(defn data-type [dtype & [args options]]
   (DataType. dtype (vec args)
-             {:time-zone nil
-              :collate nil
-              :encoding nil}))
+             (merge {:time-zone nil
+                     :collate nil
+                     :encoding nil}
+                     options)))
 
 ;;;; Column definition
 
@@ -147,10 +148,11 @@
   (let [{:keys [default encoding collate]}
         (into {} (filter vector? options))
         data-type (when data-type
-                    (update-in data-type [:options] assoc
-                               :encoding encoding
-                               :collate collate
-                               :time-zone ((set options) :time-zone)))
+                    (update-in data-type [:options]
+                               (partial merge-with #(or %1 %2))
+                               {:encoding encoding
+                                :collate collate
+                                :time-zone ((set options) :time-zone)}))
         others    (vec (filter string? options))
         not-null  (clojure.core/boolean (:not-null options))
         auto-inc  (clojure.core/boolean (:auto-inc options))]
@@ -191,7 +193,7 @@
                   options# ~options]
               (column ~'table
                       ~'column-name
-                      (apply data-type ~(keyword n) dargs#)
+                      (data-type ~(keyword n) dargs#)
                       options#))))))
 
 (defmacro def-simple-typed-columns

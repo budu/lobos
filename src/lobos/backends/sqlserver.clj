@@ -24,7 +24,7 @@
 
 (defvar- analyzer-data-type-aliases
   {:bit :boolean
-   :datetime :timestamp
+   :datetime2 :timestamp
    :image :blob
    :int :integer
    :ntext :nclob
@@ -33,11 +33,15 @@
 (defmethod analyze [:microsoft-sql-server DataType]
   [_ column-meta]
   (let [dtype (-> column-meta :type_name as-keyword)
+        [dtype options] (if (= dtype :datetimeoffset)
+                          [:timestamp {:time-zone true}]
+                          [dtype nil])
         dtype (first (replace analyzer-data-type-aliases
                               [dtype]))]
-    (apply schema/data-type
-           dtype
-           (analyze-data-type-args dtype column-meta))))
+    (schema/data-type
+     dtype
+     (analyze-data-type-args dtype column-meta)
+     options)))
 
 ;;;; Compiler
 
@@ -56,14 +60,18 @@
    :clob      :text
    :double    :float
    :nclob     :ntext
-   :timestamp :datetime})
+   :timestamp :datetime2})
 
 (defmethod compile [:sqlserver DataTypeExpression]
   [expression]
   (let [{:keys [dtype args options]} expression
-        {:keys [collate]} options
-        dtype (first (replace compiler-data-type-aliases [dtype]))
-        args (if (#{:image :datetime :ntext :text} dtype) [] args)]
+        {:keys [collate time-zone]} options
+        dtype (if (and (= dtype :timestamp) time-zone)
+                :datetimeoffset
+                (first (replace compiler-data-type-aliases [dtype])))
+        args (if (#{:image :ntext :text} dtype) [] args)]
+    (unsupported (and (= dtype :time) time-zone)
+      "Time zone unsupported for time data type.")
     (join \space
       (concat
        [(str (as-sql-keyword dtype)

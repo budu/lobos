@@ -34,13 +34,12 @@
 (defmethod analyze [:mysql DataType]
   [_ column-meta]
   (let [dtype (-> column-meta :type_name as-keyword)
-        dtype (first (replace analyzer-data-type-aliases
-                              [dtype]))]
-    (apply schema/data-type
-           dtype
-           (if (#{:time :timestamp} dtype)
-             []
-             (analyze-data-type-args dtype column-meta)))))
+        dtype (first (replace analyzer-data-type-aliases [dtype]))]
+    (schema/data-type
+     dtype
+     (if (#{:time :timestamp} dtype)
+       []
+       (analyze-data-type-args dtype column-meta)))))
 
 ;;;; Compiler
 
@@ -66,6 +65,8 @@
         args (if (#{:time :timestamp} dtype) [] args)]
     (unsupported (= dtype :real)
       "Use double instead.")
+    (unsupported (:time-zone options)
+      "Time zones not supported.")
     (join \space
       (concat
        [(str (as-sql-keyword dtype)

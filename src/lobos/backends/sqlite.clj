@@ -10,7 +10,8 @@
   "Compiler implementation for SQLite."
   (:refer-clojure :exclude [compile])
   (:require (lobos [schema :as schema]))
-  (:use lobos.analyzer
+  (:use (clojure.contrib [def :only [defvar-]])
+        lobos.analyzer
         lobos.compiler
         lobos.utils)
   (:import (lobos.ast AutoIncClause
@@ -23,15 +24,25 @@
 
 ;;;; Analyzer
 
+(defvar- analyzer-data-type-aliases
+  {:time-with-time-zone :time
+   :timestamp-with-time-zone :timestamp})
+
 (defmethod analyze [:sqlite DataType]
   [_ column-meta]
   (let [dtype (-> column-meta :type_name as-keyword)
+        tz? #{:time-with-time-zone :timestamp-with-time-zone}
+        [dtype options] (if (tz? dtype)
+                          [dtype {:time-zone true}]
+                          [dtype nil])
+        dtype (first (replace analyzer-data-type-aliases [dtype]))
         args (analyze-data-type-args dtype column-meta)]
-    (apply schema/data-type
-           dtype
-           (if (#{:decimal :numeric} dtype)
-             [(first args)]
-             args))))
+    (schema/data-type
+     dtype
+     (if (#{:decimal :numeric} dtype)
+       [(first args)]
+       args)
+     options)))
 
 ;;;; Compiler
 

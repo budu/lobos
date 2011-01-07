@@ -191,7 +191,7 @@
     (doseq [dtype [:char :nchar :varchar :nvarchar
                    :binary :varbinary
                    :numeric :decimal]]
-      (let [dtype (data-type dtype 3)
+      (let [dtype (data-type dtype [3])
             lobos (ignore-unsupported
                    (create lobos
                            (table :foo
@@ -206,7 +206,7 @@
                       (-> dtype :dtype name)
                       (:args dtype)))
           (drop lobos (table :foo)))))
-    (let [dtype (data-type :numeric 8 3)
+    (let [dtype (data-type :numeric [8 3])
           lobos (ignore-unsupported
                  (create lobos
                          (table :foo
@@ -220,4 +220,18 @@
             (format "Data type arguments not matching for %s %s"
                     (-> dtype :dtype name)
                     (:args dtype)))
-        (drop lobos (table :foo))))))
+        (drop lobos (table :foo))))
+    (doseq [dtype [:time :timestamp]]
+      (let [dtype (data-type dtype [] {:time-zone true})
+            lobos (ignore-unsupported
+                   (create lobos
+                           (table :foo
+                                  (column :bar dtype nil))))]
+        (when lobos
+          (is (= (eq (-> lobos :elements :foo :columns :bar :data-type :dtype))
+                 (eq (-> (column* :bar dtype []) :data-type :dtype)))
+              (str "Data type not matching for " (-> dtype :dtype name)))
+          (is (-> lobos :elements :foo :columns :bar :data-type :options
+                  :time-zone)
+              (str "Timezone not set for " (-> dtype :dtype name)))
+          (drop lobos (table :foo)))))))

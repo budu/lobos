@@ -94,11 +94,11 @@
         "Numeric")
     (is (= (table :foo (numeric :foo 2))
            (table* :foo {:foo (assoc column-definition-stub
-                                :data-type (data-type :numeric 2))} {} {}))
+                                :data-type (data-type :numeric [2]))} {} {}))
         "Numeric with precision")
     (is (= (table :foo (numeric :foo 2 4))
            (table* :foo {:foo (assoc column-definition-stub
-                                :data-type (data-type :numeric 2 4))} {} {}))
+                                :data-type (data-type :numeric [2 4]))} {} {}))
         "Numeric with precision and scale")
     (is (= (table :foo (numeric :foo "BAR"))
            (table* :foo {:foo (assoc column-definition-stub
@@ -111,15 +111,15 @@
         "Float")
     (is (= (table :foo (float :foo 1))
            (table* :foo {:foo (assoc column-definition-stub
-                                :data-type (data-type :float 1))} {} {}))
+                                :data-type (data-type :float [1]))} {} {}))
         "Float with precision")
     (is (= (table :foo (varchar :foo 1))
            (table* :foo {:foo (assoc column-definition-stub
-                                :data-type (data-type :varchar 1))} {} {}))
+                                :data-type (data-type :varchar [1]))} {} {}))
         "Varchar with limit")
     (is (= (table :foo (varchar :foo 1 "BAR"))
            (table* :foo {:foo (assoc column-definition-stub
-                                :data-type (data-type :varchar 1)
+                                :data-type (data-type :varchar [1])
                                      :others ["BAR"])} {} {}))
         "Varchar with other option")
     (is (= (table :foo (timestamp :foo))

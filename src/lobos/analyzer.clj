@@ -85,9 +85,9 @@
 (defmethod analyze [::standard DataType]
   [_ column-meta]
   (let [dtype (-> column-meta :type_name as-keyword)]
-    (apply schema/data-type
-           dtype
-           (analyze-data-type-args dtype column-meta))))
+    (schema/data-type
+     dtype
+     (analyze-data-type-args dtype column-meta))))
 
 (defmethod analyze [::standard Column]
   [_ column-meta]

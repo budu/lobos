@@ -29,16 +29,20 @@
    :int2 :smallint
    :int4 :integer
    :int8 :bigint
-   :text :nclob})
+   :text :nclob
+   :timestamptz :timestamp
+   :timetz :time})
 
 (defmethod analyze [:postgresql DataType]
   [_ column-meta]
   (let [dtype (-> column-meta :type_name as-keyword)
+        options {:time-zone (#{:timetz :timestamptz} dtype)}
         dtype (first (replace analyzer-data-type-aliases
                               [dtype]))]
-    (apply schema/data-type
-           dtype
-           (analyze-data-type-args dtype column-meta))))
+    (schema/data-type
+     dtype
+     (analyze-data-type-args dtype column-meta)
+     options)))
 
 ;;;; Compiler
 
