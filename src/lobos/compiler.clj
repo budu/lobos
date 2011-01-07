@@ -19,6 +19,7 @@
                       CreateSchemaStatement
                       DataTypeExpression
                       DropStatement
+                      ForeignKeyConstraintDefinition
                       Identifier
                       Mode
                       UniqueConstraintDefinition
@@ -124,6 +125,24 @@
                     (as-identifier db-spec cname)
                     spec])
       spec)))
+
+(defmethod compile [::standard ForeignKeyConstraintDefinition]
+  [definition]
+  (let [{:keys [db-spec cname columns foreign-table foreign-columns match
+                triggered-actions]} definition]
+    (join \space
+      ["CONSTRAINT"
+       (as-identifier db-spec cname)
+       "FOREIGN KEY"
+       (as-list (map (partial as-identifier db-spec) columns))
+       "REFERENCES"
+       (as-identifier db-spec foreign-table :schema)
+       (as-list (map (partial as-identifier db-spec) foreign-columns))
+       (when match (as-sql-keyword match))
+       (when (contains? triggered-actions :on-delete)
+         (str "ON DELETE " (as-sql-keyword (:on-delete triggered-actions))))
+       (when (contains? triggered-actions :on-update)
+         (str "ON UPDATE " (as-sql-keyword (:on-update triggered-actions))))])))
 
 ;;; Statements
 
