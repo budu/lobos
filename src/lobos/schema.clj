@@ -80,10 +80,9 @@
                   columns
                   (conj columns name-or-column))
         constraint-name (or constraint-name
-                            (keyword
-                             (join "_"
-                               (conj (map name columns)
-                                     (name constraint-type)))))]
+                            (make-constraint-name table
+                                                  constraint-type
+                                                  columns))]
     (update-in table [:constraints] conj
                [constraint-name
                 (UniqueConstraint. constraint-name
@@ -125,17 +124,13 @@
   (let [[constraint-name args] (optional keyword? args)
         columns                (first args)
         foreign-table          (second args)
-        constraint-name        (or constraint-name
-                                   (keyword
-                                    (join "_"
-                                      (conj (map name columns)
-                                            (name foreign-table)
-                                            "fkey"))))
         args                   (nnext args)
         [foreign-columns args] (optional vector? args)
         foreign-columns        (or foreign-columns columns)
         [match args]           (optional #{:full :partial :simple} args)
-        triggered-actions      (apply hash-map args)]
+        triggered-actions      (apply hash-map args)
+        constraint-name        (or constraint-name
+                                   (make-constraint-name table "fkey" columns))]
     (update-in table [:constraints] conj
                [constraint-name
                 (ForeignKeyConstraint. constraint-name

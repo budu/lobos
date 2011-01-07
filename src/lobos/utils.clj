@@ -46,6 +46,13 @@
 (defn as-keyword [s]
   (-> s lower-case (replace #"[_ ]" "-") keyword))
 
+(defn make-constraint-name [table ctype columns]
+  (keyword
+   (replace (join "_" (conj (map name columns)
+                            (name ctype)
+                            (-> table :name name)))
+             \- \_)))
+
 (defn optional [pred? args]
   (if (pred? (first args))
     [(first args) (next args)]
