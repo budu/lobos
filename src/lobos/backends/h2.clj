@@ -50,4 +50,4 @@
       (as-sql-keyword otype)
       (as-identifier db-spec oname :schema)
       (when (and behavior (#{:table} otype))
-        [(as-sql-keyword behavior)]))))
+        (as-sql-keyword behavior)))))
