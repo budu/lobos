@@ -109,6 +109,18 @@
                               false))))
     (catch java.sql.SQLException _ nil)))
 
+(defn references-meta
+  "Returns metadata maps for cross reference of the specified foreign
+  table. Results are sorted by their ordinal position and grouped by
+  foreign key name."
+  [sname tname]
+  (group-by :fk_name
+    (resultset-seq
+     (.getImportedKeys (db-meta)
+                       (when-not (supports-schemas) (name sname))
+                       (when (supports-schemas) (name sname))
+                       (name tname)))))
+
 (defn columns-meta
   "Returns metadata maps for each columns of the specified table."
   [sname tname]

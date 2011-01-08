@@ -69,6 +69,11 @@
        :primary-key
        columns))))
 
+(defn sqlite-constraints [sname tname]
+  (map (fn [[cname meta]] (analyze UniqueConstraint sname tname cname meta))
+       (indexes-meta sname tname #(let [nu (:non_unique %)]
+                                    (or (false? nu) (= nu 0))))))
+
 (defmethod analyze [:sqlite Table]
   [_ sname tname]
   (let [pkey (analyze-primary-keys tname)]
@@ -77,7 +82,7 @@
                                     [(:cname c) c])
                                  (columns-meta sname tname)))
                    (into {} (map #(vector (:cname %) %)
-                                 (concat (constraints sname tname)
+                                 (concat (sqlite-constraints sname tname)
                                          (when pkey [pkey])))))))
 
 ;;;; Compiler

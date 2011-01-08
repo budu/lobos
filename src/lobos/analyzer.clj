@@ -14,11 +14,13 @@
         (clojure [string :only [replace]])
         lobos.metadata
         lobos.utils)
-  (:import (lobos.schema Column
-                         UniqueConstraint
+  (:import (java.sql DatabaseMetaData)
+           (lobos.schema Column
+                         ForeignKeyConstraint
                          DataType
                          Schema
-                         Table)))
+                         Table
+                         UniqueConstraint)))
 
 ;;;; Analyzer
 
@@ -62,10 +64,38 @@
      (vec (map #(-> % :column_name keyword)
                index-meta)))))
 
+(def action-rules
+  {DatabaseMetaData/importedKeyCascade    :cascade
+   DatabaseMetaData/importedKeySetNull    :set-null
+   DatabaseMetaData/importedKeyRestrict   :restrict
+   DatabaseMetaData/importedKeySetDefault :set-default})
+
+(defmethod analyze [::standard ForeignKeyConstraint]
+  [_ cname ref-meta]
+  (let [pcolumns (vec (map #(-> % :pkcolumn_name keyword)
+                           ref-meta))
+        fcolumns (vec (map #(-> % :fkcolumn_name keyword)
+                           ref-meta))
+        ptable (-> ref-meta first :pktable_name keyword)
+        on-delete (-> ref-meta first :delete_rule action-rules)
+        on-delete (when on-delete [:on-delete on-delete])
+        on-update (-> ref-meta first :update_rule action-rules)
+        on-update (when on-delete [:on-update on-update])]
+    (ForeignKeyConstraint.
+     (keyword cname)
+     fcolumns
+     ptable
+     pcolumns
+     nil
+     (into {} [on-delete on-update]))))
+
 (defn constraints [sname tname]
-  (map (fn [[cname meta]] (analyze UniqueConstraint sname tname cname meta))
-       (indexes-meta sname tname #(let [nu (:non_unique %)]
-                                    (or (false? nu) (= nu 0))))))
+  (concat
+   (map (fn [[cname meta]] (analyze UniqueConstraint sname tname cname meta))
+        (indexes-meta sname tname #(let [nu (:non_unique %)]
+                                     (or (false? nu) (= nu 0)))))
+   (map (fn [[cname meta]] (analyze ForeignKeyConstraint cname meta))
+        (references-meta sname tname))))
 
 (defn analyze-data-type-args
   "Returns a vector containing the data type arguments for the given
