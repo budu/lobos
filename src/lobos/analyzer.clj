@@ -51,7 +51,6 @@
             (keyword func))
           :else (str expr))))
 
-
 (defmethod analyze [::standard UniqueConstraint]
   [_ sname tname cname index-meta]
   (let [pkeys (primary-keys sname tname)]
@@ -60,13 +59,13 @@
      (if (pkeys (keyword cname))
        :primary-key
        :unique)
-     {:columns
-      (vec (map #(-> % :column_name keyword)
-                index-meta))})))
+     (vec (map #(-> % :column_name keyword)
+               index-meta)))))
 
 (defn constraints [sname tname]
   (map (fn [[cname meta]] (analyze UniqueConstraint sname tname cname meta))
-       (indexes-meta sname tname #(-> % :non_unique not))))
+       (indexes-meta sname tname #(let [nu (:non_unique %)]
+                                    (or (false? nu) (= nu 0))))))
 
 (defn analyze-data-type-args
   "Returns a vector containing the data type arguments for the given
