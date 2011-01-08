@@ -13,6 +13,7 @@
   (:use (clojure.contrib [def :only [defvar-]])
         lobos.analyzer
         lobos.compiler
+        lobos.metadata
         lobos.utils)
   (:import (lobos.ast AutoIncClause
                       CreateSchemaStatement
@@ -20,7 +21,8 @@
                       DataTypeExpression
                       DropStatement
                       Identifier)
-           (lobos.schema DataType)))
+           (lobos.schema DataType
+                         UniqueConstraint)))
 
 ;;;; Analyzer
 
@@ -40,6 +42,18 @@
      (if (#{:time :timestamp} dtype)
        []
        (analyze-data-type-args dtype column-meta)))))
+
+(defmethod analyze [:mysql UniqueConstraint]
+  [_ sname tname cname index-meta]
+  (let [pkeys (primary-keys sname tname)
+        pkey (pkeys (keyword cname))]
+    (UniqueConstraint.
+     (when-not pkey (keyword cname))
+     (if pkey
+       :primary-key
+       :unique)
+     (vec (map #(-> % :column_name keyword)
+               index-meta)))))
 
 ;;;; Compiler
 
