@@ -96,16 +96,15 @@
   [sname tname & [f]]
   (try
     (group-by :index_name
-      (sort-by :ordinal_position
-        (filter #(and (> (:type %) 0)
-                      ((or f identity) %))
-          (resultset-seq
-           (.getIndexInfo (db-meta)
-                          (when-not (supports-schemas) (name sname))
-                          (when (supports-schemas) (name sname))
-                          (name tname)
-                          false
-                          false)))))
+      (filter #(and (> (:type %) 0)
+                    ((or f identity) %))
+              (resultset-seq
+               (.getIndexInfo (db-meta)
+                              (when-not (supports-schemas) (name sname))
+                              (when (supports-schemas) (name sname))
+                              (name tname)
+                              false
+                              false))))
     (catch java.sql.SQLException _ nil)))
 
 (defn columns-meta
