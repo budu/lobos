@@ -154,14 +154,9 @@
         [params* & body] args]
     `(do
        (defn ~name [& params#]
-         (let [fparam# (first params#)
-               [cnx-or-schema# params#]
-               (if (or (fn? fparam#)
-                       (schema/schema? fparam#)
-                       (not (schema/definition? fparam#))
-                       (keyword? fparam#))
-                 [fparam# (next params#)]
-                 [nil params#])
+         (let [[cnx-or-schema# params#]
+               (optional #(or (schema/schema? %)
+                              ((comp not schema/definition?) %)) params#)
                ~params* params#
                cnx-or-schema# (or cnx-or-schema# (get-default-schema))
                ~'schema (cond (schema/schema? cnx-or-schema#) cnx-or-schema#
