@@ -237,10 +237,8 @@
                                         (unique-constraint ctype :bar []))))
             cname (make-constraint-name {:name :foo} ctype [:bar])]
         (when lobos
-          (is (or (= (-> lobos :elements :foo :constraints cname)
-                     (UniqueConstraint. cname ctype [:bar]))
-                  (= ((-> lobos :elements :foo :constraints) nil)
-                     (UniqueConstraint. nil ctype [:bar])))
+          (is (= (-> lobos :elements :foo :constraints cname)
+                 (UniqueConstraint. cname ctype [:bar]))
               (format "Checking if %s constraint has been created"
                       (name ctype)))
           (drop lobos (table :foo)))))))

@@ -23,15 +23,6 @@
                       UniqueConstraintDefinition
                       ValueExpression)))
 
-;;;; Helpers
-
-(defn conj-when
-  "Like conj but if test is false returns coll untouched."
-  [coll test x & xs]
-  (if test
-    (apply conj coll x xs)
-    coll))
-
 ;;;; Protocols
 
 (defprotocol Buildable

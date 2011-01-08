@@ -50,10 +50,19 @@
   (keyword
    (replace (apply join "_" (conj (map name columns)
                                   (name ctype)
-                                  (-> table :name name)))
+                                  (name (if (keyword? table)
+                                          table
+                                          (:name table)))))
              \- \_)))
 
 (defn optional [pred? args]
   (if (pred? (first args))
     [(first args) (next args)]
     [nil args]))
+
+(defn conj-when
+  "Like conj but if test is false returns coll untouched."
+  [coll test x & xs]
+  (if test
+    (apply conj coll x xs)
+    coll))

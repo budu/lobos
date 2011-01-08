@@ -13,6 +13,7 @@
   (:use (clojure.contrib [def :only [defvar-]])
         lobos.analyzer
         lobos.compiler
+        lobos.metadata
         lobos.utils)
   (:import (lobos.ast AutoIncClause
                       CreateSchemaStatement
@@ -20,7 +21,10 @@
                       DataTypeExpression
                       DropStatement
                       Identifier)
-           (lobos.schema DataType)))
+           (lobos.schema Column
+                         DataType
+                         UniqueConstraint
+                         Table)))
 
 ;;;; Analyzer
 
@@ -44,6 +48,38 @@
        args)
      options)))
 
+(defmethod analyze [:sqlite UniqueConstraint]
+  [_ sname tname cname index-meta]
+  (let [columns (vec (map #(-> % :column_name keyword)
+                          index-meta))]
+  (UniqueConstraint.
+   (make-constraint-name tname :unique columns)
+   :unique
+   columns)))
+
+(defn analyze-primary-keys [tname]
+  (let [columns (reduce
+                 #(conj %1 (-> %2 :column_name keyword))
+                 []
+                 (resultset-seq
+                  (.getPrimaryKeys (db-meta) nil nil (name tname))))]
+    (when (not-empty columns)
+      (UniqueConstraint.
+       (make-constraint-name tname :primary-key columns)
+       :primary-key
+       columns))))
+
+(defmethod analyze [:sqlite Table]
+  [_ sname tname]
+  (let [pkey (analyze-primary-keys tname)]
+    (schema/table* tname
+                   (into {} (map #(let [c (analyze Column %)]
+                                    [(:cname c) c])
+                                 (columns-meta sname tname)))
+                   (into {} (map #(vector (:cname %) %)
+                                 (concat (constraints sname tname)
+                                         (when pkey [pkey])))))))
+
 ;;;; Compiler
 
 (defmethod compile [:sqlite Identifier]
@@ -63,7 +99,7 @@
 
 (defmethod compile [:sqlite AutoIncClause]
   [_]
-  "AUTOINCREMENT")
+  nil)
 
 (defmethod compile [:sqlite CreateSchemaStatement]
   [statement]

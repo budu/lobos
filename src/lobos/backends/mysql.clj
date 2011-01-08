@@ -46,14 +46,17 @@
 (defmethod analyze [:mysql UniqueConstraint]
   [_ sname tname cname index-meta]
   (let [pkeys (primary-keys sname tname)
-        pkey (pkeys (keyword cname))]
+        pkey (pkeys (keyword cname))
+        columns (vec (map #(-> % :column_name keyword)
+                          index-meta))]
     (UniqueConstraint.
-     (when-not pkey (keyword cname))
+     (if pkey
+       (make-constraint-name tname :primary-key columns)
+       (keyword cname))
      (if pkey
        :primary-key
        :unique)
-     (vec (map #(-> % :column_name keyword)
-               index-meta)))))
+     columns)))
 
 ;;;; Compiler
 
