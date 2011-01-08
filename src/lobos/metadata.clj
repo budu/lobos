@@ -92,11 +92,12 @@
 (defn indexes-meta
   "Returns metadata maps for indexes of the specified table. Results are
   sorted by ordinal position, grouped by index name and can be filtered
-  by the given function f."
+  by the given function f. Doesn't returns indexes that have
+  tableIndexStatistic type."
   [sname tname & [f]]
   (try
     (group-by :index_name
-      (filter #(and (> (:type %) 0)
+      (filter #(and (> (:type %) DatabaseMetaData/tableIndexStatistic)
                     ((or f identity) %))
               (resultset-seq
                (.getIndexInfo (db-meta)
