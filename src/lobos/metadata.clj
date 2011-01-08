@@ -9,7 +9,8 @@
 (ns lobos.metadata
   "Helpers to query the database's meta-data."
   (:require (lobos [connectivity :as conn]))
-  (:use (clojure.contrib [def :only [defvar-]])))
+  (:use (clojure.contrib [def :only [defvar-]]))
+  (:import (java.sql DatabaseMetaData)))
 
 ;;;; Database metadata
 
