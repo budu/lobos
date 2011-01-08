@@ -12,7 +12,8 @@
         (clojure.contrib [io :only [delete-file file]])
         (lobos analyzer compiler connectivity core metadata schema utils)
         (lobos.backends h2 mysql postgresql sqlite sqlserver))
-  (:import (java.lang UnsupportedOperationException)))
+  (:import (java.lang UnsupportedOperationException)
+           (lobos.schema UniqueConstraint)))
 
 ;;;; DB connection specifications
 
@@ -180,9 +181,7 @@
                    :date :time :timestamp]]
       (let [dtype (data-type dtype)
             lobos (ignore-unsupported
-                   (create lobos
-                           (table :foo
-                                  (column :bar dtype nil))))]
+                   (create lobos (table :foo (column :bar dtype nil))))]
         (when lobos
           (is (= (eq (-> lobos :elements :foo :columns :bar :data-type :dtype))
                  (eq (-> (column* :bar dtype []) :data-type :dtype)))
@@ -193,9 +192,7 @@
                    :numeric :decimal]]
       (let [dtype (data-type dtype [3])
             lobos (ignore-unsupported
-                   (create lobos
-                           (table :foo
-                                  (column :bar dtype nil))))]
+                   (create lobos (table :foo (column :bar dtype nil))))]
         (when lobos
           (is (= (eq (-> lobos :elements :foo :columns :bar :data-type :dtype))
                  (eq (-> (column* :bar dtype []) :data-type :dtype)))
@@ -208,9 +205,7 @@
           (drop lobos (table :foo)))))
     (let [dtype (data-type :numeric [8 3])
           lobos (ignore-unsupported
-                 (create lobos
-                         (table :foo
-                                (column :bar dtype nil))))]
+                 (create lobos (table :foo (column :bar dtype nil))))]
       (when lobos
         (is (= (eq (-> lobos :elements :foo :columns :bar :data-type :dtype))
                (eq (-> (column* :bar dtype []) :data-type :dtype)))
@@ -224,9 +219,7 @@
     (doseq [dtype [:time :timestamp]]
       (let [dtype (data-type dtype [] {:time-zone true})
             lobos (ignore-unsupported
-                   (create lobos
-                           (table :foo
-                                  (column :bar dtype nil))))]
+                   (create lobos (table :foo (column :bar dtype nil))))]
         (when lobos
           (is (= (eq (-> lobos :elements :foo :columns :bar :data-type :dtype))
                  (eq (-> (column* :bar dtype []) :data-type :dtype)))
@@ -234,4 +227,20 @@
           (is (-> lobos :elements :foo :columns :bar :data-type :options
                   :time-zone)
               (str "Timezone not set for " (-> dtype :dtype name)))
+          (drop lobos (table :foo)))))))
+
+(def-db-test test-unique-constraint
+  (with-schema [lobos :lobos]
+    (doseq [ctype [:unique :primary-key]]
+      (let [lobos (ignore-unsupported
+                   (create lobos (table :foo (integer :bar)
+                                        (unique-constraint ctype :bar []))))
+            cname (make-constraint-name {:name :foo} ctype [:bar])]
+        (when lobos
+          (is (or (= (-> lobos :elements :foo :constraints cname)
+                     (UniqueConstraint. cname ctype [:bar]))
+                  (= ((-> lobos :elements :foo :constraints) nil)
+                     (UniqueConstraint. nil ctype [:bar])))
+              (format "Checking if %s constraint has been created"
+                      (name ctype)))
           (drop lobos (table :foo)))))))
