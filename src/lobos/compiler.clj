@@ -9,11 +9,13 @@
 (ns lobos.compiler
   "The compiler multimethod definition, an default implementation and
   some helpers functions."
-  (:refer-clojure :exclude [compile])
+  (:refer-clojure :exclude [compile replace])
   (:require (lobos [ast :as ast]))
-  (:use lobos.utils)
+  (:use (clojure [string :only [replace]])
+        lobos.utils)
   (:import (java.lang UnsupportedOperationException)
            (lobos.ast AutoIncClause
+                      CheckConstraintDefinition
                       ColumnDefinition
                       CreateTableStatement
                       CreateSchemaStatement
@@ -142,6 +144,18 @@
         (str "ON DELETE " (as-sql-keyword (:on-delete triggered-actions))))
       (when (contains? triggered-actions :on-update)
         (str "ON UPDATE " (as-sql-keyword (:on-update triggered-actions)))))))
+
+(defmethod compile [::standard CheckConstraintDefinition]
+  [definition]
+  (let [{:keys [db-spec cname condition identifiers]} definition
+        identifiers-re (re-pattern (apply join \| identifiers))]
+    (join \space
+      "CONSTRAINT"
+      (as-identifier db-spec cname)
+      "CHECK"
+      (replace condition
+               identifiers-re
+               #(as-identifier db-spec %)))))
 
 ;;; Statements
 
