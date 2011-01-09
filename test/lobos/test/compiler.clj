@@ -67,20 +67,16 @@
       "Compiling a column definition with custom options"))
 
 (def unique-constraint-definition-stub
-  (UniqueConstraintDefinition. nil nil :unique [:foo :bar :baz]))
+  (UniqueConstraintDefinition. nil :foo_a_b_c :unique [:a :b :c]))
 
 (deftest test-compile-unique-constraint-definition
   (is (= (compile unique-constraint-definition-stub)
-         "UNIQUE (\"foo\", \"bar\", \"baz\")")
-      "Compiling an unnamed unique constraint definition")
-  (is (= (compile (assoc unique-constraint-definition-stub
-                    :cname :foo))
-         "CONSTRAINT \"foo\" UNIQUE (\"foo\", \"bar\", \"baz\")")
-      "Compiling a named unique constraint definition")
+         "CONSTRAINT \"foo_a_b_c\" UNIQUE (\"a\", \"b\", \"c\")")
+      "Compiling a unique constraint definition")
   (is (= (compile (assoc unique-constraint-definition-stub
                     :ctype :primary-key))
-         "PRIMARY KEY (\"foo\", \"bar\", \"baz\")")
-      "Compiling an unnamed primary key constraint definition"))
+         "CONSTRAINT \"foo_a_b_c\" PRIMARY KEY (\"a\", \"b\", \"c\")")
+      "Compiling a primary key constraint definition"))
 
 (def create-schema-statement-stub
   (CreateSchemaStatement. nil :foo []))

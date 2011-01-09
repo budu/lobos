@@ -116,16 +116,12 @@
 
 (defmethod compile [::standard UniqueConstraintDefinition]
   [definition]
-  (let [{:keys [db-spec cname ctype columns]} definition
-        spec (join \space
-               (as-sql-keyword ctype)
-               (as-list (map (partial as-identifier db-spec) columns)))]
-    (if cname
-      (join \space
-        "CONSTRAINT"
-        (as-identifier db-spec cname)
-        spec)
-      spec)))
+  (let [{:keys [db-spec cname ctype columns]} definition]
+    (join \space
+      "CONSTRAINT"
+      (as-identifier db-spec cname)
+      (as-sql-keyword ctype)
+      (as-list (map (partial as-identifier db-spec) columns)))))
 
 (defmethod compile [::standard ForeignKeyConstraintDefinition]
   [definition]
