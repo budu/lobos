@@ -135,7 +135,7 @@
       "REFERENCES"
       (as-identifier db-spec parent-table :schema)
       (as-list (map (partial as-identifier db-spec) parent-columns))
-      (when match (as-sql-keyword match))
+      (when match (str "MATCH " (as-sql-keyword match)))
       (when (contains? triggered-actions :on-delete)
         (str "ON DELETE " (as-sql-keyword (:on-delete triggered-actions))))
       (when (contains? triggered-actions :on-update)
