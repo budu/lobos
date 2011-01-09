@@ -48,7 +48,7 @@
   [db-spec cname columns foreign-table foreign-columns match triggered-actions])
 
 (defrecord CheckConstraintDefinition
-  [db-spec cname condition])
+  [db-spec cname condition identifiers])
 
 ;;;; Statement records
 

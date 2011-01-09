@@ -11,7 +11,8 @@
   (:refer-clojure :exclude [replace])
   (:use (clojure [string :only [lower-case
                                 replace
-                                upper-case]])))
+                                upper-case]]
+                 [walk :only [postwalk]])))
 
 (defn join [separator & coll]
   (clojure.string/join separator (filter identity coll)))
@@ -66,3 +67,12 @@
   (if test
     (apply conj coll x xs)
     coll))
+
+(defn capture-keywords
+  "Returns a set containing all keywords found in the given form as
+  strings."
+  [form]
+  (let [acc (atom #{})
+        f #(if (keyword? %2) (conj %1 (name %2)) %1)]
+    (postwalk #(swap! acc f %) form)
+    @acc))

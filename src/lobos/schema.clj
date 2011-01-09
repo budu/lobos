@@ -9,10 +9,11 @@
 (ns lobos.schema
   "The abstract schema data-structure and some function to help creating
   one."
-  (:refer-clojure :exclude [bigint boolean char double float time])
+  (:refer-clojure :exclude [bigint boolean char double float time replace])
   (:require clojureql.predicates
             lobos.ast)
-  (:use (clojure [walk :only [postwalk-replace]])
+  (:use (clojure [walk :only [postwalk-replace]]
+                 [string :only [replace]])
         (clojure.contrib [def :only [defalias]])
         lobos.utils)
   (:import (lobos.ast AutoIncClause
@@ -135,26 +136,28 @@
                                        triggered-actions)])))
 
 (defrecord CheckConstraint
-  [cname condition]
+  [cname condition identifiers]
   Buildable
 
   (build-definition [this db-spec]
     (CheckConstraintDefinition.
      db-spec
      cname
-     condition)))
+     condition
+     identifiers)))
 
 (defn check*
   "Constructs an abstract check constraint definition and add it to the
   given table."
-  [table constraint-name condition]
+  [table constraint-name condition identifiers]
   (let [condition (apply format
-                         (-> condition :stmt first)
+                         (replace (-> condition :stmt first) "?" "%s")
                          (:env condition))]
     (update-in table [:constraints] conj
                [constraint-name
                 (CheckConstraint. constraint-name
-                                  condition)])))
+                                  condition
+                                  identifiers)])))
 
 (defmacro check
   "Constructs an abstract check constraint definition and add it to the
@@ -162,6 +165,7 @@
   predicates namespace."
   [table constraint-name condition]
   `(check*
+    ~table
     ~constraint-name
     ~(postwalk-replace
       '{=   clojureql.predicates/=*
@@ -174,7 +178,8 @@
         or  clojureql.predicates/or*
         not clojureql.predicates/not*
         in  clojureql.predicates/in}
-      condition)))
+      condition)
+    ~(capture-keywords condition)))
 
 ;;;; Data-type definition
 
