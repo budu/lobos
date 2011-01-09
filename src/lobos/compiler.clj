@@ -125,7 +125,7 @@
 
 (defmethod compile [::standard ForeignKeyConstraintDefinition]
   [definition]
-  (let [{:keys [db-spec cname columns foreign-table foreign-columns match
+  (let [{:keys [db-spec cname columns parent-table parent-columns match
                 triggered-actions]} definition]
     (join \space
       "CONSTRAINT"
@@ -133,8 +133,8 @@
       "FOREIGN KEY"
       (as-list (map (partial as-identifier db-spec) columns))
       "REFERENCES"
-      (as-identifier db-spec foreign-table :schema)
-      (as-list (map (partial as-identifier db-spec) foreign-columns))
+      (as-identifier db-spec parent-table :schema)
+      (as-list (map (partial as-identifier db-spec) parent-columns))
       (when match (as-sql-keyword match))
       (when (contains? triggered-actions :on-delete)
         (str "ON DELETE " (as-sql-keyword (:on-delete triggered-actions))))

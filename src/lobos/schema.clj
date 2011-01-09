@@ -97,7 +97,7 @@
   (unique-constraint table :unique name-or-column columns))
 
 (defrecord ForeignKeyConstraint
-  [cname columns foreign-table foreign-columns match triggered-actions]
+  [cname columns parent-table parent-columns match triggered-actions]
   Buildable
 
   (build-definition [this db-spec]
@@ -105,23 +105,23 @@
      db-spec
      cname
      columns
-     foreign-table
-     foreign-columns
+     parent-table
+     parent-columns
      match
      triggered-actions)))
 
 (defn foreign-key
   "Constructs an abstract foreign key constraint definition and add it
   to the given table."
-  {:arglists '([table name? columns foreign-table foreign-columns? match?
+  {:arglists '([table name? columns parent-table parent-columns? match?
                 & triggered-actions])}
   [table & args]
   (let [[constraint-name args] (optional keyword? args)
         columns                (first args)
-        foreign-table          (second args)
+        parent-table           (second args)
         args                   (nnext args)
-        [foreign-columns args] (optional vector? args)
-        foreign-columns        (or foreign-columns columns)
+        [parent-columns args]  (optional vector? args)
+        parent-columns         (or parent-columns columns)
         [match args]           (optional #{:full :partial :simple} args)
         triggered-actions      (apply hash-map args)
         constraint-name        (or constraint-name
@@ -130,8 +130,8 @@
                [constraint-name
                 (ForeignKeyConstraint. constraint-name
                                        columns
-                                       foreign-table
-                                       foreign-columns
+                                       parent-table
+                                       parent-columns
                                        match
                                        triggered-actions)])))
 

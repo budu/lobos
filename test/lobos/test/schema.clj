@@ -67,7 +67,7 @@
       "Foreign key constraint definition with name")
   (is (= (table :foo (foreign-key [:a :b :c] :bar [:d :e :f]))
          (table* :foo {} {:foo_fkey_a_b_c (assoc foreign-key-stub
-                                            :foreign-columns [:d :e :f])}))
+                                            :parent-columns [:d :e :f])}))
       "Foreign key constraint definition with foreign columns")
   (is (= (table :foo (foreign-key [:a :b :c] :bar :full))
          (table* :foo {} {:foo_fkey_a_b_c (assoc foreign-key-stub
@@ -92,7 +92,7 @@
                                   :on-update :restrict))
          (table* :foo {} {:foobar (assoc foreign-key-stub
                                     :cname :foobar
-                                    :foreign-columns [:d :e :f]
+                                    :parent-columns [:d :e :f]
                                     :match :full
                                     :triggered-actions
                                     {:on-delete :cascade
