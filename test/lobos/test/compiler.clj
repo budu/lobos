@@ -16,6 +16,7 @@
                       CreateSchemaStatement
                       DataTypeExpression
                       DropStatement
+                      ForeignKeyConstraintDefinition
                       UniqueConstraintDefinition
                       ValueExpression)))
 
@@ -77,6 +78,45 @@
                     :ctype :primary-key))
          "CONSTRAINT \"foo_a_b_c\" PRIMARY KEY (\"a\", \"b\", \"c\")")
       "Compiling a primary key constraint definition"))
+
+(def foreign-key-constraint-definition-stub
+  (ForeignKeyConstraintDefinition.
+   nil
+   :foo_fkey_a_b_c
+   [:a :b :c]
+   :bar
+   [:a :b :c]
+   nil
+   {}))
+
+(deftest test-compile-foreign-key-constraint-definition
+  (is (= (compile foreign-key-constraint-definition-stub)
+         (str "CONSTRAINT \"foo_fkey_a_b_c\" "
+              "FOREIGN KEY (\"a\", \"b\", \"c\") "
+              "REFERENCES \"bar\" (\"a\", \"b\", \"c\")"))
+      "Compiling an unnamed foreign key constraint definition")
+  (is (= (compile (assoc foreign-key-constraint-definition-stub
+                    :parent-columns [:d :e :f]))
+         (str "CONSTRAINT \"foo_fkey_a_b_c\" "
+              "FOREIGN KEY (\"a\", \"b\", \"c\") "
+              "REFERENCES \"bar\" (\"d\", \"e\", \"f\")"))
+      (str "Compiling an unnamed foreign key constraint definition"
+           " with different parent columns"))
+  (is (= (compile (assoc foreign-key-constraint-definition-stub
+                    :match :full))
+         (str "CONSTRAINT \"foo_fkey_a_b_c\" "
+              "FOREIGN KEY (\"a\", \"b\", \"c\") "
+              "REFERENCES \"bar\" (\"a\", \"b\", \"c\") MATCH FULL"))
+      "Compiling an unnamed foreign key constraint definition with match type")
+  (is (= (compile (assoc foreign-key-constraint-definition-stub
+                    :triggered-actions {:on-delete :cascade
+                                        :on-update :restrict}))
+         (str "CONSTRAINT \"foo_fkey_a_b_c\" "
+              "FOREIGN KEY (\"a\", \"b\", \"c\") "
+              "REFERENCES \"bar\" (\"a\", \"b\", \"c\") "
+              "ON DELETE CASCADE ON UPDATE RESTRICT"))
+      (str "Compiling an unnamed foreign key constraint definition"
+           " with triggered actions")))
 
 (def create-schema-statement-stub
   (CreateSchemaStatement. nil :foo []))
