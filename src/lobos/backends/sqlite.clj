@@ -23,8 +23,21 @@
                       Identifier)
            (lobos.schema Column
                          DataType
+                         ForeignKeyConstraint
                          UniqueConstraint
                          Table)))
+
+;;;; Temporary code: need more think more about where to put it or if
+;;;; I'll use Contrib or ClojureQL...
+
+(use 'lobos.connectivity)
+
+(defn query [sql-string]
+  (try
+    (with-open [stmt (.createStatement (connection))]
+      (doall (resultset-seq
+              (.executeQuery stmt sql-string))))
+    (catch Exception _)))
 
 ;;;; Analyzer
 
@@ -64,10 +77,35 @@
                  (resultset-seq
                   (.getPrimaryKeys (db-meta) nil nil (name tname))))]
     (when (not-empty columns)
-      (UniqueConstraint.
-       (make-constraint-name tname :primary-key columns)
-       :primary-key
-       columns))))
+      [(UniqueConstraint.
+        (make-constraint-name tname :primary-key columns)
+        :primary-key
+        columns)])))
+
+(defn analyze-foreign-keys [tname]
+  (let [fks (group-by :id (query (format "pragma foreign_key_list(%s);"
+                                         (name tname))))]
+    (for [fk fks]
+      (let [fk (second fk)
+            pcolumns (reduce #(conj %1 (-> %2 :to keyword)) [] fk)
+            fcolumns (reduce #(conj %1 (-> %2 :from keyword)) [] fk)
+            fk (first fk)
+            ptable (keyword (:table fk))
+            match (as-keyword (:match fk))
+            match (when-not (= match :none) match)
+            on-delete (as-keyword (:on_delete fk))
+            on-delete (when-not (= on-delete :no-action) on-delete)
+            on-delete (when on-delete [:on-delete on-delete])
+            on-update (as-keyword (:on_update fk))
+            on-update (when-not (= on-update :no-action) on-update)
+            on-update (when on-delete [:on-update on-update])]
+        (ForeignKeyConstraint.
+         (make-constraint-name tname :fkey fcolumns)
+         fcolumns
+         ptable
+         pcolumns
+         match
+         (into {} [on-delete on-update]))))))
 
 (defn sqlite-constraints [sname tname]
   (map (fn [[cname meta]] (analyze UniqueConstraint sname tname cname meta))
@@ -76,14 +114,14 @@
 
 (defmethod analyze [:sqlite Table]
   [_ sname tname]
-  (let [pkey (analyze-primary-keys tname)]
-    (schema/table* tname
-                   (into {} (map #(let [c (analyze Column %)]
-                                    [(:cname c) c])
-                                 (columns-meta sname tname)))
-                   (into {} (map #(vector (:cname %) %)
-                                 (concat (sqlite-constraints sname tname)
-                                         (when pkey [pkey])))))))
+  (schema/table* tname
+                 (into {} (map #(let [c (analyze Column %)]
+                                  [(:cname c) c])
+                               (columns-meta sname tname)))
+                 (into {} (map #(vector (:cname %) %)
+                               (concat (sqlite-constraints sname tname)
+                                       (analyze-primary-keys tname)
+                                       (analyze-foreign-keys tname))))))
 
 ;;;; Compiler
 
