@@ -1,5 +1,12 @@
 # Lobos History
 
+## 0.5
+
+ * Added remaining scalar data-types
+ * Added support for foreign key and check constraints
+ * Rewrote part of the analyzer as a multi-method
+ * Added drop cascade support for SQL Server
+
 ## 0.4
 
  * Added a comprehensive set of data types

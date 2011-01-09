@@ -11,7 +11,4 @@
 ## 0.6
 
  * Support for altering tables
-
-## 0.5
-
- * Analyzer rewrite, will probably change the compiler multi-method
+ * Adding functional testing
