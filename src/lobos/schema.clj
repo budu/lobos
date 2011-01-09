@@ -10,10 +10,13 @@
   "The abstract schema data-structure and some function to help creating
   one."
   (:refer-clojure :exclude [bigint boolean char double float time])
-  (:require (lobos [ast :as ast]))
-  (:use (clojure.contrib [def :only [defalias]])
+  (:require clojureql.predicates
+            lobos.ast)
+  (:use (clojure [walk :only [postwalk-replace]])
+        (clojure.contrib [def :only [defalias]])
         lobos.utils)
   (:import (lobos.ast AutoIncClause
+                      CheckConstraintDefinition
                       ColumnDefinition
                       CreateTableStatement
                       CreateSchemaStatement
@@ -108,7 +111,7 @@
 
 (defn foreign-key
   "Constructs an abstract foreign key constraint definition and add it
-  to the given table"
+  to the given table."
   {:arglists '([table name? columns foreign-table foreign-columns? match?
                 & triggered-actions])}
   [table & args]
@@ -130,6 +133,48 @@
                                        foreign-columns
                                        match
                                        triggered-actions)])))
+
+(defrecord CheckConstraint
+  [cname condition]
+  Buildable
+
+  (build-definition [this db-spec]
+    (CheckConstraintDefinition.
+     db-spec
+     cname
+     condition)))
+
+(defn check*
+  "Constructs an abstract check constraint definition and add it to the
+  given table."
+  [table constraint-name condition]
+  (let [condition (apply format
+                         (-> condition :stmt first)
+                         (:env condition))]
+    (update-in table [:constraints] conj
+               [constraint-name
+                (CheckConstraint. constraint-name
+                                  condition)])))
+
+(defmacro check
+  "Constructs an abstract check constraint definition and add it to the
+  given table. Replace core predicates by custom one from ClojureQL
+  predicates namespace."
+  [table constraint-name condition]
+  `(check*
+    ~constraint-name
+    ~(postwalk-replace
+      '{=   clojureql.predicates/=*
+        !=  clojureql.predicates/!=*
+        <   clojureql.predicates/<*
+        >   clojureql.predicates/>*
+        <=  clojureql.predicates/<=*
+        >=  clojureql.predicates/>=*
+        and clojureql.predicates/and*
+        or  clojureql.predicates/or*
+        not clojureql.predicates/not*
+        in  clojureql.predicates/in}
+      condition)))
 
 ;;;; Data-type definition
 
