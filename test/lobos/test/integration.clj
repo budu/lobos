@@ -13,7 +13,8 @@
         (lobos analyzer compiler connectivity core metadata schema utils)
         (lobos.backends h2 mysql postgresql sqlite sqlserver))
   (:import (java.lang UnsupportedOperationException)
-           (lobos.schema UniqueConstraint)))
+           (lobos.schema ForeignKeyConstraint
+                         UniqueConstraint)))
 
 ;;;; DB connection specifications
 
@@ -235,10 +236,24 @@
       (let [lobos (ignore-unsupported
                    (create lobos (table :foo (integer :bar)
                                         (unique-constraint ctype :bar []))))
-            cname (make-constraint-name {:name :foo} ctype [:bar])]
+            cname (make-constraint-name :foo ctype [:bar])]
         (when lobos
           (is (= (-> lobos :elements :foo :constraints cname)
                  (UniqueConstraint. cname ctype [:bar]))
               (format "Checking if %s constraint has been created"
                       (name ctype)))
           (drop lobos (table :foo)))))))
+
+(def-db-test test-foreign-key-constraint
+  (with-schema [lobos :lobos]
+    (let [lobos (ignore-unsupported
+                 (create lobos (table :foo (integer :bar :primary-key)))
+                 (create lobos (table :baz (integer :bar)
+                                      (foreign-key [:bar] :foo))))
+          cname (make-constraint-name :baz :fkey [:bar])]
+      (when lobos
+        (is (= (-> lobos :elements :baz :constraints cname)
+               (ForeignKeyConstraint. cname [:bar] :foo [:bar] nil {}))
+            "Checking if foreign key constraint has been created")
+        (drop lobos (table :baz))
+        (drop lobos (table :foo))))))
