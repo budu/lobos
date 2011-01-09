@@ -152,7 +152,9 @@
   [table constraint-name condition identifiers]
   (let [condition (apply format
                          (replace (-> condition :stmt first) "?" "%s")
-                         (:env condition))]
+                         (map #(if (string? %)
+                                 (str \' % \')
+                                 %) (:env condition)))]
     (update-in table [:constraints] conj
                [constraint-name
                 (CheckConstraint. constraint-name
