@@ -10,7 +10,8 @@
   (:refer-clojure :exclude [bigint boolean char double float time])
   (:use clojure.test
         lobos.schema)
-  (:import (lobos.schema Column
+  (:import (lobos.schema CheckConstraint
+                         Column
                          ForeignKeyConstraint
                          UniqueConstraint
                          DataType
@@ -59,31 +60,31 @@
 (deftest test-foreign-key
   (is (= (table :foo (foreign-key [:a :b :c] :bar))
          (table* :foo {} {:foo_fkey_a_b_c foreign-key-stub}))
-      "Foreign key definition")
+      "Foreign key constraint definition")
   (is (= (table :foo (foreign-key :foobar [:a :b :c] :bar))
          (table* :foo {} {:foobar (assoc foreign-key-stub
                                     :cname :foobar)}))
-      "Foreign key definition with name")
+      "Foreign key constraint definition with name")
   (is (= (table :foo (foreign-key [:a :b :c] :bar [:d :e :f]))
          (table* :foo {} {:foo_fkey_a_b_c (assoc foreign-key-stub
                                             :foreign-columns [:d :e :f])}))
-      "Foreign key definition with foreign columns")
+      "Foreign key constraint definition with foreign columns")
   (is (= (table :foo (foreign-key [:a :b :c] :bar :full))
          (table* :foo {} {:foo_fkey_a_b_c (assoc foreign-key-stub
                                             :match :full)}))
-      "Foreign key definition with match")
+      "Foreign key constraint definition with match")
   (is (= (table :foo (foreign-key [:a :b :c] :bar :on-delete :cascade))
          (table* :foo {} {:foo_fkey_a_b_c (assoc foreign-key-stub
                                             :triggered-actions
                                             {:on-delete :cascade})}))
-      "Foreign key definition with one triggered action")
+      "Foreign key constraint definition with one triggered action")
   (is (= (table :foo (foreign-key [:a :b :c] :bar :on-delete :cascade
                                                   :on-update :restrict))
          (table* :foo {} {:foo_fkey_a_b_c (assoc foreign-key-stub
                                             :triggered-actions
                                             {:on-delete :cascade
                                              :on-update :restrict})}))
-      "Foreign key definition with two triggered actions")
+      "Foreign key constraint definition with two triggered actions")
   (is (= (table :foo (foreign-key :foobar [:a :b :c]
                                   :bar [:d :e :f]
                                   :full
@@ -96,7 +97,21 @@
                                     :triggered-actions
                                     {:on-delete :cascade
                                      :on-update :restrict})}))
-      "Foreign key definition with everything"))
+      "Foreign key constraint definition with everything"))
+
+(deftest test-check
+  (is (= (-> (table :foo (check :bar (> :a 1))) :constraints :bar)
+         (CheckConstraint. :bar "(a > 1)" #{"a"}))
+      "Simple check constraint definition")
+  (is (= (-> (table :foo (check :bar (and (> :a 1) (< :a 10)
+                                          (or (= :b "foo")
+                                              (= :b "bar"))
+                                          (in :ab 1 2 3)))) :constraints :bar)
+         (CheckConstraint. :bar (str "((a > 1) AND (a < 10) AND "
+                                     "((b = 'foo') OR (b = 'bar')) AND "
+                                     "ab IN (1,2,3))")
+                           #{"a" "b" "ab"}))
+      "Complex check constraint definition"))
 
 ;;;; Column definition tests
 
