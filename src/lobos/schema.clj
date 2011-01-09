@@ -150,16 +150,11 @@
   "Constructs an abstract check constraint definition and add it to the
   given table."
   [table constraint-name condition identifiers]
-  (let [condition (apply format
-                         (replace (-> condition :stmt first) "?" "%s")
-                         (map #(if (string? %)
-                                 (str \' % \')
-                                 %) (:env condition)))]
-    (update-in table [:constraints] conj
-               [constraint-name
-                (CheckConstraint. constraint-name
-                                  condition
-                                  identifiers)])))
+  (update-in table [:constraints] conj
+             [constraint-name
+              (CheckConstraint. constraint-name
+                                condition
+                                identifiers)]))
 
 (defmacro check
   "Constructs an abstract check constraint definition and add it to the

@@ -144,14 +144,21 @@
 (defmethod compile [::standard CheckConstraintDefinition]
   [definition]
   (let [{:keys [db-spec cname condition identifiers]} definition
-        identifiers-re (re-pattern (apply join \| identifiers))]
+        identifiers-re (re-pattern (apply join \| identifiers))
+        {:keys [stmt env]} condition
+        condition (replace (first stmt)
+                           identifiers-re
+                           #(as-identifier db-spec %))
+        condition (apply format
+                         (replace condition "?" "%s")
+                         (map #(if (string? %)
+                                 (str \' % \')
+                                 %) env))]
     (join \space
       "CONSTRAINT"
       (as-identifier db-spec cname)
       "CHECK"
-      (replace condition
-               identifiers-re
-               #(as-identifier db-spec %)))))
+      condition)))
 
 ;;; Statements
 

@@ -11,6 +11,7 @@
   (:use clojure.test
         lobos.compiler)
   (:import (lobos.ast AutoIncClause
+                      CheckConstraintDefinition
                       ColumnDefinition
                       CreateTableStatement
                       CreateSchemaStatement
@@ -94,20 +95,20 @@
          (str "CONSTRAINT \"foo_fkey_a_b_c\" "
               "FOREIGN KEY (\"a\", \"b\", \"c\") "
               "REFERENCES \"bar\" (\"a\", \"b\", \"c\")"))
-      "Compiling an unnamed foreign key constraint definition")
+      "Compiling a foreign key constraint definition")
   (is (= (compile (assoc foreign-key-constraint-definition-stub
                     :parent-columns [:d :e :f]))
          (str "CONSTRAINT \"foo_fkey_a_b_c\" "
               "FOREIGN KEY (\"a\", \"b\", \"c\") "
               "REFERENCES \"bar\" (\"d\", \"e\", \"f\")"))
-      (str "Compiling an unnamed foreign key constraint definition"
+      (str "Compiling a foreign key constraint definition"
            " with different parent columns"))
   (is (= (compile (assoc foreign-key-constraint-definition-stub
                     :match :full))
          (str "CONSTRAINT \"foo_fkey_a_b_c\" "
               "FOREIGN KEY (\"a\", \"b\", \"c\") "
               "REFERENCES \"bar\" (\"a\", \"b\", \"c\") MATCH FULL"))
-      "Compiling an unnamed foreign key constraint definition with match type")
+      "Compiling a foreign key constraint definition with match type")
   (is (= (compile (assoc foreign-key-constraint-definition-stub
                     :triggered-actions {:on-delete :cascade
                                         :on-update :restrict}))
@@ -115,8 +116,30 @@
               "FOREIGN KEY (\"a\", \"b\", \"c\") "
               "REFERENCES \"bar\" (\"a\", \"b\", \"c\") "
               "ON DELETE CASCADE ON UPDATE RESTRICT"))
-      (str "Compiling an unnamed foreign key constraint definition"
+      (str "Compiling a foreign key constraint definition"
            " with triggered actions")))
+
+(deftest test-compile-check-constraint-definition
+  (is (= (compile (CheckConstraintDefinition.
+                   nil
+                   :bar
+                   {:stmt ["(a > ?)"] :env [1]}
+                   #{"a"}))
+         "CONSTRAINT \"bar\" CHECK (\"a\" > 1)")
+      "Compiling a simple check constraint definition")
+  (is (= (compile (CheckConstraintDefinition.
+                   nil
+                   :bar
+                   {:stmt [(str "((a > ?) AND (a < ?) AND "
+                                "((b = ?) OR (b = ?)) AND "
+                                "ab IN (?,?,?))")]
+                    :env [1 10 "foo" "bar" 1 2 3]}
+                   #{"ab" "a" "b"}))
+         (str "CONSTRAINT \"bar\" CHECK "
+              "((\"a\" > 1) AND (\"a\" < 10) AND "
+              "((\"b\" = 'foo') OR (\"b\" = 'bar')) AND "
+              "\"ab\" IN (1,2,3))"))
+      "Compiling a complex check constraint definition"))
 
 (def create-schema-statement-stub
   (CreateSchemaStatement. nil :foo []))

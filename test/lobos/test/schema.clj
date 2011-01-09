@@ -101,15 +101,20 @@
 
 (deftest test-check
   (is (= (-> (table :foo (check :bar (> :a 1))) :constraints :bar)
-         (CheckConstraint. :bar "(a > 1)" #{"a"}))
+         (CheckConstraint. :bar
+                           (clojureql.predicates.APredicate. ["(a > ?)"] [1])
+                           #{"a"}))
       "Simple check constraint definition")
   (is (= (-> (table :foo (check :bar (and (> :a 1) (< :a 10)
                                           (or (= :b "foo")
                                               (= :b "bar"))
                                           (in :ab 1 2 3)))) :constraints :bar)
-         (CheckConstraint. :bar (str "((a > 1) AND (a < 10) AND "
-                                     "((b = 'foo') OR (b = 'bar')) AND "
-                                     "ab IN (1,2,3))")
+         (CheckConstraint. :bar
+                           (clojureql.predicates.APredicate.
+                            [(str "((a > ?) AND (a < ?) AND "
+                                  "((b = ?) OR (b = ?)) AND "
+                                  "ab IN (?,?,?))")]
+                            [1 10 "foo" "bar" 1 2 3])
                            #{"a" "b" "ab"}))
       "Complex check constraint definition"))
 
