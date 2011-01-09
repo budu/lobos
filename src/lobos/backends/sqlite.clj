@@ -32,7 +32,7 @@
 
 (use 'lobos.connectivity)
 
-(defn query [sql-string]
+(defn- query [sql-string]
   (try
     (with-open [stmt (.createStatement (connection))]
       (doall (resultset-seq
@@ -70,7 +70,7 @@
    :unique
    columns)))
 
-(defn analyze-primary-keys [tname]
+(defn- analyze-primary-keys [tname]
   (let [columns (reduce
                  #(conj %1 (-> %2 :column_name keyword))
                  []
@@ -82,7 +82,7 @@
         :primary-key
         columns)])))
 
-(defn analyze-foreign-keys [tname]
+(defn- analyze-foreign-keys [tname]
   (let [fks (group-by :id (query (format "pragma foreign_key_list(%s);"
                                          (name tname))))]
     (for [fk fks]
@@ -107,7 +107,7 @@
          match
          (into {} [on-delete on-update]))))))
 
-(defn sqlite-constraints [sname tname]
+(defn- sqlite-constraints [sname tname]
   (map (fn [[cname meta]] (analyze UniqueConstraint sname tname cname meta))
        (indexes-meta sname tname #(let [nu (:non_unique %)]
                                     (or (false? nu) (= nu 0))))))
