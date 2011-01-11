@@ -207,7 +207,9 @@
       (:dtype data-type)
       (:args data-type)
       (:options data-type))
-     (when default (ValueExpression. db-spec default))
+     (if (= default :drop)
+       default
+       (when default (ValueExpression. db-spec default)))
      (when auto-inc (AutoIncClause. db-spec))
      not-null
      others)))
@@ -223,9 +225,10 @@
                                {:encoding encoding
                                 :collate collate
                                 :time-zone ((set options) :time-zone)}))
-        others    (vec (filter string? options))
-        not-null  (clojure.core/boolean (:not-null options))
-        auto-inc  (clojure.core/boolean (:auto-inc options))]
+        others     (vec (filter string? options))
+        option-set (set options)
+        not-null   (clojure.core/boolean (:not-null option-set))
+        auto-inc   (clojure.core/boolean (:auto-inc option-set))]
     (Column. column-name
              data-type
              default
@@ -235,15 +238,26 @@
 
 (defn column
   "Constructs an abstract column definition and add it to the given
-  table."
-  [table column-name data-type options]
-  (let [options  (set options)]
-    (name-required column-name "column")
-    (#(cond (options :primary-key) (primary-key % column-name)
-            (options :unique) (unique % column-name)
-            :else %)
+  table. Also creates and add the appropriate column constraints.
+
+  It also can be used in alter modify and rename subactions. In that
+  case, if data-type is :to, it acts as a column rename clause and if
+  data-type is :drop-default, it acts as a column drop default clause."
+  [table column-name & [data-type options]]
+  (name-required column-name "column")
+  (let [option-set (when (seq? options) (set options))
+        add-constraint #(cond (:primary-key option-set)
+                              (primary-key % column-name)
+                              (:unique option-set)
+                              (unique % column-name)
+                              :else %)]
+    (add-constraint
      (update-in table [:columns] conj
-                [column-name (column* column-name data-type options)]))))
+                [column-name
+                 (case data-type
+                   :to (Column. column-name nil nil nil nil options)
+                   :drop-default (Column. column-name nil :drop nil nil nil)
+                   (column* column-name data-type options))]))))
 
 ;;;; Typed column definition
 
