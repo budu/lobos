@@ -14,7 +14,8 @@
   (:use (clojure [string :only [replace]])
         lobos.utils)
   (:import (java.lang UnsupportedOperationException)
-           (lobos.ast AutoIncClause
+           (lobos.ast AlterTableStatement
+                      AutoIncClause
                       CheckConstraintDefinition
                       ColumnDefinition
                       CreateTableStatement
@@ -176,6 +177,25 @@
             (as-identifier db-spec tname :schema)
             (or (as-list (map compile elements))
                 "()"))))
+
+(defmethod compile [::standard AlterTableStatement]
+  [statement]
+  (let [{:keys [db-spec tname subaction element]} statement
+        is-column (instance? ColumnDefinition element)]
+    (join \space
+          "ALTER TABLE"
+          (as-identifier db-spec tname)
+          (case subaction
+            :add (join \space
+                       "ADD"
+                       (when is-column "COLUMN")
+                       (compile element))
+            :drop (join \space
+                        "DROP"
+                        (if is-column
+                          "COLUMN"
+                          "CONSTRAINT")
+                        (as-identifier db-spec (:cname element)))))))
 
 (defmethod compile [::standard DropStatement]
   [statement]

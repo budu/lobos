@@ -16,7 +16,8 @@
                  [string :only [replace]])
         (clojure.contrib [def :only [defalias]])
         lobos.utils)
-  (:import (lobos.ast AutoIncClause
+  (:import (lobos.ast AlterTableStatement
+                      AutoIncClause
                       CheckConstraintDefinition
                       ColumnDefinition
                       CreateTableStatement
@@ -28,6 +29,9 @@
                       ValueExpression)))
 
 ;;;; Protocols
+
+(defprotocol Alterable
+  (build-alter-statement [this subaction db-spec]))
 
 (defprotocol Buildable
   (build-definition [this db-spec]))
@@ -369,8 +373,18 @@
 ;;;; Table definition
 
 (defrecord Table [name columns constraints options]
-  Creatable Dropable
-  
+  Alterable Creatable Dropable
+
+  (build-alter-statement [this subaction db-spec]
+    (let [elements (map #(build-definition (second %) db-spec)
+                        (concat columns constraints))]
+      (for [element elements]
+        (AlterTableStatement.
+         db-spec
+         name
+         subaction
+         element))))
+
   (build-create-statement [this db-spec]
     (CreateTableStatement.
      db-spec

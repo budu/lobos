@@ -59,7 +59,7 @@
   [db-spec tname elements])
 
 (defrecord AlterTableStatement
-  [db-spec tname action])
+  [db-spec tname subaction element])
 
 (defrecord DropStatement
   [db-spec otype oname behavior])
