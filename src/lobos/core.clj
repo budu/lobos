@@ -8,7 +8,7 @@
 
 (ns lobos.core
   "Main interface to interact with Lobos."
-  (:refer-clojure :exclude [drop])
+  (:refer-clojure :exclude [alter drop])
   (:require (lobos [analyzer :as analyzer]
                    [compiler :as compiler]
                    [connectivity :as conn]
@@ -122,6 +122,46 @@
               (apply schema/schema ~schema-name options# elements#))
              (update-global-schema ~schema-name db-spec#))))))))
 
+;;;; Action helpers
+
+(defn connection?
+  "Checks if the given argument is a named connection or a db-spec."
+  [cnx]
+  (or ((set (keys @conn/global-connections)) cnx)
+      (and (map? cnx)
+           ((comp not schema/definition?) cnx))))
+
+(defmacro defaction
+  "Define an action applicable to an optional abstract schema."
+  {:arglists '([name doc-string? attr-map? [params*] & body])}
+  [name & args]
+  (let [params (seq (first (filter vector? args)))
+        [name args] (name-with-attributes name args)
+        [params* & body] args]
+    `(do
+       (defn ~name [& params#]
+         (let [[cnx-or-schema# params#]
+               (optional #(or (schema/schema? %)
+                              (connection? %)) params#)
+               ~params* params#
+               cnx-or-schema# (or cnx-or-schema# (get-default-schema))
+               ~'schema (cond (schema/schema? cnx-or-schema#) cnx-or-schema#
+                              (fn? cnx-or-schema#) (cnx-or-schema#))
+               cnx# (or (-> ~'schema :options :db-spec)
+                        cnx-or-schema#
+                        :default-connection)
+               ~'db-spec (merge (conn/get-db-spec cnx#)
+                                (when ~'schema
+                                  {:schema (-> ~'schema :sname name)}))]
+           (execute
+            ~@body
+            ~'db-spec)
+           (when ~'schema (update-global-schema (:schema ~'db-spec)
+                                                ~'db-spec))))
+       (.setMeta #'~name
+                 (merge (.meta #'name)
+                        {:arglists '(~(vec (conj params 'cnx-or-schema?)))})))))
+
 ;;;; Actions
 
 (defn debug
@@ -160,44 +200,20 @@
           (.execute stmt sql-string))))
     nil))
 
-(defmacro defaction
-  "Define an action applicable to an optional abstract schema."
-  {:arglists '([name doc-string? attr-map? [params*] & body])}
-  [name & args]
-  (let [params (seq (first (filter vector? args)))
-        [name args] (name-with-attributes name args)
-        [params* & body] args]
-    `(do
-       (defn ~name [& params#]
-         (let [[cnx-or-schema# params#]
-               (optional #(or (schema/schema? %)
-                              ((comp not schema/definition?) %)) params#)
-               ~params* params#
-               cnx-or-schema# (or cnx-or-schema# (get-default-schema))
-               ~'schema (cond (schema/schema? cnx-or-schema#) cnx-or-schema#
-                              (fn? cnx-or-schema#) (cnx-or-schema#))
-               cnx# (or (-> ~'schema :options :db-spec)
-                        cnx-or-schema#
-                        :default-connection)
-               ~'db-spec (merge (conn/get-db-spec cnx#)
-                                (when ~'schema
-                                  {:schema (-> ~'schema :sname name)}))]
-           ~@body
-           (when ~'schema (update-global-schema (:schema ~'db-spec)
-                                                ~'db-spec))))
-       (.setMeta #'~name
-                 (merge (.meta #'name)
-                        {:arglists '(~(vec (conj params 'cnx-or-schema?)))})))))
-
 (defaction create
-  "Builds a create statement with the given schema object and execute it."
+  "Builds a create statement with the given schema element and execute it."
   [odef]
-  (execute (schema/build-create-statement odef db-spec) db-spec))
+  (schema/build-create-statement odef db-spec))
+
+(defaction alter
+  "Builds an alter statement with the given schema element and execute it."
+  [subaction odef]
+  (schema/build-alter-statement odef subaction db-spec))
 
 (defaction drop
-  "Builds a drop statement with the given schema object and execute it."
+  "Builds a drop statement with the given schema element and execute it."
   [odef & [behavior]]
-  (execute (schema/build-drop-statement odef behavior db-spec) db-spec))
+  (schema/build-drop-statement odef behavior db-spec))
 
 (defn create-schema
   "Create a new schema."
