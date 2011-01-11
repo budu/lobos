@@ -181,24 +181,27 @@
       :schema (do (println (type object))
                   (pprint object)))))
 
+(defn- execute* [sql-string]
+  (when (= :sql @debug-level) (println sql-string))
+  (with-open [stmt (.createStatement (conn/connection))]
+    (.execute stmt sql-string)))
+
 (defn execute
   "Execute the given statement using the specified connection
   information or the bound one."
-  [statement & [connection-info]]
-  (when-let [sql-string (not-empty (if (string? statement)
-                                     statement
-                                     (compiler/compile statement)))]
-    (when (= :sql @debug-level)
-      (println sql-string))
-    (let [db-spec (conn/get-db-spec connection-info)
-          mode (compiler/compile (compiler/mode db-spec))]
-      (conn/with-connection connection-info
-        (when mode
-          (with-open [stmt (.createStatement (conn/connection))]
-            (.execute stmt mode)))
-        (with-open [stmt (.createStatement (conn/connection))]
-          (.execute stmt sql-string))))
-    nil))
+  [statements & [connection-info]]
+  (let [statements (if (seq? statements)
+                     statements
+                     [statements])
+        db-spec (conn/get-db-spec connection-info)
+        mode (compiler/compile (compiler/mode db-spec))]
+    (conn/with-connection connection-info
+      (when mode (execute* mode))
+      (doseq [statement statements]
+        (let [sql-string (if (string? statement)
+                           statement
+                           (compiler/compile statement))]
+          (when sql-string (execute* sql-string)))))) nil)
 
 (defaction create
   "Builds a create statement with the given schema element and execute it."

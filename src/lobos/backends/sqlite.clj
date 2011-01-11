@@ -147,10 +147,11 @@
 (defmethod compile [:sqlite CreateSchemaStatement]
   [statement]
   (let [{:keys [db-spec sname elements]} statement]
-    (apply join ";\n\n"
-      (map (comp compile
-                 #(assoc-in % [:db-spec :schema] sname))
-           elements))))
+    (not-empty
+     (apply join ";\n\n"
+            (map (comp compile
+                       #(assoc-in % [:db-spec :schema] sname))
+                 elements)))))
 
 (defmethod compile [:sqlite DropStatement]
   [statement]
