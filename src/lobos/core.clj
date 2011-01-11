@@ -87,6 +87,21 @@
   []
   (@global-schemas @default-schema))
 
+(defn get-or-create-schema
+  "Returns the given schema, the schema returned by the given function
+  or create an abstract schema definition with the given keyword
+  depending on the argument's type, else nil. Associates the db-spec
+  obtained from the optional connection-info in its options map if
+  there's not already one."
+  [schema-or-name & [connection-info]]
+  (let [db-spec (conn/get-db-spec connection-info)
+        schema (cond (schema/schema? schema-or-name) schema-or-name
+                     (fn? schema-or-name) (schema-or-name)
+                     (keyword? schema-or-name) (schema/schema schema-or-name))]
+    (if (-> schema :options :db-spec)
+      schema
+      (assoc-in schema [:options :db-spec] db-spec))))
+
 (defmacro defschema
   "Defines a var containing the specified schema constructed from
   database meta-data."
@@ -187,30 +202,14 @@
 (defn create-schema
   "Create a new schema."
   [schema-or-name & [connection-info]]
-  (let [schema (cond (schema/schema? schema-or-name) schema-or-name
-                     (fn? schema-or-name) (schema-or-name))
-        cnx (conn/get-db-spec connection-info)
-        db-spec (if connection-info
-                  cnx
-                  (or (-> schema :options :db-spec)
-                      cnx))
-        schema (if schema
-                 (assoc-in schema [:options :db-spec] db-spec)
-                 (schema/schema schema-or-name {:db-spec db-spec}))]
+  (let [schema (get-or-create-schema schema-or-name connection-info)
+        db-spec (-> schema :options :db-spec)]
     (execute (schema/build-create-statement schema db-spec) db-spec)
     (update-global-schema schema)))
 
 (defn drop-schema
   "Drop the specified schema using the given behavior."
   [schema-or-name & [behavior connection-info]]
-  (let [schema (cond (schema/schema? schema-or-name) schema-or-name
-                     (fn? schema-or-name) (schema-or-name))
-        cnx (conn/get-db-spec connection-info)
-        db-spec (if connection-info
-                  cnx
-                  (or (-> schema :options :db-spec)
-                      cnx))
-        schema (if schema
-                 (assoc-in schema [:options :db-spec] db-spec)
-                 (schema/schema schema-or-name {:db-spec db-spec}))]
+  (let [schema (get-or-create-schema schema-or-name connection-info)
+        db-spec (-> schema :options :db-spec)]
     (execute (schema/build-drop-statement schema behavior db-spec) db-spec)))
