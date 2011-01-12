@@ -185,7 +185,7 @@
                    :date :time :timestamp]]
       (let [dtype (data-type dtype)
             lobos (ignore-unsupported
-                   (create lobos (table :foo (column :bar dtype nil))))]
+                   (create lobos (table :foo (column :bar dtype))))]
         (when lobos
           (is (= (eq (-> lobos :elements :foo :columns :bar :data-type :dtype))
                  (eq (-> (column* :bar dtype []) :data-type :dtype)))
@@ -209,7 +209,7 @@
           (drop lobos (table :foo)))))
     (let [dtype (data-type :numeric [8 3])
           lobos (ignore-unsupported
-                 (create lobos (table :foo (column :bar dtype nil))))]
+                 (create lobos (table :foo (column :bar dtype))))]
       (when lobos
         (is (= (eq (-> lobos :elements :foo :columns :bar :data-type :dtype))
                (eq (-> (column* :bar dtype []) :data-type :dtype)))
@@ -223,7 +223,7 @@
     (doseq [dtype [:time :timestamp]]
       (let [dtype (data-type dtype [] {:time-zone true})
             lobos (ignore-unsupported
-                   (create lobos (table :foo (column :bar dtype nil))))]
+                   (create lobos (table :foo (column :bar dtype))))]
         (when lobos
           (is (= (eq (-> lobos :elements :foo :columns :bar :data-type :dtype))
                  (eq (-> (column* :bar dtype []) :data-type :dtype)))

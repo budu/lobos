@@ -122,19 +122,19 @@
     (is (= (table :foo (column :foo nil nil))
            (table* :foo {:foo column-definition-stub} {} {}))
         "Column with name and data-type")
-    (is (= (table :foo (column :foo nil [:auto-inc]))
+    (is (= (table :foo (column :foo nil :auto-inc))
            (table* :foo {:foo (assoc column-definition-stub
                                 :auto-inc true)} {} {}))
         "Setting column as auto incremented")
-    (is (= (table :foo (column :foo nil [:not-null]))
+    (is (= (table :foo (column :foo nil :not-null))
            (table* :foo {:foo (assoc column-definition-stub
                                 :not-null true)} {} {}))
         "Setting column as not null")
-    (is (= (table :foo (column :foo nil [[:default 0]]))
+    (is (= (table :foo (column :foo nil [:default 0]))
            (table* :foo {:foo (assoc column-definition-stub
                                 :default 0)} {} {}))
         "Setting default value")
-    (is (= (table :foo (column :foo nil ["BAR"]))
+    (is (= (table :foo (column :foo nil "BAR"))
            (table* :foo {:foo (assoc column-definition-stub
                                 :others ["BAR"])} {} {}))
         "Setting custom options")))

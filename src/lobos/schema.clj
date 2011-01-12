@@ -234,9 +234,11 @@
   It also can be used in alter modify and rename actions. In that
   case, if data-type is :to, it acts as a column rename clause and if
   data-type is :drop-default, it acts as a column drop default clause."
-  [table column-name & [data-type options]]
+  {:arglists '([table column-name data-type? options])}
+  [table column-name & options]
   (name-required column-name "column")
-  (let [option-set (when (seq? options) (set options))
+  (let [[data-type options] (optional #(instance? DataType %) options)
+        option-set (when (seq? options) (set options))
         add-constraint #(cond (:primary-key option-set)
                               (primary-key % [column-name])
                               (:unique option-set)
@@ -266,10 +268,11 @@
             ~args
             (let [dargs# ~dargs
                   options# ~options]
-              (column ~'table
-                      ~'column-name
-                      (data-type ~(keyword n) dargs#)
-                      options#))))))
+              (apply column
+                     ~'table
+                     ~'column-name
+                     (data-type ~(keyword n) dargs#)
+                     options#))))))
 
 (defmacro def-simple-typed-columns
   "Defines typed columns for simple data-types taking no arguments."
