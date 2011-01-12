@@ -107,6 +107,9 @@
      (finally (try (drop-schema ~sname :cascade *db*)
                    (catch Exception _#)))))
 
+(defn get-schema []
+  (get-global-schema :lobos *db*))
+
 ;;;; Fixtures
 
 (def tmp-files-ext '(db sqlite3))
@@ -151,18 +154,17 @@
                 (supports-catalogs)))
       (is (= lobos (schema :lobos {:db-spec (get-db-spec *db*)}))
           "Checking if the schema has been created")
-      (drop-schema lobos)
-      (is (nil? (analyze-schema :lobos *db*))
+      (is (nil? (drop-schema lobos))
           "Checking if the schema has been dropped"))))
 
 (def-db-test test-create-and-drop-table
   (with-schema [lobos :lobos]
-    (let [lobos (create lobos (table :foo (integer :bar)))]
-      (is (= (-> lobos :elements :foo) (table :foo (integer :bar)))
-          "Checking if the table has been created"))
-    (let [lobos (drop lobos (table :foo))]
-      (is (nil? (-> lobos :elements :foo))
-          "Checking if the table has been dropped"))))
+    (create lobos (table :foo (integer :bar)))
+    (is (= (-> (get-schema) :elements :foo)
+           (table :foo (integer :bar)))
+        "Checking if the table has been created")
+    (is (nil? (-> (drop lobos (table :foo)) :elements :foo))
+        "Checking if the table has been dropped")))
 
 (defn- eq [dtype]
   (first (replace {:float :double
