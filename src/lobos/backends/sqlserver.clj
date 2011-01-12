@@ -15,7 +15,11 @@
         lobos.compiler
         lobos.metadata
         lobos.utils)
-  (:import (lobos.ast AlterModifyAction
+  (:import (lobos.ast AlterAddAction
+                      AlterDropAction
+                      AlterModifyAction
+                      AlterRenameAction
+                      AlterTableStatement
                       AutoIncClause
                       DataTypeExpression
                       DropStatement
@@ -128,3 +132,27 @@
                 "FOR"
                 (as-identifier db-spec (:cname element)))
           :else (unsupported "Only set/drop default supported."))))
+
+(defmethod compile [:sqlserver AlterRenameAction]
+  [action]
+  (let [{:keys [db-spec element]} action]
+    (format "EXEC sp_rename '%s', '%s', 'COLUMN';"
+            (join \.
+                  (as-identifier db-spec (:sname element))
+                  (as-identifier db-spec (:tname element))
+                  (as-identifier db-spec (:cname element)))
+            (as-str (:others element)))))
+
+(defmethod compile [:sqlserver AlterTableStatement]
+  [statement]
+  (let [{:keys [db-spec tname action element]} statement
+        element (assoc element :sname (:schema db-spec) :tname tname)]
+    (if (= action :rename)
+      (compile (AlterRenameAction. db-spec element))
+      (join \space
+            "ALTER TABLE"
+            (as-identifier db-spec tname :schema)
+            (case action
+                  :add    (compile (AlterAddAction. db-spec element))
+                  :drop   (compile (AlterDropAction. db-spec element))
+                  :modify (compile (AlterModifyAction. db-spec element)))))))
