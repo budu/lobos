@@ -11,17 +11,27 @@
   (:refer-clojure :exclude [compile])
   (:require (lobos [schema :as schema]))
   (:use (clojure.contrib [def :only [defvar-]])
-        lobos.analyzer
-        lobos.compiler
-        lobos.metadata
-        lobos.utils)
-  (:import (lobos.ast AutoIncClause
+        (lobos [schema :only [build-definition]]
+               analyzer
+               compiler
+               metadata
+               utils))
+  (:import (lobos.ast AlterAddAction
+                      AlterDropAction
+                      AlterModifyAction
+                      AlterRenameAction
+                      AlterTableStatement
+                      AutoIncClause
+                      ColumnDefinition
                       CreateSchemaStatement
                       CreateTableStatement
                       DataTypeExpression
                       DropStatement
-                      Identifier)
-           (lobos.schema DataType
+                      ForeignKeyConstraintDefinition
+                      Identifier
+                      UniqueConstraintDefinition)
+           (lobos.schema Column
+                         DataType
                          UniqueConstraint)))
 
 ;;;; Analyzer
@@ -57,6 +67,12 @@
        :primary-key
        :unique)
      columns)))
+
+(defn- analyze-column [sname tname cname]
+  (analyze Column
+    (first
+     (resultset-seq
+      (.getColumns (db-meta) (name sname) nil (name tname) (name cname))))))
 
 ;;;; Compiler
 
@@ -112,3 +128,32 @@
       (as-identifier db-spec oname :schema)
       (when (and behavior (#{:table} otype))
         [(as-sql-keyword behavior)]))))
+
+(defmethod compile [:mysql AlterDropAction]
+  [action]
+  (let [{:keys [db-spec element]} action
+        is-unique (instance? UniqueConstraintDefinition element)
+        is-pkey (and is-unique (= (:type element) :primary-key))]
+    (join \space
+          "DROP"
+          (cond (instance? ColumnDefinition element) "COLUMN"
+                (instance? ForeignKeyConstraintDefinition element) "FOREIGN KEY"
+                (and is-unique (= (:ctype element) :unique)) "INDEX"
+                is-pkey "PRIMARY KEY")
+          (when-not is-pkey
+            (as-identifier db-spec (:cname element))))))
+
+(defmethod compile [:mysql AlterRenameAction]
+  [action]
+  (let [{:keys [db-spec element]} action
+        old-name (:cname element)
+        new-name (:others element)
+        column (with-db-meta db-spec
+                 (assoc (analyze-column (:sname element)
+                                        (:tname element)
+                                        old-name)
+                   :cname new-name))]
+    (join \space
+          "CHANGE"
+          (as-identifier db-spec old-name)
+          (compile (build-definition column db-spec)))))
