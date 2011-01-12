@@ -166,6 +166,35 @@
     (is (nil? (-> (drop lobos (table :foo)) :elements :foo))
         "Checking if the table has been dropped")))
 
+(def-db-test test-alter-table
+  (with-schema [lobos :lobos]
+    (create lobos (table :foo (integer :a)))
+    (is (= (-> lobos (alter :add (table :foo (integer :b))) :elements :foo)
+           (table :foo (integer :a) (integer :b)))
+        "Checking if the column has been added")
+    (is (= (-> lobos (alter :drop (table :foo (integer :b))) :elements :foo)
+           (table :foo (integer :a)))
+        "Checking if the column has been dropped")
+    (is (= (-> lobos (alter :add (table :foo (unique [:a]))) :elements :foo)
+           (table :foo (integer :a :unique)))
+        "Checking if the constraint has been added")
+    (is (= (-> lobos (alter :drop (table :foo (unique [:a]))) :elements :foo)
+           (table :foo (integer :a)))
+        "Checking if the constraint has been dropped")
+    (is (= (-> lobos (alter :modify (table :foo (column :a [:default 0])))
+               :elements :foo)
+           (table :foo (integer :a [:default 0])))
+        "Checking if the default clause has been set")
+    (is (= (-> lobos (alter :modify (table :foo (column :a :drop-default)))
+               :elements :foo)
+           (table :foo (integer :a)))
+        "Checking if the default clause has been dropped")
+    (is (= (-> lobos (alter :rename (table :foo (column :a :to :b)))
+               :elements :foo)
+           (table :foo (integer :b)))
+        "Checking if the column has been renamed")
+    (drop lobos (table :foo))))
+
 (defn- eq [dtype]
   (first (replace {:float :double
                    :numeric :decimal
