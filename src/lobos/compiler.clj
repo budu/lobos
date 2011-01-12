@@ -183,12 +183,12 @@
 
 (defmethod compile [::standard AlterTableStatement]
   [statement]
-  (let [{:keys [db-spec tname subaction element]} statement
+  (let [{:keys [db-spec tname action element]} statement
         is-column (instance? ColumnDefinition element)]
     (join \space
           "ALTER TABLE"
           (as-identifier db-spec tname)
-          (case subaction
+          (case action
             :add (join \space
                        "ADD"
                        (when is-column "COLUMN")
@@ -208,7 +208,7 @@
                                 "DROP DEFAULT"
                                 (str "SET DEFAULT " (compile default))))
                         (unsupported "Only set/drop default supported.")))
-            :rename (unsupported "Rename subaction not supported.")))))
+            :rename (unsupported "Rename action not supported.")))))
 
 (defmethod compile [::standard DropStatement]
   [statement]

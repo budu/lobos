@@ -181,7 +181,7 @@
   (is (= (compile alter-statement-stub)
          "ALTER TABLE \"foo\" ADD COLUMN \"foo\" INTEGER")
       "Compiling an alter table statement to add a column")
-  (is (= (compile (assoc alter-statement-stub :subaction :drop))
+  (is (= (compile (assoc alter-statement-stub :action :drop))
          "ALTER TABLE \"foo\" DROP COLUMN \"foo\"")
       "Compiling an alter table statement to drop a column")
   (is (= (compile (assoc alter-statement-stub
@@ -190,18 +190,18 @@
               "UNIQUE (\"a\", \"b\", \"c\")"))
       "Compiling an alter table statement to add a constraint")
   (is (= (compile (assoc alter-statement-stub
-                    :subaction :drop
+                    :action :drop
                     :element unique-constraint-definition-stub))
          "ALTER TABLE \"foo\" DROP CONSTRAINT \"foo_a_b_c\"")
       "Compiling an alter table statement to drop a constraint")
   (is (= (compile (assoc alter-statement-stub
-                    :subaction :modify
+                    :action :modify
                     :element (assoc column-definition-stub
                                :default (ValueExpression. nil 1))))
          "ALTER TABLE \"foo\" ALTER COLUMN \"foo\" SET DEFAULT 1")
       "Compiling an alter table statement to set default clause")
   (is (= (compile (assoc alter-statement-stub
-                    :subaction :modify
+                    :action :modify
                     :element (assoc column-definition-stub :default :drop)))
          "ALTER TABLE \"foo\" ALTER COLUMN \"foo\" DROP DEFAULT")
       "Compiling an alter table statement to drop default clause"))

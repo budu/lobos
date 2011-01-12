@@ -210,8 +210,8 @@
 
 (defaction alter
   "Builds an alter statement with the given schema element and execute it."
-  [subaction odef]
-  (schema/build-alter-statement odef subaction db-spec))
+  [action odef]
+  (schema/build-alter-statement odef action db-spec))
 
 (defaction drop
   "Builds a drop statement with the given schema element and execute it."

@@ -31,7 +31,7 @@
 ;;;; Protocols
 
 (defprotocol Alterable
-  (build-alter-statement [this subaction db-spec]))
+  (build-alter-statement [this action db-spec]))
 
 (defprotocol Buildable
   (build-definition [this db-spec]))
@@ -240,7 +240,7 @@
   "Constructs an abstract column definition and add it to the given
   table. Also creates and add the appropriate column constraints.
 
-  It also can be used in alter modify and rename subactions. In that
+  It also can be used in alter modify and rename actions. In that
   case, if data-type is :to, it acts as a column rename clause and if
   data-type is :drop-default, it acts as a column drop default clause."
   [table column-name & [data-type options]]
@@ -389,14 +389,14 @@
 (defrecord Table [name columns constraints options]
   Alterable Creatable Dropable
 
-  (build-alter-statement [this subaction db-spec]
+  (build-alter-statement [this action db-spec]
     (let [elements (map #(build-definition (second %) db-spec)
                         (concat columns constraints))]
       (for [element elements]
         (AlterTableStatement.
          db-spec
          name
-         subaction
+         action
          element))))
 
   (build-create-statement [this db-spec]

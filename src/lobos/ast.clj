@@ -58,8 +58,22 @@
 (defrecord CreateTableStatement
   [db-spec tname elements])
 
-(defrecord AlterTableStatement
-  [db-spec tname subaction element])
-
 (defrecord DropStatement
   [db-spec otype oname behavior])
+
+(defrecord AlterTableStatement
+  [db-spec tname action element])
+
+;;;; Alter action records
+
+(defrecord AlterAddAction
+  [db-spec element])
+
+(defrecord AlterDropAction
+  [db-spec element])
+
+(defrecord AlterModifyAction
+  [db-spec element])
+
+(defrecord AlterRenameAction
+  [db-spec element])
