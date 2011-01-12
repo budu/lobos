@@ -14,7 +14,11 @@
   (:use (clojure [string :only [replace]])
         lobos.utils)
   (:import (java.lang UnsupportedOperationException)
-           (lobos.ast AlterTableStatement
+           (lobos.ast AlterAddAction
+                      AlterDropAction
+                      AlterModifyAction
+                      AlterRenameAction
+                      AlterTableStatement
                       AutoIncClause
                       CheckConstraintDefinition
                       ColumnDefinition
@@ -181,35 +185,6 @@
             (or (as-list (map compile elements))
                 "()"))))
 
-(defmethod compile [::standard AlterTableStatement]
-  [statement]
-  (let [{:keys [db-spec tname action element]} statement
-        is-column (instance? ColumnDefinition element)]
-    (join \space
-          "ALTER TABLE"
-          (as-identifier db-spec tname)
-          (case action
-            :add (join \space
-                       "ADD"
-                       (when is-column "COLUMN")
-                       (compile element))
-            :drop (join \space
-                        "DROP"
-                        (if is-column
-                          "COLUMN"
-                          "CONSTRAINT")
-                        (as-identifier db-spec (:cname element)))
-            :modify (let [default (:default element)]
-                      (if default
-                        (join \space
-                              "ALTER COLUMN"
-                              (as-identifier db-spec (:cname element))
-                              (if (= default :drop)
-                                "DROP DEFAULT"
-                                (str "SET DEFAULT " (compile default))))
-                        (unsupported "Only set/drop default supported.")))
-            :rename (unsupported "Rename action not supported.")))))
-
 (defmethod compile [::standard DropStatement]
   [statement]
   (let [{:keys [db-spec otype oname behavior]} statement]
@@ -218,3 +193,55 @@
       (as-sql-keyword otype)
       (as-identifier db-spec oname :schema)
       (as-sql-keyword behavior))))
+
+;;; Alter statement and actions
+
+(defmethod compile [::standard AlterAddAction]
+  [action]
+  (let [{:keys [db-spec element]} action
+        is-column (instance? ColumnDefinition element)]
+    (join \space
+          "ADD"
+          (when is-column "COLUMN")
+          (compile element))))
+
+(defmethod compile [::standard AlterDropAction]
+  [action]
+  (let [{:keys [db-spec element]} action
+        is-column (instance? ColumnDefinition element)]
+    (join \space
+          "DROP"
+          (if is-column
+            "COLUMN"
+            "CONSTRAINT")
+          (as-identifier db-spec (:cname element)))))
+
+(defmethod compile [::standard AlterModifyAction]
+  [action]
+  (let [{:keys [db-spec element]} action
+        default (:default element)]
+    (if default
+      (join \space
+            "ALTER COLUMN"
+            (as-identifier db-spec (:cname element))
+            (if (= default :drop)
+              "DROP DEFAULT"
+              (str "SET DEFAULT " (compile default))))
+      (unsupported "Only set/drop default supported."))))
+
+(defmethod compile [::standard AlterRenameAction]
+  [action]
+  (let [{:keys [db-spec element]} action]
+     (unsupported "Rename action not supported.")))
+
+(defmethod compile [::standard AlterTableStatement]
+  [statement]
+  (let [{:keys [db-spec tname action element]} statement]
+    (join \space
+          "ALTER TABLE"
+          (as-identifier db-spec tname)
+          (case action
+            :add    (compile (AlterAddAction. db-spec element))
+            :drop   (compile (AlterDropAction. db-spec element))
+            :modify (compile (AlterModifyAction. db-spec element))
+            :rename (compile (AlterRenameAction. db-spec element))))))
