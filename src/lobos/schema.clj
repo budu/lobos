@@ -248,7 +248,7 @@
      (update-in table [:columns] conj
                 [column-name
                  (case (first options)
-                   :to (Column. column-name nil nil nil nil options)
+                   :to (Column. column-name nil nil nil nil (second options))
                    :drop-default (Column. column-name nil :drop nil nil nil)
                    (column* column-name data-type options))]))))
 
