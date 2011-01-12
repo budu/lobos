@@ -14,7 +14,8 @@
         lobos.analyzer
         lobos.compiler
         lobos.utils)
-  (:import (lobos.ast ColumnDefinition
+  (:import (lobos.ast AlterRenameAction
+                      ColumnDefinition
                       DataTypeExpression)
            (lobos.schema DataType)))
 
@@ -75,3 +76,12 @@
       (when default (str "DEFAULT " (compile default)))
       (when not-null "NOT NULL")
       others)))
+
+(defmethod compile [:postgresql AlterRenameAction]
+  [action]
+  (let [{:keys [db-spec element]} action
+        old-name (:cname element)
+        new-name (:others element)]
+    (format "RENAME COLUMN %s TO %s"
+            (as-identifier db-spec old-name)
+            (as-identifier db-spec new-name))))
