@@ -236,10 +236,11 @@
 
 (defmethod compile [::standard AlterTableStatement]
   [statement]
-  (let [{:keys [db-spec tname action element]} statement]
+  (let [{:keys [db-spec tname action element]} statement
+        element (assoc element :sname (:schema db-spec) :tname tname)]
     (join \space
           "ALTER TABLE"
-          (as-identifier db-spec tname)
+          (as-identifier db-spec tname :schema)
           (case action
             :add    (compile (AlterAddAction. db-spec element))
             :drop   (compile (AlterDropAction. db-spec element))
