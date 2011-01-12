@@ -231,4 +231,5 @@
   [schema-or-name & [behavior connection-info]]
   (let [schema (get-or-create-schema schema-or-name connection-info)
         db-spec (-> schema :options :db-spec)]
-    (execute (schema/build-drop-statement schema behavior db-spec) db-spec)))
+    (execute (schema/build-drop-statement schema behavior db-spec) db-spec)
+    (remove-global-schema schema)))
