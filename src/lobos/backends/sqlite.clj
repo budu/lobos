@@ -15,7 +15,8 @@
         lobos.compiler
         lobos.metadata
         lobos.utils)
-  (:import (lobos.ast AutoIncClause
+  (:import (lobos.ast AlterTableStatement
+                      AutoIncClause
                       CreateSchemaStatement
                       CreateTableStatement
                       DataTypeExpression
@@ -161,3 +162,7 @@
         "DROP"
         (as-sql-keyword otype)
         (as-identifier db-spec oname)))))
+
+(defmethod compile [:sqlite AlterTableStatement]
+  [statement]
+  (unsupported "Alter statement unsupported."))
