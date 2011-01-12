@@ -20,39 +20,30 @@
 
 ;;;; Constraint definition tests
 
-(deftest test-unique-constraint
-  (is (= (table :foo (column :bar nil nil)
-                (unique-constraint :unique :bar (list :baz)))
-         (table* :foo {:bar (column* :bar nil nil)}
-                 {:foo_unique_bar_baz (UniqueConstraint.
-                                       :foo_unique_bar_baz
-                                       :unique
-                                       [:bar :baz])} {}))
-      "Unnamed unique constraint definition")
-  (is (= (table :foo (column :baz nil nil)
-                (unique-constraint :unique :bar (list :baz)))
-         (table* :foo {:baz (column* :baz nil nil)}
-                 {:bar (UniqueConstraint.
-                        :bar
-                        :unique
-                        [:baz])} {}))
-      "Named unique constraint definition"))
-
 (deftest test-primary-key
-  (is (= (table :foo (primary-key :foo :bar :baz))
-         (table* :foo {} {:foo (UniqueConstraint.
-                                :foo
-                                :primary-key
-                                [:bar :baz])} {}))
-      "Primary key constraint definition"))
+  (is (= (table :foo (primary-key [:a :b :c]))
+         (table* :foo {} {:foo_primary_key_a_b_c
+                          (UniqueConstraint.
+                           :foo_primary_key_a_b_c
+                           :primary-key
+                           [:a :b :c])} {}))
+      "Unnamed primary key constraint definition")
+  (is (= (table :foo (primary-key :bar [:a :b :c]))
+         (table* :foo {} {:bar
+                          (UniqueConstraint. :bar :primary-key [:a :b :c])}))
+      "Named primary key constraint definition"))
 
 (deftest test-unique
-  (is (= (table :foo (unique :foo :bar :baz))
-         (table* :foo {} {:foo (UniqueConstraint.
-                                :foo
-                                :unique
-                                [:bar :baz])} {}))
-      "Unique constraint definition"))
+  (is (= (table :foo (unique [:a :b :c]))
+         (table* :foo {} {:foo_unique_a_b_c
+                          (UniqueConstraint.
+                           :foo_unique_a_b_c
+                           :unique
+                           [:a :b :c])} {}))
+      "Unnamed unique constraint definition")
+  (is (= (table :foo (unique :bar [:a :b :c]))
+         (table* :foo {} {:bar (UniqueConstraint. :bar :unique [:a :b :c])}))
+      "Named unique constraint definition"))
 
 (def foreign-key-stub
   (ForeignKeyConstraint. :foo_fkey_a_b_c [:a :b :c] :bar [:a :b :c] nil {}))
@@ -210,12 +201,9 @@
   (is (= (table :foo (column :foo nil nil))
          (Table. :foo {:foo column-definition-stub} {} {}))
       "Table with column")
-  (is (= (table :foo (unique :foo :bar :baz))
-         (Table. :foo {} {:foo (UniqueConstraint.
-                                :foo
-                                :unique
-                                [:bar :baz])} {}))
-      "Table with unique constraint"))
+  (is (= (table :foo (unique :bar [:a]))
+         (Table. :foo {} {:bar (UniqueConstraint. :bar :unique [:a])} {}))
+      "Table with constraint"))
 
 ;;;; Schema definition tests
 

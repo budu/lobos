@@ -237,12 +237,11 @@
   (with-schema [lobos :lobos]
     (doseq [ctype [:unique :primary-key]]
       (let [lobos (ignore-unsupported
-                   (create lobos (table :foo (integer :bar)
-                                        (unique-constraint ctype :bar []))))
-            cname (make-constraint-name :foo ctype [:bar])]
+                   (create lobos (table :foo (integer :a ctype))))
+            cname (make-constraint-name :foo ctype [:a])]
         (when lobos
           (is (= (-> lobos :elements :foo :constraints cname)
-                 (UniqueConstraint. cname ctype [:bar]))
+                 (UniqueConstraint. cname ctype [:a]))
               (format "Checking if %s constraint has been created"
                       (name ctype)))
           (drop lobos (table :foo)))))))

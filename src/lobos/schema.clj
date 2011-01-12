@@ -72,33 +72,24 @@
 (defn unique-constraint
   "Constructs an abstract unique (or primary-key depending on the given
   type) constraint definition and add it to the given table."
-  [table constraint-type name-or-column columns]
-  (let [named (not (contains? (:columns table) name-or-column))
-        constraint-name (when named name-or-column)
-        columns (if named
-                  columns
-                  (conj columns name-or-column))
-        constraint-name (or constraint-name
-                            (make-constraint-name table
-                                                  constraint-type
-                                                  columns))]
+  [table name type columns]
+  (let [name (or name (make-constraint-name table type columns))]
     (update-in table [:constraints] conj
-               [constraint-name
-                (UniqueConstraint. constraint-name
-                                   constraint-type
-                                   (vec columns))])))
+               [name (UniqueConstraint. name type (vec columns))])))
 
 (defn primary-key
   "Constructs an abstract primary key constraint definition and add it
   to the given table."
-  [table name-or-column & columns]
-  (unique-constraint table :primary-key name-or-column columns))
+  ([table columns] (primary-key table nil columns))
+  ([table name columns]
+     (unique-constraint table name :primary-key columns)))
 
 (defn unique
   "Constructs an abstract unique constraint definition and add it to the
   given table."
-  [table name-or-column & columns]
-  (unique-constraint table :unique name-or-column columns))
+  ([table columns] (unique table nil columns))
+  ([table name columns]
+     (unique-constraint table name :unique columns)))
 
 (defrecord ForeignKeyConstraint
   [cname columns parent-table parent-columns match triggered-actions]
@@ -247,9 +238,9 @@
   (name-required column-name "column")
   (let [option-set (when (seq? options) (set options))
         add-constraint #(cond (:primary-key option-set)
-                              (primary-key % column-name)
+                              (primary-key % [column-name])
                               (:unique option-set)
-                              (unique % column-name)
+                              (unique % [column-name])
                               :else %)]
     (add-constraint
      (update-in table [:columns] conj
