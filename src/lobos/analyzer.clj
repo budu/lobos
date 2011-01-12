@@ -47,7 +47,8 @@
   (when expr
     (cond (re-find #"(.*)::(.*)" expr)
           (let [[_ & [value dtype]] (first (re-seq #"(.*)::(.*)" expr))]
-            (read-string (replace (str value) \' \")))
+            (read-string (replace (str value) \' \"))) ;; HACK: to replace!
+          (re-find #"\d+" expr) (Integer/parseInt expr)
           (re-find #"(\w+)(\(\))?" expr)
           (let [[[_ func]] (re-seq #"(\w+)(\(\))?" expr)]
             (keyword func))
