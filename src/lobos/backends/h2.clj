@@ -12,7 +12,8 @@
   (:use (clojure.contrib [def :only [defvar-]])
         lobos.compiler
         lobos.utils)
-  (:import (lobos.ast AutoIncClause
+  (:import (lobos.ast AlterRenameAction
+                      AutoIncClause
                       CreateSchemaStatement
                       DataTypeExpression
                       DropStatement)))
@@ -51,3 +52,12 @@
       (as-identifier db-spec oname :schema)
       (when (and behavior (#{:table} otype))
         (as-sql-keyword behavior)))))
+
+(defmethod compile [:h2 AlterRenameAction]
+  [action]
+  (let [{:keys [db-spec element]} action
+        old-name (:cname element)
+        new-name (:others element)]
+    (format "ALTER COLUMN %s RENAME TO %s"
+            (as-identifier db-spec old-name)
+            (as-identifier db-spec new-name))))
