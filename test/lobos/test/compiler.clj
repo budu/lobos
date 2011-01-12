@@ -179,7 +179,7 @@
 
 (deftest test-compile-alter-statement
   (is (= (compile alter-statement-stub)
-         "ALTER TABLE \"foo\" ADD COLUMN \"foo\" INTEGER")
+         "ALTER TABLE \"foo\" ADD \"foo\" INTEGER")
       "Compiling an alter table statement to add a column")
   (is (= (compile (assoc alter-statement-stub :action :drop))
          "ALTER TABLE \"foo\" DROP COLUMN \"foo\"")
