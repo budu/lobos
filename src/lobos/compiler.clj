@@ -202,7 +202,6 @@
         is-column (instance? ColumnDefinition element)]
     (join \space
           "ADD"
-          (when is-column "COLUMN")
           (compile element))))
 
 (defmethod compile [::standard AlterDropAction]
