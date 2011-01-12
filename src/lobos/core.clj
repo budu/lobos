@@ -205,18 +205,18 @@
 
 (defaction create
   "Builds a create statement with the given schema element and execute it."
-  [odef]
-  (schema/build-create-statement odef db-spec))
+  [element]
+  (schema/build-create-statement element db-spec))
 
 (defaction alter
   "Builds an alter statement with the given schema element and execute it."
-  [action odef]
-  (schema/build-alter-statement odef action db-spec))
+  [action element]
+  (schema/build-alter-statement element action db-spec))
 
 (defaction drop
   "Builds a drop statement with the given schema element and execute it."
-  [odef & [behavior]]
-  (schema/build-drop-statement odef behavior db-spec))
+  [element & [behavior]]
+  (schema/build-drop-statement element behavior db-spec))
 
 (defn create-schema
   "Create a new schema."
