@@ -247,7 +247,7 @@
     (add-constraint
      (update-in table [:columns] conj
                 [column-name
-                 (case data-type
+                 (case (first options)
                    :to (Column. column-name nil nil nil nil options)
                    :drop-default (Column. column-name nil :drop nil nil nil)
                    (column* column-name data-type options))]))))
