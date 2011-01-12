@@ -10,7 +10,8 @@
   (:refer-clojure :exclude [compile])
   (:use clojure.test
         lobos.compiler)
-  (:import (lobos.ast AutoIncClause
+  (:import (lobos.ast AlterTableStatement
+                      AutoIncClause
                       CheckConstraintDefinition
                       ColumnDefinition
                       CreateTableStatement
@@ -172,3 +173,35 @@
                     :behavior :cascade))
          "DROP SCHEMA \"foo\" CASCADE")
       "Compiling a drop statement with cascade behavior"))
+
+(def alter-statement-stub
+  (AlterTableStatement. nil :foo :add column-definition-stub))
+
+(deftest test-compile-alter-statement
+  (is (= (compile alter-statement-stub)
+         "ALTER TABLE \"foo\" ADD COLUMN \"foo\" INTEGER")
+      "Compiling an alter table statement to add a column")
+  (is (= (compile (assoc alter-statement-stub :subaction :drop))
+         "ALTER TABLE \"foo\" DROP COLUMN \"foo\"")
+      "Compiling an alter table statement to drop a column")
+  (is (= (compile (assoc alter-statement-stub
+                    :element unique-constraint-definition-stub))
+         (str "ALTER TABLE \"foo\" ADD CONSTRAINT \"foo_a_b_c\" "
+              "UNIQUE (\"a\", \"b\", \"c\")"))
+      "Compiling an alter table statement to add a constraint")
+  (is (= (compile (assoc alter-statement-stub
+                    :subaction :drop
+                    :element unique-constraint-definition-stub))
+         "ALTER TABLE \"foo\" DROP CONSTRAINT \"foo_a_b_c\"")
+      "Compiling an alter table statement to drop a constraint")
+  (is (= (compile (assoc alter-statement-stub
+                    :subaction :modify
+                    :element (assoc column-definition-stub
+                               :default (ValueExpression. nil 1))))
+         "ALTER TABLE \"foo\" ALTER COLUMN \"foo\" SET DEFAULT 1")
+      "Compiling an alter table statement to set default clause")
+  (is (= (compile (assoc alter-statement-stub
+                    :subaction :modify
+                    :element (assoc column-definition-stub :default :drop)))
+         "ALTER TABLE \"foo\" ALTER COLUMN \"foo\" DROP DEFAULT")
+      "Compiling an alter table statement to drop default clause"))
