@@ -15,13 +15,21 @@
         lobos.compiler
         lobos.metadata
         lobos.utils)
-  (:import (lobos.ast AutoIncClause
+  (:import (lobos.ast AlterModifyAction
+                      AutoIncClause
                       DataTypeExpression
                       DropStatement
                       Identifier)
            (lobos.schema DataType)))
 
 ;;;; Analyzer
+
+(defmethod analyze [:microsoft-sql-server nil]
+  [_ expr]
+  (when expr
+    (cond (re-find #"^\(\((\d+)\)\)$" expr)
+          (let [[[_ n]] (re-seq #"(\w+)(\(\))?" expr)]
+            (Integer/parseInt n)))))
 
 (defvar- analyzer-data-type-aliases
   {:bit :boolean
@@ -98,3 +106,25 @@
                                :cascade
                                (assoc db-spec :schema oname))))))
             sql-string))))
+
+(defmethod compile [:sqlserver AlterModifyAction]
+  [action]
+  (let [{:keys [db-spec element]} action
+        default (:default element)
+        cname (when default
+                (make-constraint-name (:tname element)
+                                      "default"
+                                      (list (:cname element))))]
+    (cond (= default :drop)
+          (join \space
+                "DROP CONSTRAINT"
+                (as-identifier db-spec cname))
+          default
+          (join \space
+                "ADD CONSTRAINT"
+                (as-identifier db-spec cname)
+                "DEFAULT"
+                (compile default)
+                "FOR"
+                (as-identifier db-spec (:cname element)))
+          :else (unsupported "Only set/drop default supported."))))
