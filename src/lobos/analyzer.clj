@@ -42,14 +42,14 @@
 
 ;;;; Default analyzer
 
-(defmethod analyze [::standard Object]
+(defmethod analyze [::standard nil]
   [_ expr]
   (when expr
-    (cond (re-find #"(.*)::(.*)" expr)
+    (cond (re-find #"^(.*)::(.*)$" expr)
           (let [[_ & [value dtype]] (first (re-seq #"(.*)::(.*)" expr))]
             (read-string (replace (str value) \' \"))) ;; HACK: to replace!
-          (re-find #"\d+" expr) (Integer/parseInt expr)
-          (re-find #"(\w+)(\(\))?" expr)
+          (re-find #"^\d+$" expr) (Integer/parseInt expr)
+          (re-find #"^(\w+)(\(\))?$" expr)
           (let [[[_ func]] (re-seq #"(\w+)(\(\))?" expr)]
             (keyword func))
           :else (str expr))))
@@ -125,7 +125,7 @@
     (Column. (-> column-meta :column_name keyword)
              (analyze DataType column-meta)
              (when-not auto-inc
-               (analyze Object (:column_def column-meta)))
+               (analyze nil (:column_def column-meta)))
              auto-inc
              (= (:is_nullable column-meta) "NO")
              [])))
