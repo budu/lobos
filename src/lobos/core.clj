@@ -113,14 +113,13 @@
         elements (nnext args)]
     `(let [db-spec# (conn/get-db-spec ~connection-info)
            options# {:db-spec db-spec#}
-           elements# (list ~@elements)]
-       (defn ~var-name []
-         (@global-schemas
-          (schema-key
-           (if elements#
-             (update-global-schema
-              (apply schema/schema ~schema-name options# elements#))
-             (update-global-schema ~schema-name db-spec#))))))))
+           elements# (list ~@elements)
+           key# (schema-key
+                 (if elements#
+                   (update-global-schema
+                    (apply schema/schema ~schema-name options# elements#))
+                   (update-global-schema ~schema-name db-spec#)))]
+       (defn ~var-name [] (@global-schemas key#)))))
 
 ;;;; Action helpers
 
