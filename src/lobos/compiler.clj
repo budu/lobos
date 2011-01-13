@@ -124,6 +124,13 @@
 
 (defmethod compile [::standard UniqueConstraintDefinition]
   [definition]
+  (let [{:keys [db-spec cname]} definition]
+    (join \space
+      "CONSTRAINT"
+      (as-identifier db-spec cname))))
+
+(defmethod compile [::standard UniqueConstraintDefinition]
+  [definition]
   (let [{:keys [db-spec cname ctype columns]} definition]
     (join \space
       "CONSTRAINT"

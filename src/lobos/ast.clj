@@ -41,6 +41,9 @@
 (defrecord ColumnDefinition
   [db-spec cname data-type default auto-inc not-null others])
 
+(defrecord ConstraintDefinition
+  [db-spec cname])
+
 (defrecord UniqueConstraintDefinition
   [db-spec cname ctype columns])
 

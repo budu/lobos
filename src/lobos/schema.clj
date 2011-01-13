@@ -20,6 +20,7 @@
                       AutoIncClause
                       CheckConstraintDefinition
                       ColumnDefinition
+                      ConstraintDefinition
                       CreateTableStatement
                       CreateSchemaStatement
                       DataTypeExpression
@@ -58,6 +59,20 @@
   (isa? (type o) ::definition))
 
 ;;;; Constraint definition
+
+(defrecord Constraint [cname]
+  Buildable
+
+  (build-definition [this db-spec]
+    (ConstraintDefinition. db-spec cname)))
+
+(defn constraint
+  "Constructs an unspecified abstract constraint definition and add it
+  to the given table. To be used with alter action while dropping a
+  constraint."
+  [table name]
+  (update-in table [:constraints] conj
+             [name (Constraint. name)]))
 
 (defrecord UniqueConstraint [cname ctype columns]
   Buildable
