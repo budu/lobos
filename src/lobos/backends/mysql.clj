@@ -112,12 +112,11 @@
 (defmethod compile [:mysql CreateSchemaStatement]
   [statement]
   (let [{:keys [db-spec sname elements]} statement]
-    (apply join ";\n\n"
-      (conj (map (comp compile
-                       #(assoc-in % [:db-spec :schema] sname))
-                 elements)
-            (str "CREATE SCHEMA "
-                 (as-identifier db-spec sname))))))
+    (conj (map (comp compile
+                     #(assoc-in % [:db-spec :schema] sname))
+               elements)
+          (str "CREATE SCHEMA "
+               (as-identifier db-spec sname)))))
 
 (defmethod compile [:mysql DropStatement]
   [statement]
