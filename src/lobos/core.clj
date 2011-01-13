@@ -98,7 +98,8 @@
         schema (cond (schema/schema? schema-or-name) schema-or-name
                      (fn? schema-or-name) (schema-or-name)
                      (keyword? schema-or-name) (schema/schema schema-or-name))]
-    (if (-> schema :options :db-spec)
+    (if (and (not connection-info)
+             (-> schema :options :db-spec))
       schema
       (assoc-in schema [:options :db-spec] db-spec))))
 
@@ -180,10 +181,11 @@
       :schema (do (println (type object))
                   (pprint object)))))
 
-(defn- execute* [sql-string]
-  (when (= :sql @debug-level) (println sql-string))
-  (with-open [stmt (.createStatement (conn/connection))]
-    (.execute stmt sql-string)))
+(defn- execute* [sql]
+  (doseq [sql-string (if (seq? sql) sql [sql])]
+    (when (= :sql @debug-level) (println sql-string))
+    (with-open [stmt (.createStatement (conn/connection))]
+      (.execute stmt sql-string))))
 
 (defn execute
   "Execute the given statement using the specified connection
@@ -197,10 +199,10 @@
     (conn/with-connection connection-info
       (when mode (execute* mode))
       (doseq [statement statements]
-        (let [sql-string (if (string? statement)
+        (let [sql (if (string? statement)
                            statement
                            (compiler/compile statement))]
-          (when sql-string (execute* sql-string)))))) nil)
+          (when sql (execute* sql)))))) nil)
 
 (defaction create
   "Builds a create statement with the given schema element and execute it."
