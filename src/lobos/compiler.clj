@@ -233,7 +233,7 @@
 (defmethod compile [::standard AlterAddAction]
   [action]
   (let [{:keys [db-spec element]} action
-        is-column (instance? ColumnDefinition element)]
+        element (assoc element :db-spec db-spec)]
     (join \space
           "ADD"
           (compile element))))
