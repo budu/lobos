@@ -33,15 +33,31 @@
   [_]
   "AUTO_INCREMENT")
 
+(defmethod compile [::standard CreateSchemaStatement]
+  [statement]
+  (let [{:keys [db-spec sname elements]} statement
+        [elements foreign-keys] (extract-foreign-keys elements)
+        alters (map compile (build-alter-add-statements
+                             (assoc db-spec :schema sname)
+                             foreign-keys))]
+    (conj alters
+          (str "CREATE SCHEMA "
+               (apply join "\n" (conj (map compile elements)
+                                      (as-identifier db-spec sname)))))))
+
 (defmethod compile [:h2 CreateSchemaStatement]
   [statement]
-  (let [{:keys [db-spec sname elements]} statement]
-    (apply join ";\n\n"
-      (conj (map (comp compile
-                       #(assoc-in % [:db-spec :schema] sname))
-                 elements)
-            (str "CREATE SCHEMA "
-                 (as-identifier db-spec sname))))))
+  (let [{:keys [db-spec sname elements]} statement
+        [elements foreign-keys] (extract-foreign-keys elements)
+        alters (map compile (build-alter-add-statements
+                             (assoc db-spec :schema sname)
+                             foreign-keys))]
+    (conj (concat (map (comp compile
+                             #(assoc-in % [:db-spec :schema] sname))
+                       elements)
+                  alters)
+          (str "CREATE SCHEMA "
+               (as-identifier db-spec sname)))))
 
 (defmethod compile [:h2 DropStatement]
   [statement]

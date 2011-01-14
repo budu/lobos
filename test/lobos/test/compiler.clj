@@ -150,11 +150,11 @@
 
 (deftest test-compile-create-schema-statement
   (is (= (compile create-schema-statement-stub)
-         "CREATE SCHEMA \"foo\"")
+         (list "CREATE SCHEMA \"foo\""))
       "Compiling an empty create schema statement")
   (is (= (compile (assoc create-schema-statement-stub
                     :elements [create-table-statement-stub]))
-         "CREATE SCHEMA \"foo\"\n\nCREATE TABLE \"foo\" ()")
+         (list "CREATE SCHEMA \"foo\"\nCREATE TABLE \"foo\" ()"))
       "Compiling a create schema statement containing a table"))
 
 (deftest test-compile-create-table-statement

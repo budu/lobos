@@ -52,6 +52,28 @@
 
 (defn mode [db-spec] (Mode. db-spec))
 
+(defn extract-foreign-keys* [stmt]
+  (let [fkey? #(instance? ForeignKeyConstraintDefinition %)
+        foreign-keys (vector (:tname stmt)
+                             (->> (:elements stmt)
+                                  (filter fkey?)))
+        stmt (update-in stmt [:elements]
+               (fn [es] (filter #(not (fkey? %)) es)))]
+    [stmt foreign-keys]))
+
+(defn extract-foreign-keys [elements]
+  (let [tables (filter #(instance? CreateTableStatement %) elements)
+        others (filter #(not (instance? CreateTableStatement %)) elements)
+        results (map extract-foreign-keys* tables)
+        tables (map first results)
+        foreign-keys (apply hash-map (apply concat (map second results)))]
+    [(concat tables others)
+     foreign-keys]))
+
+(defn build-alter-add-statements [db-spec m]
+  (for [[tname elements] m element elements]
+    (AlterTableStatement. db-spec tname :add element)))
+
 ;;;; Compiler
 
 (def backends-hierarchy
@@ -179,10 +201,15 @@
 
 (defmethod compile [::standard CreateSchemaStatement]
   [statement]
-  (let [{:keys [db-spec sname elements]} statement]
-    (str "CREATE SCHEMA "
-         (apply join "\n\n" (conj (map compile elements)
-                                  (as-identifier db-spec sname))))))
+  (let [{:keys [db-spec sname elements]} statement
+        [elements foreign-keys] (extract-foreign-keys elements)
+        alters (map compile (build-alter-add-statements
+                             (assoc db-spec :schema sname)
+                             foreign-keys))]
+    (conj alters
+          (str "CREATE SCHEMA "
+               (apply join "\n" (conj (map compile elements)
+                                      (as-identifier db-spec sname)))))))
 
 (defmethod compile [::standard CreateTableStatement]
   [statement]

@@ -111,10 +111,15 @@
 
 (defmethod compile [:mysql CreateSchemaStatement]
   [statement]
-  (let [{:keys [db-spec sname elements]} statement]
-    (conj (map (comp compile
-                     #(assoc-in % [:db-spec :schema] sname))
-               elements)
+  (let [{:keys [db-spec sname elements]} statement
+        [elements foreign-keys] (extract-foreign-keys elements)
+        alters (map compile (build-alter-add-statements
+                             (assoc db-spec :schema sname)
+                             foreign-keys))]
+    (conj (concat (map (comp compile
+                             #(assoc-in % [:db-spec :schema] sname))
+                       elements)
+                  alters)
           (str "CREATE SCHEMA "
                (as-identifier db-spec sname)))))
 
