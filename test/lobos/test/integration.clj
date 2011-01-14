@@ -7,8 +7,8 @@
 ;; You must not remove this notice, or any other, from this software.
 
 (ns lobos.test.integration
-  (:refer-clojure :exclude [alter bigint boolean char compile double drop float
-                            time])
+  (:refer-clojure :exclude [alter compile drop
+                            bigint boolean char double float time])
   (:use clojure.test
         (lobos connectivity core metadata schema test utils)
         (lobos.backends h2 mysql postgresql sqlite sqlserver))
