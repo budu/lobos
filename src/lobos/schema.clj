@@ -258,11 +258,17 @@
   [table column-name & options]
   (name-required column-name "column")
   (let [[data-type options] (optional #(instance? DataType %) options)
+        reference? #(and (vector? %) (= (first %) :refer))
+        [ptable pcol & others] (->> options (filter reference?) first next)
+        options (filter (comp not reference?) options)
         option-set (when (seq? options) (set options))
         add-constraint #(cond (:primary-key option-set)
                               (primary-key % [column-name])
                               (:unique option-set)
                               (unique % [column-name])
+                              ptable
+                              (apply foreign-key % [column-name] ptable
+                                     (when pcol [pcol]) others)
                               :else %)]
     (add-constraint
      (update-in table [:columns] conj
