@@ -9,7 +9,8 @@
 (ns lobos.backends.sqlserver
   "Compiler implementation for SQL Server."
   (:refer-clojure :exclude [compile])
-  (:require (lobos [schema :as schema]))
+  (:require clojure.string
+            (lobos [schema :as schema]))
   (:use (clojure.contrib [def :only [defvar-]])
         lobos.analyzer
         lobos.compiler
@@ -92,6 +93,26 @@
 (defmethod compile [:sqlserver AutoIncClause]
   [_]
   "IDENTITY")
+
+;; HACK: quick fix for len function
+(defmethod compile [:sqlserver lobos.ast.CheckConstraintDefinition]
+  [definition]
+  (let [{:keys [db-spec cname condition identifiers]} definition
+        identifiers-re (re-pattern (apply join \| identifiers))
+        {:keys [stmt env]} condition
+        condition (clojure.string/replace (first stmt)
+                                          identifiers-re
+                                          #(as-identifier db-spec %))
+        condition (apply format
+                         (.replace condition "?" "%s")
+                         (map #(if (string? %)
+                                 (str \' % \')
+                                 %) env))]
+    (join \space
+      "CONSTRAINT"
+      (as-identifier db-spec cname)
+      "CHECK"
+      (.replace condition "length" "len"))))
 
 (defmethod compile [:sqlserver DropStatement]
   [statement]
