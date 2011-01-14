@@ -371,6 +371,9 @@
   clob
   nclob)
 
+(defalias text clob)
+(defalias ntext nclob)
+
 (def-length-bounded-typed-columns  
   varchar
   nvarchar)
