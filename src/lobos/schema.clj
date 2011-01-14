@@ -201,24 +201,29 @@
 
 ;;;; Column definition
 
+(defn dt-function-aliases [dtype default]
+  (if (= default :now)
+    (or ({:date :current_date
+          :time :current_time
+          :timestamp :current_timestamp} dtype) default)
+    default))
+
 (defrecord Column [cname data-type default auto-inc not-null others]
   Buildable
   
   (build-definition [this db-spec]
-    (ColumnDefinition.
-     db-spec
-     cname
-     (DataTypeExpression.
-      db-spec
-      (:dtype data-type)
-      (:args data-type)
-      (:options data-type))
-     (if (= default :drop)
-       default
-       (when default (ValueExpression. db-spec default)))
-     (when auto-inc (AutoIncClause. db-spec))
-     not-null
-     others)))
+    (let [{:keys [dtype args options]} data-type]
+      (ColumnDefinition.
+       db-spec
+       cname
+       (DataTypeExpression. db-spec dtype args options)
+       (if (= default :drop)
+         default
+         (when default
+           (ValueExpression. db-spec (dt-function-aliases dtype default))))
+       (when auto-inc (AutoIncClause. db-spec))
+       not-null
+       others))))
 
 (defn column*
   "Constructs an abstract column definition."
