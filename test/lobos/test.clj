@@ -63,11 +63,10 @@
 (def available-specs (filter driver-available? db-specs))
 
 (defn available-global-cnx []
-  (filter #(re-find #":test-.*" (str %))
-    (keys @global-connections)))
+  (keys @global-connections))
 
 (defn test-db-name [db-spec]
-  (keyword (str "test-" (:subprotocol db-spec))))
+  (keyword (:subprotocol db-spec)))
 
 (def *db* nil)
 
