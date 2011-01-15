@@ -1,5 +1,14 @@
 # Lobos History
 
+## 0.6
+
+ * Support for altering tables
+ * Improved the schema creation process
+ * Added the refer column option
+ * Added text and ntext aliases
+ * Major refactoring of integration tests
+ * Added system testing with only one test for now 
+
 ## 0.5
 
  * Added remaining scalar data-types

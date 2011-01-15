@@ -7,8 +7,3 @@
 ## 0.7
 
  * Support for migration
-
-## 0.6
-
- * Support for altering tables
- * Adding functional testing

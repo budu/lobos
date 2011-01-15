@@ -55,33 +55,6 @@ default one.
     user> (drop (table :users (integer :id :unique)))
     nil
 
-### More Complex Example
-
-Lobos now supports a quite comprehensive set of features for creating
-tables, here's a more complex example:
-
-    user> (create (table :users
-                    (integer :id :auto-inc :primary-key)
-                    (varchar :name 100 :unique)
-                    (integer :age)
-                    (timestamp :created_on [:default :current_timestamp])
-                    (check :old-enough (> :age 18))
-                    (check :not-too-old (< :age 118))))
-    
-    user> (create (table :posts
-                    (integer :id :auto-inc :primary-key)
-                    (varchar :title 200 :unique)
-                    (clob :content)
-                    (timestamp :created-on [:default :current_timestamp])
-                    (integer :user_id)
-                    (foreign-key [:user_id] :users [:id])))
-
-The `drop` action has the optional `behavior` parameter that works even
-on database without built-in support for it:
-
-    user> (drop sqlserver-spec (table :users) :cascade)
-    nil
-                    
 ### Schemas    
 
 You can use a schema which you'll first need to define:
@@ -100,6 +73,82 @@ and the actions will return the schema definition instead of nil:
     user> (drop (table :users))
     #:lobos.schema.Schema{...}
 
+### More Complex Examples
+
+Lobos now supports a quite comprehensive set of features for creating
+tables, here's a more complex example defining a complete schema:
+
+    (ns lobos.test.sample-schema
+      (:refer-clojure :exclude [alter compile drop
+                                bigint boolean char double float time])
+      (:use (lobos core schema)))
+    
+    (defn surrogate-key [table]
+      (integer table :id :auto-inc :primary-key))
+    
+    (defn datetime-tracked [table]
+      (-> table
+          (timestamp :updated_on)
+          (timestamp :created_on [:default :now])))
+    
+    (defn refer-to [table ptable]
+      (let [cname (-> (->> ptable name butlast (apply str))
+                      (str "_id")
+                      keyword)]
+        (integer table cname [:refer ptable :id :on-delete :set-null])))
+    
+    (defmacro tabl [name & elements]
+      `(-> (table ~name
+             (surrogate-key)
+             (datetime-tracked))
+           ~@elements))
+    
+    (defschema sample-schema :lobos
+      
+      (tabl :users
+        (varchar :name 100 :unique)
+        (check :name (> :length/name 1)))
+    
+      (tabl :posts
+        (varchar :title 200 :unique)
+        (text :content)
+        (refer-to :users))
+    
+      (tabl :comments
+        (text :content)
+        (refer-to :users)
+        (refer-to :posts)))
+
+To create that schema, use the `create-schema` action:
+
+    user> (use 'lobos.test.sample-schema)
+    nil
+    user> (create-schema sample-schema)
+    #:lobos.schema.Schema{...}
+
+There also the `alter` action that let you manipulate tables:
+
+    user> (alter :add (table :users (text :about-me)))
+    #:lobos.schema.Schema{...}
+    user> (alter :add (table :users
+                        (text :location)
+                        (text :occupation)))
+    #:lobos.schema.Schema{...}
+    user> (alter :add (table :comments (check :comment-limit (< :length/content 144))))
+    #:lobos.schema.Schema{...}
+    user> (alter :modify (table :users (column :location [:default "Somewhere"])))
+    #:lobos.schema.Schema{...}
+    user> (alter :drop (table :users (column :occupation)))
+    #:lobos.schema.Schema{...}
+    user> (alter :rename (table :users (column :location :to :origin)))
+    #:lobos.schema.Schema{...}
+
+The `drop` action has the optional `behavior` parameter that works even
+on database without built-in support for it:
+
+    user> (drop sqlserver-spec (table :users) :cascade)
+    nil
+                    
 ### Debugging
 
 You can always set the debug level to see the compiled statement:
