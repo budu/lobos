@@ -188,14 +188,14 @@ Lobos is available through Clojars.
 
 For the latest release, in Cake/Leiningen:
 
-    [lobos "0.5.0"]
+    [lobos "0.6.0"]
 
 in Maven:
 
     <dependency>
       <groupId>lobos</groupId>
       <artifactId>lobos</artifactId>
-      <version>0.5.0</version>
+      <version>0.6.0</version>
     </dependency>
 
 ## License
