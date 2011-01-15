@@ -47,5 +47,6 @@
 ;;;; Tests
 
 (def-db-test test-check-constraint
-  (when-not (= *db* :test-mysql)
-    (is (thrown? Exception (conj! (table *db* :lobos.users) {:name "a"})))))
+  (when-not (= *db* :mysql)
+    (binding [*err* identity]
+      (is (thrown? Exception (conj! (table *db* :lobos.users) {:name "a"}))))))
