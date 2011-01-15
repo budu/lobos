@@ -1,5 +1,7 @@
 # Lobos Roadmap
 
+You can have a look at the [wiki] for more details.
+
 ## 0.10
 
  * Emulate transaction support
@@ -17,3 +19,5 @@
  * Improve compiler support for value expression
  * Probably rewrite the analyzer once again, maybe split it to another
    project
+
+[wiki]: https://github.com/budu/lobos/wiki
