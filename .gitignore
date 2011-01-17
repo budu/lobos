@@ -4,6 +4,7 @@
 classes
 lib
 wiki
+www
 
 playground.clj
 pom.xml
