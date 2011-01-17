@@ -16,7 +16,9 @@ to add the relevant JDBC driver manually.
 
 ## Usage
 
-Here's a quick overview of how it works in its current state.
+Here's a quick overview of how it works in its current state. For more
+in depth documentation you can refer to the [commented code] for the
+front-end.
 
 ### Basics
 
@@ -210,3 +212,4 @@ the file epl-v10.html in the project root directory.
 [roadmap]: https://github.com/budu/lobos/blob/master/roadmap.md
 [history]: https://github.com/budu/lobos/blob/master/history.md
 [SQLite]: https://github.com/budu/sqlitejdbc
+[commented code]: http://budu.github.com/lobos/doc/uberdoc.frontend.html
