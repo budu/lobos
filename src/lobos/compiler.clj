@@ -1,14 +1,17 @@
-;; Copyright (c) Nicolas Buduroi. All rights reserved.
-;; The use and distribution terms for this software are covered by the
-;; Eclipse Public License 1.0 which can be found in the file
-;; epl-v10.html at the root of this distribution. By using this software
-;; in any fashion, you are agreeing to be bound by the terms of this
-;; license.
-;; You must not remove this notice, or any other, from this software.
+; Copyright (c) Nicolas Buduroi. All rights reserved.
+; The use and distribution terms for this software are covered by the
+; Eclipse Public License 1.0 which can be found in the file
+; epl-v10.html at the root of this distribution. By using this software
+; in any fashion, you are agreeing to be bound by the terms of this
+; license.
+; You must not remove this notice, or any other, from this software.
 
 (ns lobos.compiler
-  "The compiler multimethod definition, an default implementation and
-  some helpers functions."
+  "This namespace include the `compile` multimethod, a default
+  implementation based on the SQL standard and some helpers
+  functions. The compiler works on an AST defined in the `lobos.ast`
+  namespace. Database specific implementations can be found in the
+  `backends` directory."
   (:refer-clojure :exclude [compile defonce replace])
   (:require (lobos [ast :as ast]))
   (:use (clojure [string :only [replace]])
@@ -17,12 +20,36 @@
 
 (ast/import-all)
 
-(declare compile)
+;; -----------------------------------------------------------------------------
 
-;;;; Helpers
+;; ## Compiler
+
+;; When no implementation specific method is found, fall back on the
+;; default standard compiler.
+(def backends-hierarchy
+  (atom (-> (make-hierarchy)
+            (derive :h2 ::standard)
+            (derive :mysql ::standard)
+            (derive :postgresql ::standard)
+            (derive :sqlite ::standard)
+            (derive :sqlserver ::standard))))
+
+(defmulti compile
+  "Compiles the given object into SQL."
+  (fn [o]
+    [(keyword (or (-> o :db-spec :subprotocol)
+                  ::standard))
+     (type o)])
+  :hierarchy backends-hierarchy)
+
+;; -----------------------------------------------------------------------------
+
+;; ## Helpers
 
 (defn as-identifier
-  "Constructs an Identifier ast object and compile it."
+  "Constructs an Identifier AST form and compiles it. Takes an optional
+  `level` argument to determine which qualification level to output,
+  only support `:schema` for now."
   [db-spec name & [level]]
   (compile (Identifier. db-spec name level)))
 
@@ -35,18 +62,29 @@
      (when test
        (throw (UnsupportedOperationException. (str msg))))))
 
-(defn mode [db-spec] (Mode. db-spec))
+(defn mode
+  "Constructs a Mode AST form with the specified `db-spec`."
+  [db-spec]
+  (Mode. db-spec))
 
-(defn extract-foreign-keys* [stmt]
+(defn- extract-foreign-keys*
+  "Used by the `extract-foreign-keys` function to extract foreign key
+  constraints from the given `table`."
+  [table]
   (let [fkey? #(instance? ForeignKeyConstraintDefinition %)
-        foreign-keys (vector (:tname stmt)
-                             (->> (:elements stmt)
+        foreign-keys (vector (:tname table)
+                             (->> (:elements table)
                                   (filter fkey?)))
-        stmt (update-in stmt [:elements]
+        table (update-in table [:elements]
                (fn [es] (filter #(not (fkey? %)) es)))]
-    [stmt foreign-keys]))
+    [table foreign-keys]))
 
-(defn extract-foreign-keys [elements]
+(defn extract-foreign-keys
+  "Given a collection of AST statements, extract all foreign key
+  constraints for all tables and returns a vector composed of the
+  statements (without the foreign keys) and a map of the foreign keys
+  grouped by table name."
+  [elements]
   (let [tables (filter #(instance? CreateTableStatement %) elements)
         others (filter #(not (instance? CreateTableStatement %)) elements)
         results (map extract-foreign-keys* tables)
@@ -55,32 +93,27 @@
     [(concat tables others)
      foreign-keys]))
 
-(defn build-alter-add-statements [db-spec m]
+(defn build-alter-add-statements
+  "Helper used when compiling a create schema statement that require the
+  foreign keys to be extracted and added individually using alter add
+  statements."
+  [db-spec m]
   (for [[tname elements] m element elements]
     (AlterTableStatement. db-spec tname :add element)))
 
-;;;; Compiler
+;; -----------------------------------------------------------------------------
 
-(def backends-hierarchy
-  (atom (-> (make-hierarchy)
-            (derive :h2 ::standard)
-            (derive :mysql ::standard)
-            (derive :postgresql ::standard)
-            (derive :sqlite ::standard)
-            (derive :sqlserver ::standard))))
+;; ## Default compiler
 
-(defmulti compile
-  "Compile the given statement."
-  (fn [stmt]
-    [(keyword (or (-> stmt :db-spec :subprotocol)
-                  ::standard))
-     (type stmt)])
-  :hierarchy backends-hierarchy)
+;; The default compiler is based on the SQL standard and does not prefer
+;; any particular implementation.
 
-;;;; Default compiler
-
+;; Compiling `Mode` instance returns nil by default.
 (defmethod compile [::standard Mode] [_] nil)
 
+;; In the standard, identifiers are delimited by double quotes. When the
+;; `level` property is set to `:schema`, qualifies the resulting
+;; identifier using the schema name found in the `db-spec property.
 (defmethod compile [::standard Identifier]
   [identifier]
   (let [{:keys [db-spec value level]} identifier
@@ -90,8 +123,11 @@
            (as-identifier db-spec value))
       (as-str \" value \"))))
 
-;;; Expressions
+;; ### Expressions
 
+;; This is a simplified implementation, keywords will be made into SQL
+;; keywords using the `as-sql-keyword` function while strings will be
+;; properly delimited by single quotes.
 (defmethod compile [::standard ValueExpression]
   [expression]
   (let [{:keys [specification]} expression]
@@ -99,6 +135,10 @@
           (string? specification) (str "'" specification "'")
           :else specification)))
 
+;; `DataTypeExpression` instances are compiled with their `dtype`
+;; property made into SQL keywords using the `as-sql-keyword`
+;; function. If the data-type has an argument list, it will be passed
+;; through the `as-list` function.
 (defmethod compile [::standard DataTypeExpression]
   [expression]
   (let [{:keys [dtype args options]} expression
@@ -109,14 +149,21 @@
       (when collate ["COLLATE" (as-str collate)])
       (when time-zone ["WITH TIME ZONE"]))))
 
-;;; Clauses
+;; ### Clauses
 
+;; Standard `AutoIncClause` are using the `ALWAYS` variant.
 (defmethod compile [::standard AutoIncClause]
   [_]
   "GENERATED ALWAYS AS IDENTITY")
 
-;;; Definitions
+;; ### Definitions
 
+;; `ColumnDefinition` instance will get their names made into SQL
+;; identifiers using the `as-identifier` function. It's data-type will
+;; get compiled with the appropriate method. The options will be added
+;; in this order: default clause, auto-inc option and the not-null
+;; constraint. Strings found in the others property will be added as
+;; they are.
 (defmethod compile [::standard ColumnDefinition]
   [definition]
   (let [{:keys [db-spec cname data-type default
@@ -129,13 +176,9 @@
       (when not-null "NOT NULL")
       others)))
 
-(defmethod compile [::standard UniqueConstraintDefinition]
-  [definition]
-  (let [{:keys [db-spec cname]} definition]
-    (join \space
-      "CONSTRAINT"
-      (as-identifier db-spec cname))))
-
+;; `UniqueConstraintDefinition` instances will get their names made into
+;; SQL identifiers using the `as-identifier` function. The `ctype`
+;; property must one of `:primary-key` or `:unique`.
 (defmethod compile [::standard UniqueConstraintDefinition]
   [definition]
   (let [{:keys [db-spec cname ctype columns]} definition]
@@ -145,6 +188,10 @@
       (as-sql-keyword ctype)
       (as-list (map (partial as-identifier db-spec) columns)))))
 
+;; `ForeignKeyConstraintDefinition` instances are always compiled with
+;; their full references clause. The options will be added in this
+;; order: the match clause, the on-delete and the on-update triggered
+;; actions.
 (defmethod compile [::standard ForeignKeyConstraintDefinition]
   [definition]
   (let [{:keys [db-spec cname columns parent-table parent-columns match
@@ -163,6 +210,13 @@
       (when (contains? triggered-actions :on-update)
         (str "ON UPDATE " (as-sql-keyword (:on-update triggered-actions)))))))
 
+;; `CheckConstraintDefinition` are using the output from ClojureQL
+;; predicates namespace, namely the APredicate record.
+
+;; It will use the `identifiers` property to go over that output and
+;; replace all mention of them using their properly delimited
+;; names. Only after that, it will replace `?` parameters by their
+;; corresponding values.
 (defmethod compile [::standard CheckConstraintDefinition]
   [definition]
   (let [{:keys [db-spec cname condition identifiers]} definition
@@ -182,8 +236,11 @@
       "CHECK"
       condition)))
 
-;;; Statements
+;; ### Create and Drop Statements
 
+;; The default create statement will extract all foreign key constraint
+;; from its create table statements to be added afterward using alter
+;; add statements.
 (defmethod compile [::standard CreateSchemaStatement]
   [statement]
   (let [{:keys [db-spec sname elements]} statement
@@ -196,6 +253,8 @@
                (apply join "\n" (conj (map compile elements)
                                       (as-identifier db-spec sname)))))))
 
+;; `CreateTableStatement` instances will properly compile all their
+;; elements.
 (defmethod compile [::standard CreateTableStatement]
   [statement]
   (let [{:keys [db-spec tname elements]} statement]
@@ -213,7 +272,7 @@
       (as-identifier db-spec oname :schema)
       (as-sql-keyword behavior))))
 
-;;; Alter statement and actions
+;; ### Alter Statement and Actions
 
 (defmethod compile [::standard AlterAddAction]
   [action]
@@ -247,11 +306,16 @@
               (str "SET DEFAULT " (compile default))))
       (unsupported "Only set/drop default supported."))))
 
+;; `AlterRenameAction` instances aren't supported by the default
+;; compiler.
 (defmethod compile [::standard AlterRenameAction]
   [action]
   (let [{:keys [db-spec element]} action]
      (unsupported "Rename action not supported.")))
 
+;; `AlterTableStatement` instances will get dispatched further into one
+;; of the action supported: `AlterAddAction`, `AlterDropAction`,
+;; `AlterModifyAction` or `AlterRenameAction`.
 (defmethod compile [::standard AlterTableStatement]
   [statement]
   (let [{:keys [db-spec tname action element]} statement
