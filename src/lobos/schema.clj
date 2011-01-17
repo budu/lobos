@@ -48,24 +48,24 @@
 
 ;; ## Protocols
 
-;; The Alterable protocol add the possibility of building alter
-;; statements from an object implementing it. *For internal use*.
 (defprotocol Alterable
+  "The Alterable protocol add the possibility of building alter
+  statements from an object implementing it. *For internal use*."
   (build-alter-statement [this action db-spec]))
 
-;; The Buildable protocol is currently used only by table elements.
-;; *For internal use*.
 (defprotocol Buildable
+  "The Buildable protocol is currently used only by table elements.
+  *For internal use*."
   (build-definition [this db-spec]))
 
-;; The Creatable protocol add the possibility of building create
-;; statements from an object implementing it. *For internal use*.
 (defprotocol Creatable
+  "The Creatable protocol add the possibility of building create
+  statements from an object implementing it. *For internal use*."
   (build-create-statement [this db-spec]))
 
-;; The Dropable protocol add the possibility of building drop
-;; statements from an object implementing it. *For internal use*.
 (defprotocol Dropable
+  "The Dropable protocol add the possibility of building drop
+  statements from an object implementing it. *For internal use*."
   (build-drop-statement [this behavior db-spec]))
 
 ;; -----------------------------------------------------------------------------
