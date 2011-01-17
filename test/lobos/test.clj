@@ -7,7 +7,7 @@
 ;; You must not remove this notice, or any other, from this software.
 
 (ns lobos.test
-  (:refer-clojure :exclude [alter drop])
+  (:refer-clojure :exclude [alter defonce drop])
   (:use clojure.test
         (clojure.contrib [io :only [delete-file file]])
         (lobos connectivity core utils))

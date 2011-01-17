@@ -8,7 +8,7 @@
 
 (ns lobos.backends.sqlite
   "Compiler implementation for SQLite."
-  (:refer-clojure :exclude [compile])
+  (:refer-clojure :exclude [compile defonce])
   (:require (lobos [schema :as schema]))
   (:use (clojure.contrib [def :only [defvar-]])
         lobos.analyzer

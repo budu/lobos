@@ -6,4 +6,5 @@
                  [lobos/clojureql "1.1.0-SNAPSHOT"]]
   :dev-dependencies [[swank-clojure "1.2.1"]
                      [lein-clojars "0.6.0"]
+                     [marginalia "0.3.2"]
                      [clj-help "0.2.0"]])

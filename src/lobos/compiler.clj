@@ -9,7 +9,7 @@
 (ns lobos.compiler
   "The compiler multimethod definition, an default implementation and
   some helpers functions."
-  (:refer-clojure :exclude [compile replace])
+  (:refer-clojure :exclude [compile defonce replace])
   (:require (lobos [ast :as ast]))
   (:use (clojure [string :only [replace]])
         lobos.utils)

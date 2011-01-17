@@ -8,7 +8,7 @@
 
 (ns lobos.utils
   "Helpers used in unrelated namespaces."
-  (:refer-clojure :exclude [replace])
+  (:refer-clojure :exclude [defonce replace])
   (:use (clojure [string :only [lower-case
                                 replace
                                 upper-case]]
@@ -76,3 +76,14 @@
         f #(if (keyword? %2) (conj %1 (name %2)) %1)]
     (postwalk #(swap! acc f %) form)
     @acc))
+
+(defmacro defonce
+  "Same as defonce but with an optional docstring."
+  ([name expr]
+     (list 'clojure.core/defonce
+           name
+           expr))
+  ([name expr doc]
+     (list 'clojure.core/defonce
+           (with-meta name (assoc (meta name) :doc doc))
+           expr)))

@@ -1,41 +1,54 @@
-;; Copyright (c) Nicolas Buduroi. All rights reserved.
-;; The use and distribution terms for this software are covered by the
-;; Eclipse Public License 1.0 which can be found in the file
-;; epl-v10.html at the root of this distribution. By using this software
-;; in any fashion, you are agreeing to be bound by the terms of this
-;; license.
-;; You must not remove this notice, or any other, from this software.
+; Copyright (c) Nicolas Buduroi. All rights reserved.
+; The use and distribution terms for this software are covered by the
+; Eclipse Public License 1.0 which can be found in the file
+; epl-v10.html at the root of this distribution. By using this software
+; in any fashion, you are agreeing to be bound by the terms of this
+; license.
+; You must not remove this notice, or any other, from this software.
 
 (ns lobos.connectivity
   "A set of connectivity functions."
+  (:refer-clojure :exclude [defonce])
   (:require (clojure.contrib.sql [internal :as sqlint]))
-  (:use (clojure.contrib [def :only [defalias defvar]])))
+  (:use (clojure.contrib [def :only [defalias defvar]])
+        lobos.utils))
 
-;;;; Globals
+;; -----------------------------------------------------------------------------
 
-(defonce global-connections (atom {}))
+;; ## Globals
 
-;;;; Helpers
+(defonce global-connections
+  (atom {})
+  "This atom contains a map of all opened global connections.")
+
+;; -----------------------------------------------------------------------------
+
+;; ## Helpers
 
 (defalias connection sqlint/connection*)
 
 (defn get-db-spec
-  "Returns the associated db-spec or itself."
+  "Returns the associated db-spec or itself. *For internal use*."
   [& [connection-info]]
   (let [connection-info (or connection-info :default-connection)]
     (if (keyword? connection-info)
       (-> @global-connections connection-info :db-spec)
       connection-info)))
 
-(defn- get-cnx [db-spec]
+(defn- get-cnx
+  "Replaces `get-connection` from `contrib.sql.internal`
+  namespace. Dissociates the `:schema` key to prevent conflit."
+  [db-spec]
   (let [db-spec (dissoc db-spec :schema)]
     (sqlint/get-connection db-spec)))
 
-;;;; Global connection
+;; -----------------------------------------------------------------------------
+
+;; ## Global Connections
 
 (defn open-global
-  "Supplied with a keyword identifying a global connection, that connection
-  is closed and the reference dropped."
+  "Opens a global connection to the database specified by `db-spec`. If
+  no `connection-name` is given, opens a default global connection."
   [db-spec & [connection-name]]
   (let [connection-name (or connection-name :default-connection)]
     (if-let [cnx (connection-name @global-connections)]
@@ -65,7 +78,9 @@
        (Exception. (format "No global connection by that name is open: %s"
                            connection-name))))))
 
-;;;; With connection
+;; -----------------------------------------------------------------------------
+
+;; ## With Connections
 
 (defn with-named-connection
   "Evaluates func in the context of a named global connection to a
@@ -107,28 +122,28 @@
   connection or a map containing values for one of the following
   parameter sets:
 
-  Factory:
-    :factory (required) a function of one argument, a map of params
-    (others) (optional) passed to the factory function in a map
+   *  Factory:
+     * `:factory` (required) a function of one argument, a map of params
+     * (others) (optional) passed to the factory function in a map
 
-  DriverManager:
-    :classname (required) a String, the jdbc driver class name
-    :subprotocol (required) a String, the jdbc subprotocol
-    :subname (required) a String, the jdbc subname
-    (others) (optional) passed to the driver as properties.
+   * DriverManager:
+     * `:classname` (required) a String, the jdbc driver class name
+     * `:subprotocol` (required) a String, the jdbc subprotocol
+     * `:subname` (required) a String, the jdbc subname
+     * (others) (optional) passed to the driver as properties.
 
-  DataSource:
-    :datasource (required) a javax.sql.DataSource
-    :username (optional) a String
-    :password (optional) a String, required if :username is supplied
+   * DataSource:
+     * `:datasource` (required) a javax.sql.DataSource
+     * `:username` (optional) a String
+     * `:password` (optional) a String, required if :username is supplied
 
-  JNDI:
-    :name (required) a String or javax.naming.Name
-    :environment (optional) a java.util.Map
+   * JNDI:
+     * `:name` (required) a String or javax.naming.Name
+     * `:environment` (optional) a java.util.Map
 
-  Options (for ClojureQL):
-    :auto-commit (optional) a Boolean
-    :fetch-size  (optional) an integer"
+   * Options (for ClojureQL):
+     * `:auto-commit` (optional) a Boolean
+     * `:fetch-size`  (optional) an integer"
   [connection-info & body]
   `(let [connection-info# (or ~connection-info :default-connection)]
      ((if (keyword? connection-info#)

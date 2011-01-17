@@ -1,15 +1,30 @@
-;; Copyright (c) Nicolas Buduroi. All rights reserved.
-;; The use and distribution terms for this software are covered by the
-;; Eclipse Public License 1.0 which can be found in the file
-;; epl-v10.html at the root of this distribution. By using this software
-;; in any fashion, you are agreeing to be bound by the terms of this
-;; license.
-;; You must not remove this notice, or any other, from this software.
+; Copyright (c) Nicolas Buduroi. All rights reserved.
+; The use and distribution terms for this software are covered by the
+; Eclipse Public License 1.0 which can be found in the file
+; epl-v10.html at the root of this distribution. By using this software
+; in any fashion, you are agreeing to be bound by the terms of this
+; license.
+; You must not remove this notice, or any other, from this software.
 
 (ns lobos.schema
-  "The abstract schema data-structure and some function to help creating
-  one."
-  (:refer-clojure :exclude [bigint boolean char double float time replace])
+  "This namespace include the abstract schema data-structures, an
+  handful of helpers to create them and the protocol to build the into
+  an abstract syntax tree of implementation agnostic SQL
+  statements. Abstract schema data-structures can be divided in two
+  categories.
+
+  First, schema elements which include the `schema` and the `table`
+  element definitions. Those can be created or dropped, also the `table`
+  element can be altered.
+
+  Then there's the table elements that serves to define tables. There's
+  the completly abstract `column` and `constraint` elements, which are
+  only meant to be used directly with the alter action. Each of them
+  have more specialized function to help you define tables, like the
+  `unique`, `primary-key`, `foreign-key` and `check` constraints
+  definitons and the typed data definitions."
+  (:refer-clojure :exclude [defonce replace
+                            bigint boolean char double float time])
   (:require clojureql.predicates
             lobos.ast)
   (:use (clojure [walk :only [postwalk-replace]]
@@ -29,37 +44,61 @@
                       UniqueConstraintDefinition
                       ValueExpression)))
 
-;;;; Protocols
+;; -----------------------------------------------------------------------------
 
+;; ## Protocols
+
+;; The Alterable protocol add the possibility of building alter
+;; statements from an object implementing it. *For internal use*.
 (defprotocol Alterable
   (build-alter-statement [this action db-spec]))
 
+;; The Buildable protocol is currently used only by table elements.
+;; *For internal use*.
 (defprotocol Buildable
   (build-definition [this db-spec]))
 
+;; The Creatable protocol add the possibility of building create
+;; statements from an object implementing it. *For internal use*.
 (defprotocol Creatable
   (build-create-statement [this db-spec]))
 
+;; The Dropable protocol add the possibility of building drop
+;; statements from an object implementing it. *For internal use*.
 (defprotocol Dropable
   (build-drop-statement [this behavior db-spec]))
 
-;;;; Common exceptions
+;; -----------------------------------------------------------------------------
 
-(defn name-required [name otype]
+;; ## Common Exception
+
+(defn name-required
+  "Throws an IllegalArgumentException when the given name is nil with a
+  default message using the given type of elements."
+  [name etype]
   (when-not name
     (throw (IllegalArgumentException.
             (format "A % definition needs at least a name."
-                    otype)))))
+                    etype)))))
 
-;;;; Definition predicate
+;; -----------------------------------------------------------------------------
+
+;; ## Definition Predicate
 
 (defn definition?
-  "Returns true if the given object is a definition."
+  "Returns true if the given object is an abstract schema element
+  definition. *For internal use*."
   [o]
   (isa? (type o) ::definition))
 
-;;;; Constraint definition
+;; -----------------------------------------------------------------------------
 
+;; ## Constraint Definitions
+
+;; `Constraint` records are only used to define unspecified constraint.
+;; These type of constraints are useful with the alter drop action. They
+;; can be be construct using the `constraint` function.
+;; *For internal use*.
 (defrecord Constraint [cname]
   Buildable
 
@@ -74,6 +113,9 @@
   (update-in table [:constraints] conj
              [name (Constraint. name)]))
 
+;; `UniqueConstraint` records can be constructed using the `primary-key` or
+;; `unique` functions. It can represent either a unique or primary key
+;; constraint. *For internal use*.
 (defrecord UniqueConstraint [cname ctype columns]
   Buildable
   
@@ -94,18 +136,22 @@
 
 (defn primary-key
   "Constructs an abstract primary key constraint definition and add it
-  to the given table."
+  to the given table. If the name isn't specified, this constraint will
+  be named using its specification."
   ([table columns] (primary-key table nil columns))
   ([table name columns]
      (unique-constraint table name :primary-key columns)))
 
 (defn unique
   "Constructs an abstract unique constraint definition and add it to the
-  given table."
+  given table. If the name isn't specified, this constraint will
+  be named using its specification."
   ([table columns] (unique table nil columns))
   ([table name columns]
      (unique-constraint table name :unique columns)))
 
+;; `ForeignKeyConstraint` record can be constructed using the
+;; `foreign-key` function. *For internal use*.
 (defrecord ForeignKeyConstraint
   [cname columns parent-table parent-columns match triggered-actions]
   Buildable
@@ -122,7 +168,22 @@
 
 (defn foreign-key
   "Constructs an abstract foreign key constraint definition and add it
-  to the given table."
+  to the given table. The `columns` and `parent-table` arguments must be
+  specified. If no `parent-columns` are specified, the `columns` will be
+  used in its place.
+
+  The `match` optional argument can be one of `:full`, `:partial` or
+  `:simple`, but note that this isn't supported by most databases.
+
+  You can specify `triggered-actions` with pairs of keyword, the first
+  of the pairs must be one of `:on-delete` or `:on-update`, while the
+  second one can be one of `:cascade`, `:set-null`, `:restrict`,
+  `:set-default` or `:no-action`. The actions keywords are directly
+  translated to SQL keywords, so you can specify custom ones if the
+  database you're using provide more.
+
+  If the name isn't specified, this constraint will be named
+  using its specification."
   {:arglists '([table name? columns parent-table parent-columns? match?
                 & triggered-actions])}
   [table & args]
@@ -145,6 +206,8 @@
                                        match
                                        triggered-actions)])))
 
+;; `CheckConstraint` record can be constructed using the
+;; `check` macro or the `chech*` function. *For internal use*.
 (defrecord CheckConstraint
   [cname condition identifiers]
   Buildable
@@ -158,8 +221,11 @@
 
 (defn check*
   "Constructs an abstract check constraint definition and add it to the
-  given table."
+  given table. The `constraint-name` argument is mandatory. For the
+  condition argument, see ClojureQL predicates namespace. Also a list of
+  identifiers used must be provided as keywords."
   [table constraint-name condition identifiers]
+  (name-required constraint-name "check constraint")
   (update-in table [:constraints] conj
              [constraint-name
               (CheckConstraint. constraint-name
@@ -188,26 +254,45 @@
       condition)
     ~(capture-keywords condition)))
 
-;;;; Data-type definition
+;; -----------------------------------------------------------------------------
 
+;; ## Data-type Definition
+
+;; `DataType` records can be constructed using the `data-type` function.
+;; *For internal use*.
 (defrecord DataType [dtype args options])
 
-(defn data-type [dtype & [args options]]
+(defn data-type
+  "Constructs an abstract data-type definition using the given keyword
+  `dtype`. Can also take an options list of arguments (`args`) and
+  `options`."
+  [dtype & [args options]]
   (DataType. dtype (vec args)
              (merge {:time-zone nil
                      :collate nil
                      :encoding nil}
                      options)))
 
-;;;; Column definition
+;; -----------------------------------------------------------------------------
 
-(defn dt-function-aliases [dtype default]
+;; ## Column Definition
+
+(defn datetime-now-alias
+  "If the given default value, it will be replaced by the standard
+  function returning the current time, date or timestamp depending on
+  the specified data-type. *For internal use*."
+  [dtype default]
   (if (= default :now)
     (or ({:date :current_date
           :time :current_time
           :timestamp :current_timestamp} dtype) default)
     default))
 
+;; `Column` records can be constructed using the `column` function or
+;; the more specific typed column functions. The `build-definition`
+;; method will create the appropriate `DataTypeExpression` for data-type
+;; definitions and `ValueExpression` for default values.
+;; *For internal use*.
 (defrecord Column [cname data-type default auto-inc not-null others]
   Buildable
   
@@ -220,13 +305,15 @@
        (if (= default :drop)
          default
          (when default
-           (ValueExpression. db-spec (dt-function-aliases dtype default))))
+           (ValueExpression. db-spec (datetime-now-alias dtype default))))
        (when auto-inc (AutoIncClause. db-spec))
        not-null
        others))))
 
 (defn column*
-  "Constructs an abstract column definition."
+  "Constructs an abstract column definition. It'll parse the column
+  specific options. See the `column` function for more details.
+  *For internal use*."
   [column-name data-type options]
   (let [{:keys [default encoding collate]}
         (into {} (filter vector? options))
@@ -249,9 +336,25 @@
 
 (defn column
   "Constructs an abstract column definition and add it to the given
-  table. Also creates and add the appropriate column constraints.
+  table. Also creates and add the appropriate column constraints when
+  these are specified as options. Here's a list of available options:
 
-  It also can be used in alter modify and rename actions. In that
+   * `:unique` which construct an unique constraint on that column
+   * `:primary-key` which make the current column the primary key
+   * `[:refer tname & options]` which add a foreign key constraint to
+     the specified table. The options are the same as the `foreign-key`
+     function with the expection that you can specify only one parent
+     column.
+   * `:not-null` prevents this column from being null
+   * `:auto-inc` (for integers types) which makes it auto-populated with
+     incremented integers
+   * `[:encoding enc]` (for character types) determines which encoding to
+     use if supported by the database. Also see the natianal character types.
+   * `[:collate type]` (for character types) determines how equality is
+     handled
+   * :time-zone (for time types) determines if the type includes a time-zone
+
+It also can be used in alter modify and rename actions. In that
   case, if data-type is :to, it acts as a column rename clause and if
   data-type is :drop-default, it acts as a column drop default clause."
   {:arglists '([table column-name data-type? options])}
@@ -278,18 +381,29 @@
                    :drop-default (Column. column-name nil :drop nil nil nil)
                    (column* column-name data-type options))]))))
 
-;;;; Typed column definition
+;; -----------------------------------------------------------------------------
 
-;;; Typed column helpers
+;; ## Typed Column Definitions
+
+;; Instead of calling the `column` option directly and including the
+;; data-type argument, you can use typed column definition in which case
+;; each types have their own functions.
+
+;; ### Typed Column Helpers
 
 (defn def-typed-columns*
-  "Helper for macros that create typed columns definitions."
-  [names args dargs options]
+  "Helper for macros that create typed columns definitions. It takes a
+  sequence of names and define a function for each of them, a vector of
+  arguments for those functions, `dargs` must specify how to handle
+  these arguement and `options` must specify the generic column options.
+  The optional `docs` arguement is appended to the generic docstring.
+  *For internal use*."
+  [names args dargs options & [docs]]
   `(do
      ~@(for [n names]
          `(defn ~n
             ~(format (str "Constructs an abstract %s column definition and"
-                          " add it to the given table.")
+                          " add it to the given table." docs)
                      (name n))
             ~args
             (let [dargs# ~dargs
@@ -301,7 +415,8 @@
                      options#))))))
 
 (defmacro def-simple-typed-columns
-  "Defines typed columns for simple data-types taking no arguments."
+  "Defines typed columns for simple data-types taking no arguments.
+  *For internal use*."
   [& names]
   (def-typed-columns*
     names
@@ -310,7 +425,8 @@
     'options))
 
 (defmacro def-numeric-like-typed-columns
-  "Defines numeric-like typed columns."
+  "Defines numeric-like typed columns. These typed column funcitons can
+  take an optional `precision` and `scale` argument. *For internal use*."
   [& names]
   (def-typed-columns*
     names
@@ -320,36 +436,43 @@
          (conj-when (integer? scale) scale))
     '(-> options
          (conj-when (not (integer? precision)) precision)
-         (conj-when (not (integer? scale)) scale))))
+         (conj-when (not (integer? scale)) scale))
+    "Takes an optional `precision` and `scale` arguments."))
 
 (defmacro def-optional-precision-typed-columns
-  "Defines typed columns with optional precision."
+  "Defines typed columns with optional precision. Used by `float` and
+  time data-types. *For internal use*."
   [& names]
   (def-typed-columns*
     names
     '[table column-name & [precision & options]]
     '(conj-when [] (integer? precision) precision)
-    '(conj-when options (not (integer? precision)) precision)))
+    '(conj-when options (not (integer? precision)) precision)
+    "Takes an optional `precision` argument."))
 
 (defmacro def-optional-length-typed-columns
-  "Defines optionally length-bounded typed columns."
+  "Defines optionally length-bounded typed columns. Used by binary and
+  character types. *For internal use*."
   [& names]
   (def-typed-columns*
     names
     '[table column-name & [length & options]]
     '(conj-when [] (integer? length) length)
-    '(conj-when options (not (integer? length)) length)))
+    '(conj-when options (not (integer? length)) length)
+    "Takes an optional `length` argument."))
 
 (defmacro def-length-bounded-typed-columns
-  "Defines length-bounded typed columns."
+  "Defines length-bounded typed columns. Used by variable binary and
+  character types. *For internal use*."
   [& names]
   (def-typed-columns*
     names
     '[table column-name length & options]
     '(conj-when [] (integer? length) length)
-    '(conj-when options (not (integer? length)) length)))
+    '(conj-when options (not (integer? length)) length)
+    "The `length` arguemnt is mandatory."))
 
-;;; Numeric types
+;; ### Numeric Types
 
 (def-simple-typed-columns
   smallint
@@ -369,7 +492,7 @@
 (def-optional-precision-typed-columns
   float)
 
-;;; Character types
+;; ### Character Types
 
 (def-optional-length-typed-columns
   char
@@ -378,13 +501,14 @@
   nclob)
 
 (defalias text clob)
+
 (defalias ntext nclob)
 
 (def-length-bounded-typed-columns  
   varchar
   nvarchar)
 
-;;; Binary data type
+;; ### Binary Types
 
 (def-optional-length-typed-columns
   binary
@@ -393,12 +517,12 @@
 (def-length-bounded-typed-columns
   varbinary)
 
-;;; Boolean type
+;; ### Boolean Type
 
 (def-simple-typed-columns
   boolean)
 
-;;; Data/time types
+;; ### Data/time Types
 
 (def-simple-typed-columns
   date)
@@ -407,8 +531,12 @@
   time
   timestamp)
 
-;;;; Table definition
+;; -----------------------------------------------------------------------------
 
+;; ## Table Definition
+
+;; `Table` records can be constructed using the `table*` function or
+;; the `table` macro. *For internal use*.
 (defrecord Table [name columns constraints options]
   Alterable Creatable Dropable
 
@@ -433,7 +561,8 @@
     (DropStatement. db-spec :table name behavior)))
 
 (defn table*
-  "Constructs an abstract table definition."
+  "Constructs an abstract table definition. The `table-name` is
+  mandatory."
   [table-name & [columns constraints options]]
   (name-required table-name "table")
   (Table. table-name
@@ -443,12 +572,16 @@
 
 (defmacro table
   "Constructs an abstract table definition containing the given
-  elements."
+  elements. Takes an arbitrary number of table elements."
   [name & elements]
   `(-> (table* ~name {} {} {}) ~@elements))
 
-;;;; Schema definition
+;; -----------------------------------------------------------------------------
 
+;; ## Schema Definition
+
+;; `Schema` records can be constructed using the `schema` function.
+;; *For internal use*.
 (defrecord Schema [sname elements options]
   Creatable Dropable
   
@@ -478,10 +611,18 @@
            (map #(vector (:name %) %) elements))
      (or options {}))))
 
-;;;; Definitions hierarchy
+;; -----------------------------------------------------------------------------
 
-(derive UniqueConstraint ::definition)
-(derive DataType ::definition)
-(derive Column ::definition)
-(derive Table ::definition)
-(derive Schema ::definition)
+;; ## Definitions Hierarchy
+
+;; The definition hierarchy makes it easy to test if an object represent
+;; an abstract schema element definition. See the `definition?`
+;; predicate.
+(derive Constraint           ::definition)
+(derive UniqueConstraint     ::definition)
+(derive ForeignKeyConstraint ::definition)
+(derive CheckConstraint      ::definition)
+(derive DataType             ::definition)
+(derive Column               ::definition)
+(derive Table                ::definition)
+(derive Schema               ::definition)

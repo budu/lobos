@@ -8,7 +8,7 @@
 
 (ns lobos.backends.sqlserver
   "Compiler implementation for SQL Server."
-  (:refer-clojure :exclude [compile])
+  (:refer-clojure :exclude [compile defonce])
   (:require clojure.string
             (lobos [schema :as schema]))
   (:use (clojure.contrib [def :only [defvar-]])

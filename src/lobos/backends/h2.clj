@@ -8,7 +8,7 @@
 
 (ns lobos.backends.h2
   "Compiler implementation for H2."
-  (:refer-clojure :exclude [compile])
+  (:refer-clojure :exclude [compile defonce])
   (:use (clojure.contrib [def :only [defvar-]])
         lobos.compiler
         lobos.utils)

@@ -7,6 +7,7 @@
 ;; You must not remove this notice, or any other, from this software.
 
 (ns lobos.test.utils
+  (:refer-clojure :exclude [defonce])
   (:use clojure.test
         lobos.utils))
 

@@ -8,7 +8,7 @@
 
 (ns lobos.backends.mysql
   "Compiler implementation for MySQL."
-  (:refer-clojure :exclude [compile])
+  (:refer-clojure :exclude [compile defonce])
   (:require (lobos [schema :as schema]))
   (:use (clojure.contrib [def :only [defvar-]])
         (lobos [schema :only [build-definition]]

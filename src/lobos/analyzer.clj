@@ -8,7 +8,7 @@
 
 (ns lobos.analyzer
   "Analyze a database's meta-data to contruct an abstract schema."
-  (:refer-clojure :exclude [replace])
+  (:refer-clojure :exclude [defonce replace])
   (:require (lobos [schema :as schema]))
   (:use (clojure.contrib [def :only [defvar-]])
         (clojure [string :only [replace]])
