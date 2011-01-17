@@ -1,40 +1,31 @@
-;; Copyright (c) Nicolas Buduroi. All rights reserved.
-;; The use and distribution terms for this software are covered by the
-;; Eclipse Public License 1.0 which can be found in the file
-;; epl-v10.html at the root of this distribution. By using this software
-;; in any fashion, you are agreeing to be bound by the terms of this
-;; license.
-;; You must not remove this notice, or any other, from this software.
+; Copyright (c) Nicolas Buduroi. All rights reserved.
+; The use and distribution terms for this software are covered by the
+; Eclipse Public License 1.0 which can be found in the file
+; epl-v10.html at the root of this distribution. By using this software
+; in any fashion, you are agreeing to be bound by the terms of this
+; license.
+; You must not remove this notice, or any other, from this software.
 
 (ns lobos.backends.mysql
   "Compiler implementation for MySQL."
   (:refer-clojure :exclude [compile defonce])
-  (:require (lobos [schema :as schema]))
+  (:require (lobos [schema :as schema]
+                   [ast :as ast]))
   (:use (clojure.contrib [def :only [defvar-]])
         (lobos [schema :only [build-definition]]
                analyzer
                compiler
                metadata
                utils))
-  (:import (lobos.ast AlterAddAction
-                      AlterDropAction
-                      AlterModifyAction
-                      AlterRenameAction
-                      AlterTableStatement
-                      AutoIncClause
-                      ColumnDefinition
-                      CreateSchemaStatement
-                      CreateTableStatement
-                      DataTypeExpression
-                      DropStatement
-                      ForeignKeyConstraintDefinition
-                      Identifier
-                      UniqueConstraintDefinition)
-           (lobos.schema Column
+  (:import (lobos.schema Column
                          DataType
                          UniqueConstraint)))
 
-;;;; Analyzer
+(ast/import-all)
+
+;; -----------------------------------------------------------------------------
+
+;; ## Analyzer
 
 (defvar- analyzer-data-type-aliases
   {:bit :boolean
@@ -74,7 +65,9 @@
      (resultset-seq
       (.getColumns (db-meta) (name sname) nil (name tname) (name cname))))))
 
-;;;; Compiler
+;; -----------------------------------------------------------------------------
+
+;; ## Compiler
 
 (defmethod compile [:mysql Identifier]
   [identifier]
