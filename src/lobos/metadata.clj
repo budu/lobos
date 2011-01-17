@@ -1,10 +1,10 @@
-;; Copyright (c) Nicolas Buduroi. All rights reserved.
-;; The use and distribution terms for this software are covered by the
-;; Eclipse Public License 1.0 which can be found in the file
-;; epl-v10.html at the root of this distribution. By using this software
-;; in any fashion, you are agreeing to be bound by the terms of this
-;; license.
-;; You must not remove this notice, or any other, from this software.
+; Copyright (c) Nicolas Buduroi. All rights reserved.
+; The use and distribution terms for this software are covered by the
+; Eclipse Public License 1.0 which can be found in the file
+; epl-v10.html at the root of this distribution. By using this software
+; in any fashion, you are agreeing to be bound by the terms of this
+; license.
+; You must not remove this notice, or any other, from this software.
 
 (ns lobos.metadata
   "Helpers to query the database's meta-data."
@@ -12,7 +12,9 @@
   (:use (clojure.contrib [def :only [defvar-]]))
   (:import (java.sql DatabaseMetaData)))
 
-;;;; Database metadata
+;; -----------------------------------------------------------------------------
+
+;; ## Database Metadata
 
 (defvar- *db-meta* nil)
 
@@ -35,7 +37,9 @@
          ~@body))
      (do ~@body)))
 
-;;;; Predicates
+;; -----------------------------------------------------------------------------
+
+;; ## Predicates
 
 (defn supports-catalogs
   "Returns the term used for catalogs if the underlying database supports
@@ -51,7 +55,9 @@
   (when (.supportsSchemasInDataManipulation (db-meta))
     (.getSchemaTerm (db-meta))))
 
-;;;; Database objects
+;; -----------------------------------------------------------------------------
+
+;; ## Database Objects
 
 (defn catalogs
   "Returns a list of catalog names as keywords."
