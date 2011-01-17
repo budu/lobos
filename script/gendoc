@@ -1,0 +1,8 @@
+#!/bin/bash
+
+lein marg -d www/doc -f uberdoc.frontend.html \
+  src/lobos/core.clj src/lobos/schema.clj src/lobos/connectivity.clj
+lein marg -d www/doc -f uberdoc.backend.html \
+  src/lobos/compiler.clj src/lobos/backends/* src/lobos/ast.clj
+lein marg -d www/doc -f uberdoc.analyzer.html \
+  src/lobos/metadata.clj src/lobos/analyzer.clj
