@@ -26,23 +26,13 @@
   (:refer-clojure :exclude [defonce replace
                             bigint boolean char double float time])
   (:require clojureql.predicates
-            lobos.ast)
+            (lobos [ast :as ast]))
   (:use (clojure [walk :only [postwalk-replace]]
                  [string :only [replace]])
         (clojure.contrib [def :only [defalias]])
-        lobos.utils)
-  (:import (lobos.ast AlterTableStatement
-                      AutoIncClause
-                      CheckConstraintDefinition
-                      ColumnDefinition
-                      ConstraintDefinition
-                      CreateTableStatement
-                      CreateSchemaStatement
-                      DataTypeExpression
-                      DropStatement
-                      ForeignKeyConstraintDefinition
-                      UniqueConstraintDefinition
-                      ValueExpression)))
+        lobos.utils))
+
+(ast/import-all)
 
 ;; -----------------------------------------------------------------------------
 

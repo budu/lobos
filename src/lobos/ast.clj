@@ -80,3 +80,27 @@
 
 (defrecord AlterRenameAction
   [db-spec element])
+
+;; ## Helpers
+
+(defn import-all []
+  (import
+   '(lobos.ast AlterAddAction
+               AlterDropAction
+               AlterModifyAction
+               AlterRenameAction
+               AlterTableStatement
+               AutoIncClause
+               CheckConstraintDefinition
+               ColumnDefinition
+               ConstraintDefinition
+               CreateTableStatement
+               CreateSchemaStatement
+               DataTypeExpression
+               DropStatement
+               ForeignKeyConstraintDefinition
+               Identifier
+               Literal
+               Mode
+               UniqueConstraintDefinition
+               ValueExpression)))

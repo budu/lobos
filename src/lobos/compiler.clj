@@ -13,24 +13,9 @@
   (:require (lobos [ast :as ast]))
   (:use (clojure [string :only [replace]])
         lobos.utils)
-  (:import (java.lang UnsupportedOperationException)
-           (lobos.ast AlterAddAction
-                      AlterDropAction
-                      AlterModifyAction
-                      AlterRenameAction
-                      AlterTableStatement
-                      AutoIncClause
-                      CheckConstraintDefinition
-                      ColumnDefinition
-                      CreateTableStatement
-                      CreateSchemaStatement
-                      DataTypeExpression
-                      DropStatement
-                      ForeignKeyConstraintDefinition
-                      Identifier
-                      Mode
-                      UniqueConstraintDefinition
-                      ValueExpression)))
+  (:import (java.lang UnsupportedOperationException)))
+
+(ast/import-all)
 
 (declare compile)
 
