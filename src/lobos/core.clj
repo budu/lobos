@@ -10,7 +10,13 @@
   "The `core` namespace provide the basic interface to interact with a
   database. It contains a set of functions and *actions* (a special kind
   of functions acting on abstract schemas or their elements) used to
-  manipulate database schemas in an implementation agnostic way."
+  manipulate database schemas in an implementation agnostic way.
+
+  To find out more about **Lobos**, check out:
+
+   * [Lobos website](http://budu.github.com/lobos/)
+   * [Lobos repo](https://github.com/budu/lobos)
+   * [Lobos wiki](https://github.com/budu/lobos/wiki)"
   {:author "Nicolas Buduroi"}
   (:refer-clojure :exclude [alter defonce drop])
   (:require (lobos [analyzer :as analyzer]
