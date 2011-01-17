@@ -1,20 +1,20 @@
-;; Copyright (c) Nicolas Buduroi. All rights reserved.
-;; The use and distribution terms for this software are covered by the
-;; Eclipse Public License 1.0 which can be found in the file
-;; epl-v10.html at the root of this distribution. By using this software
-;; in any fashion, you are agreeing to be bound by the terms of this
-;; license.
-;; You must not remove this notice, or any other, from this software.
+; Copyright (c) Nicolas Buduroi. All rights reserved.
+; The use and distribution terms for this software are covered by the
+; Eclipse Public License 1.0 which can be found in the file
+; epl-v10.html at the root of this distribution. By using this software
+; in any fashion, you are agreeing to be bound by the terms of this
+; license.
+; You must not remove this notice, or any other, from this software.
 
 (ns lobos.ast
   "Abstract SQL syntax tree for the DDL part of the language.")
 
-;;;; Special records
+;; ### Special Records
 
 (defrecord Mode
   [db-spec])
 
-;;;; Atomic records
+;; ### Atomic Records
 
 (defrecord Identifier
   [db-spec value level])
@@ -22,21 +22,21 @@
 (defrecord Literal
   [db-spec value])
 
-;;;; Expression records
+;; ### Expression Records
 
 (defrecord DataTypeExpression
   [db-spec dtype args options])
 
-;; not going down the rabbit hole yet!
+;; Not going down the rabbit hole yet!
 (defrecord ValueExpression
   [db-spec specification])
 
-;;; Clause records
+;; ### Clause Records
 
 (defrecord AutoIncClause
   [db-spec])
 
-;;;; Definition records
+;; ### Definition Records
 
 (defrecord ColumnDefinition
   [db-spec cname data-type default auto-inc not-null others])
@@ -53,7 +53,7 @@
 (defrecord CheckConstraintDefinition
   [db-spec cname condition identifiers])
 
-;;;; Statement records
+;; ### Statement Records
 
 (defrecord CreateSchemaStatement
   [db-spec sname elements])
@@ -67,7 +67,7 @@
 (defrecord AlterTableStatement
   [db-spec tname action element])
 
-;;;; Alter action records
+;; ### Alter Action Records
 
 (defrecord AlterAddAction
   [db-spec element])
@@ -83,7 +83,9 @@
 
 ;; ## Helpers
 
-(defn import-all []
+(defn import-all
+  "Import all AST record into the calling namespace."
+  []
   (import
    '(lobos.ast AlterAddAction
                AlterDropAction
