@@ -7,4 +7,7 @@
   :dev-dependencies [[swank-clojure "1.2.1"]
                      [lein-clojars "0.6.0"]
                      [marginalia "0.3.2"]
-                     [clj-help "0.2.0"]])
+                     [cljss "0.1.0"]
+                     [hiccup "0.3.1"]
+                     [clj-help "0.2.0"]]
+  :jar-exclusions [#"www.clj"])
