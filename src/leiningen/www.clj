@@ -23,6 +23,7 @@
   (css css-vars
    ;; tags
    [:body :font-family :$font-main]
+   [:pre :display :inline]
    ;; sections
    [:#wrapper :background-color :$color-main
               :border "solid 5px $color-main"
@@ -64,7 +65,12 @@
               :padding :1.5em
               :padding-left :200px]
    ;; footer
-   [($ :#footer :p) :font-size :0.7em]))
+   [($ :#footer :p) :font-size :0.7em
+                    :padding-bottom :3em
+                    :text-align :center]
+   ;; SyntaxHighlighter
+   [:div.syntaxhighlighter :border-radius :0.3em
+                           :padding "0.5em 0.3em"]))
 
 (defn page-layout [title body]
   (html
@@ -74,7 +80,11 @@
      [:link {:rel "shortcut icon" :href "favicon.ico" :type "image/x-icon"}]
      [:style {:type "text/css"} reset-style]
      [:style {:type "text/css"} page-style]
-     (include-js "https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js")]
+     ;; jQuery
+     (include-js "https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js")
+     ;; SyntaxHighlighter
+     (include-js "sh/js/shCore.js" "sh/js/shBrushXml.js" "sh/js/shBrushClojure.js")
+     (include-css "sh/css/shCore.css" "sh/css/shThemeDjango.css")]
     [:body
      [:div#wrapper
       [:div#header
@@ -87,10 +97,18 @@
          (link-to "contribute.html" "Contribute")])]
       [:div#content body]
       (javascript-tag
-       "function rsz() {
-          $('#wrapper').css('height', ($(window).height() - 10) + 'px');
-          $('#content').css('height', ($(window).height() * 0.5) + 'px'); };
-        window.onresize = function() { rsz(); }; rsz();")
+       "function rsz_to_min_sz(elem, min_sz, sz) {
+          if (elem.height() < min_sz)
+            elem.css('height', sz + 'px'); };
+        function rsz() {
+          var w = $(window).width().toString();
+          $('body').css('font-size', w.substring(0, w.length - 2) + 'pt');
+          var min_sz = $(window).height() * 0.5;
+          rsz_to_min_sz($('#wrapper'), min_sz, $(window).height() - 10);
+          rsz_to_min_sz($('#content'), min_sz, min_sz); };
+        rsz();
+        window.onresize = function() { rsz(); };
+        SyntaxHighlighter.all();")
       [:div#footer
        [:p "&copy; 2011 Nicolas Buduroi. All rights reserved."]]]]]))
 
@@ -99,16 +117,36 @@
                 :content (page-layout ~title (html ~@body))}))
 
 (defpage home ["Home" "index"]
-  [:h1 "Welcome..."]
+  [:h2 "Description"]
 
   [:p [:b "Lobos"] " is a library to help you create and modify database
    schemas using Clojure code."]
+
+  [:p "It is currently being actively developed and its API isn't stable
+   yet. In its present form, it only provide an imperative DSL to
+   generated database specific data definition statements. That is the
+   foundation upon which the migration and declarative schema features
+   will be built."]
+
+  [:h2 "Installation"]
   
   [:p "You can use " [:b "Lobos"] " in your projects using either
-  Leiningen, Cake by adding the following dependency to you project
+  Leiningen or Cake by adding the following dependency to you project
   file:"]
 
-  [:pre "[lobos \"0.7.0-SNAPSHOT\"]"])
+  [:pre.brush:.clojure "[lobos \"0.7.0-SNAPSHOT\"]"]
+
+  [:p [:b "Lobos"] " is also available through Maven:"]
+
+  [:pre.brush:.xml (h "<dependency>
+  <groupId>lobos</groupId>
+  <artifactId>lobos</artifactId>
+  <version>0.7.0-SNAPSHOT</version>
+</dependency>")]
+
+  [:p "You can always add the current or previous version manually,
+  consult the " (link-to "downloads.html" "downloads page") " to find
+  the version you want."])
 
 (defpage downloads ["Downloads"]
   [:h1 "Downloads..."])
