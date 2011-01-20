@@ -2525,8 +2525,8 @@ $(document).ready(function() {
   font-style: italic !important;
   color: #2a00ff !important;
 }
-</style><style type="text/css">html{margin:0;padding:0;}h1{margin:0;padding:0;}h2{margin:0;padding:0;}h3{margin:0;padding:0;}h4{margin:0;padding:0;}a{color:#261A3B;}a:visited{color:#261A3B;}</style><style type="text/css">.header{margin-top:30px;}h1.project-name{font-size:34px;display:inline;}h2.project-version{font-size:18px;margin-top:0;display:inline;margin-left:10px;}.toc-link{font-size:12px;margin-left:10px;color:#252519;text-decoration:none;}.toc-link:hover{color:#5050A6;}.toc h1{font-size:34px;margin:0;}.docs-header{border-bottom:dotted #aaa 1px;padding-bottom:10px;margin-bottom:25px;}.toc h1{font-size:24px;}.toc{border-bottom:solid #bbb 1px;margin-bottom:40px;}.toc ul{margin-left:20px;padding-left:0px;padding-top:0;margin-top:0;}.toc li{list-style-type:none;padding-left:0;}.dependencies{}.dependencies table{font-size:16px;width:99.99%;border:none;margin-left:20px;}.dependencies td{padding-right:20px;;white-space:nowrap;}.dependencies .dotted{width:99%;}.dependencies .dotted hr{margin-bottom:-6px;noshade:noshade;border-top:none;color:transparent;border-left:none;border-bottom:dotted #bbb 1px;border-right:none;background-color:transparent;height:0;}.dependencies .dep-version{text-align:right;}.plugins ul{margin-left:20px;padding-left:0px;padding-top:0;margin-top:0;}.plugins li{list-style-type:none;padding-left:0;}.header p{margin-left:20px;}</style><style type="text/css">#floating-toc{position:fixed;top:10px;right:20px;height:20px;overflow:hidden;text-align:right;}#floating-toc li{list-style-type:none;margin:0;padding:0;}</style><style type="text/css">body{margin:0;padding:0;font-family:'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;;font-size:16px;color:#252519;}h1{font-size:20px;margin-top:0;}a.anchor{text-decoration:none;color:#252519;}a.anchor:hover{color:#5050A6;}table{border-spacing:0;border-bottom:solid #ddd 1px;;margin-bottom:10px;}code{display:inline;}p{margin-top:8px;}tr{margin:0px;padding:0px;}td.docs{width:410px;max-width:410px;vertical-align:top;margin:0px;padding-left:55px;padding-right:20px;border:none;}td.docs pre{font-size:12px;overflow:hidden;}td.codes{border:none;margin:0px;padding-left:20px;width:55%;border-left:solid #E5E5EE 1px;font-size:10pt;vertical-align:top;overflow:hidden;background-color:#F5F5FF;}td.spacer{padding-bottom:40px;}pre code{display:block;padding:4px;}code{background-color:ghostWhite;border:solid #DEDEDE 1px;padding-left:3px;padding-right:3px;font-size:14px;}.syntaxhighlighter code{font-size:13px;}.footer{text-align:center;}</style><title>lobos -- Marginalia</title></head><body><table><tr><td class="docs"><div class="header"><h1 class="project-name">lobos</h1><h2 class="project-version">0.7.0-SNAPSHOT</h2><br /><p>A library to create and manipulate SQL database schemas.</p>
-</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.2.0</td></tr><tr><td class="dep-name">org.clojure/clojure-contrib</td><td class="dotted"><hr /></td><td class="dep-version">1.2.0</td></tr><tr><td class="dep-name">lobos/clojureql</td><td class="dotted"><hr /></td><td class="dep-version">1.1.0-SNAPSHOT</td></tr></table></div><div class="dependencies"><h3>dev dependencies</h3><table><tr><td class="dep-name">swank-clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.2.1</td></tr><tr><td class="dep-name">lein-clojars</td><td class="dotted"><hr /></td><td class="dep-version">0.6.0</td></tr><tr><td class="dep-name">marginalia</td><td class="dotted"><hr /></td><td class="dep-version">0.3.2</td></tr><tr><td class="dep-name">cljss</td><td class="dotted"><hr /></td><td class="dep-version">0.1.0</td></tr><tr><td class="dep-name">hiccup</td><td class="dotted"><hr /></td><td class="dep-version">0.3.1</td></tr><tr><td class="dep-name">clj-help</td><td class="dotted"><hr /></td><td class="dep-version">0.2.0</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#lobos.core">lobos.core</a></li><li><a href="#lobos.schema">lobos.schema</a></li><li><a href="#lobos.connectivity">lobos.connectivity</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#lobos.core" name="lobos.core"><h1 class="project-name">lobos.core</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>The <code>core</code> namespace provide the basic interface to interact with a
+</style><style type="text/css">html{margin:0;padding:0;}h1{margin:0;padding:0;}h2{margin:0;padding:0;}h3{margin:0;padding:0;}h4{margin:0;padding:0;}a{color:#261A3B;}a:visited{color:#261A3B;}</style><style type="text/css">.header{margin-top:30px;}h1.project-name{font-size:34px;display:inline;}h2.project-version{font-size:18px;margin-top:0;display:inline;margin-left:10px;}.toc-link{font-size:12px;margin-left:10px;color:#252519;text-decoration:none;}.toc-link:hover{color:#5050A6;}.toc h1{font-size:34px;margin:0;}.docs-header{border-bottom:dotted #aaa 1px;padding-bottom:10px;margin-bottom:25px;}.toc h1{font-size:24px;}.toc{border-bottom:solid #bbb 1px;margin-bottom:40px;}.toc ul{margin-left:20px;padding-left:0px;padding-top:0;margin-top:0;}.toc li{list-style-type:none;padding-left:0;}.dependencies{}.dependencies table{font-size:16px;width:99.99%;border:none;margin-left:20px;}.dependencies td{padding-right:20px;;white-space:nowrap;}.dependencies .dotted{width:99%;}.dependencies .dotted hr{margin-bottom:-6px;noshade:noshade;border-top:none;color:transparent;border-left:none;border-bottom:dotted #bbb 1px;border-right:none;background-color:transparent;height:0;}.dependencies .dep-version{text-align:right;}.plugins ul{margin-left:20px;padding-left:0px;padding-top:0;margin-top:0;}.plugins li{list-style-type:none;padding-left:0;}.header p{margin-left:20px;}</style><style type="text/css">#floating-toc{position:fixed;top:10px;right:20px;height:20px;overflow:hidden;text-align:right;}#floating-toc li{list-style-type:none;margin:0;padding:0;}</style><style type="text/css">body{margin:0;padding:0;font-family:'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;;font-size:16px;color:#252519;}h1{font-size:20px;margin-top:0;}a.anchor{text-decoration:none;color:#252519;}a.anchor:hover{color:#5050A6;}table{border-spacing:0;border-bottom:solid #ddd 1px;;margin-bottom:10px;}code{display:inline;}p{margin-top:8px;}tr{margin:0px;padding:0px;}td.docs{width:410px;max-width:410px;vertical-align:top;margin:0px;padding-left:55px;padding-right:20px;border:none;}td.docs pre{font-size:12px;overflow:hidden;}td.codes{border:none;margin:0px;padding-left:20px;width:55%;border-left:solid #E5E5EE 1px;font-size:10pt;vertical-align:top;overflow:hidden;background-color:#F5F5FF;}td.spacer{padding-bottom:40px;}pre code{display:block;padding:4px;}code{background-color:ghostWhite;border:solid #DEDEDE 1px;padding-left:3px;padding-right:3px;font-size:14px;}.syntaxhighlighter code{font-size:13px;}.footer{text-align:center;}</style><title>lobos -- Marginalia</title></head><body><table><tr><td class="docs"><div class="header"><h1 class="project-name">lobos</h1><h2 class="project-version">0.6.0-SNAPSHOT</h2><br /><p>A library to create and manipulate SQL database schemas.</p>
+</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.2.0</td></tr><tr><td class="dep-name">org.clojure/clojure-contrib</td><td class="dotted"><hr /></td><td class="dep-version">1.2.0</td></tr><tr><td class="dep-name">lobos/clojureql</td><td class="dotted"><hr /></td><td class="dep-version">1.1.0-SNAPSHOT</td></tr></table></div><div class="dependencies"><h3>dev dependencies</h3><table><tr><td class="dep-name">swank-clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.2.1</td></tr><tr><td class="dep-name">lein-clojars</td><td class="dotted"><hr /></td><td class="dep-version">0.6.0</td></tr><tr><td class="dep-name">marginalia</td><td class="dotted"><hr /></td><td class="dep-version">0.5.0-alpha</td></tr><tr><td class="dep-name">cljss</td><td class="dotted"><hr /></td><td class="dep-version">0.1.1</td></tr><tr><td class="dep-name">hiccup</td><td class="dotted"><hr /></td><td class="dep-version">0.3.1</td></tr><tr><td class="dep-name">clj-help</td><td class="dotted"><hr /></td><td class="dep-version">0.2.0</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#lobos.core">lobos.core</a></li><li><a href="#lobos.schema">lobos.schema</a></li><li><a href="#lobos.connectivity">lobos.connectivity</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#lobos.core" name="lobos.core"><h1 class="project-name">lobos.core</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>The <code>core</code> namespace provide the basic interface to interact with a
   database. It contains a set of functions and <em>actions</em> (a special kind
   of functions acting on abstract schemas or their elements) used to
   manipulate database schemas in an implementation agnostic way.</p>
@@ -2549,11 +2549,10 @@ $(document).ready(function() {
         (clojure [pprint :only [pprint]])
         lobos.utils))</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Debugging Interface</h2>
-</td><td class="codes" /></tr><tr><td class="docs">
+</td><td class="codes" /></tr><tr><td class="docs"><p>This atom keeps the currently set debug level, see
+  <code>set-debug-level</code>. <em>For internal use</em>.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defonce debug-level
-  (atom nil)
-  "This atom keeps the currently set debug level, see
-  `set-debug-level`. *For internal use*.")</pre></tr><tr><td class="docs"><p>Set the current debugging level. The level argument can be one of
+  (atom nil))</pre></tr><tr><td class="docs"><p>Set the current debugging level. The level argument can be one of
   <code>:schema</code>, <code>:ast</code> or <code>:sql</code>. Currently only <code>:sql</code> is supported for
   all actions. e.g.:</p>
 
@@ -2567,14 +2566,12 @@ $(document).ready(function() {
 most of it if you only mean to use <strong>Lobos</strong> as a library. If that's
 the case, have a look at the <code>defschema</code> macro and the
 <code>set-default-schema</code> and <code>get-default-schema</code> functions.</p>
-</td><td class="codes" /></tr><tr><td class="docs">
+</td><td class="codes" /></tr><tr><td class="docs"><p>This atom keeps a map of all schemas in use. See <code>schema-key</code> for
+  more details on how keys are generated. <em>For internal use</em>.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defonce global-schemas
-  (atom {})
-  "This atom keeps a map of all schemas in use. See `schema-key` for
-  more details on how keys are generated. *For internal use*.")</pre></tr><tr><td class="docs">
+  (atom {}))</pre></tr><tr><td class="docs"><p>This atom keeps the key of the default schema. <em>For internal use</em>.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defonce default-schema
-  (atom nil)
-  "This atom keeps the key of the default schema. *For internal use*.")</pre></tr><tr><td class="docs"><p>Returns an unique schema key for the given schema. This schema must
+  (atom nil))</pre></tr><tr><td class="docs"><p>Returns an unique schema key for the given schema. This schema must
   have its db-spec option properly set. When given a keyword instead of
   a schema, it look-up this schema by name in the <code>global-schemas</code> map
   using the supplied db-spec argument. <em>For internal use</em>.</p>
@@ -2626,23 +2623,24 @@ the case, have a look at the <code>defschema</code> macro and the
     (if (and (not connection-info)
              (-> schema :options :db-spec))
       schema
-      (assoc-in schema [:options :db-spec] db-spec))))</pre></tr><tr><td class="docs">
-</td><td class="codes" /><pre class="brush: clojure">(defmacro defschema
-  "This macro take two mandatory argument, the name of the variable
+      (assoc-in schema [:options :db-spec] db-spec))))</pre></tr><tr><td class="docs"><p>This macro take two mandatory argument, the name of the variable
   being defined and the name of the schema it represent. When used
   without specifying elements, it defines a var containing the specified
-  schema constructed from database meta-data. e.g.:
+  schema constructed from database meta-data. e.g.:</p>
 
-    user> (defschema sample-schema :tmp)
+<pre><code>user&gt; (defschema sample-schema :tmp)
+</code></pre>
 
-  If used with elements, the defined var will keep the abstract schema
-  definition to be later created using the `create-schema` action. e.g.:
+<p>  If used with elements, the defined var will keep the abstract schema
+  definition to be later created using the <code>create-schema</code> action. e.g.:</p>
 
-    user> (defschema sample-schema :tmp
-             (table :foo (integer :a)))
+<pre><code>user&gt; (defschema sample-schema :tmp
+         (table :foo (integer :a)))
+</code></pre>
 
-  It can also take an optional `connection-info` argument from which the
-  db-spec map will be used."
+<p>  It can also take an optional <code>connection-info</code> argument from which the
+  db-spec map will be used.</p>
+</td><td class="codes" /><pre class="brush: clojure">(defmacro defschema
   {:arglists '([connection-info? var-name schema-name & elements])}
   [& args]
   (let [[connection-info args] (optional map? args)
@@ -2689,10 +2687,9 @@ the case, have a look at the <code>defschema</code> macro and the
       :ast (do (println (type ast))
                (pprint ast))
       :schema (do (println (type object))
-                  (pprint object)))))</pre></tr><tr><td class="docs">
+                  (pprint object)))))</pre></tr><tr><td class="docs"><p>Execute the given SQL string or sequence of strings. Prints them if
+  the <code>debug-level</code> is set to <code>:sql</code>.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defn- execute*
-  "Execute the given SQL string or sequence of strings. Prints them if
-  the `debug-level` is set to `:sql`."
   [sql]
   (doseq [sql-string (if (seq? sql) sql [sql])]
     (when (= :sql @debug-level) (println sql-string))
@@ -2724,23 +2721,22 @@ the case, have a look at the <code>defschema</code> macro and the
   [cnx]
   (or ((set (keys @conn/global-connections)) cnx)
       (and (map? cnx)
-           ((comp not schema/definition?) cnx))))</pre></tr><tr><td class="docs">
-</td><td class="codes" /><pre class="brush: clojure">(defmacro defaction
-  "Defines an action applicable to an optional abstract schema or
-  database connection. *Actions* are simply a special kind of
+           ((comp not schema/definition?) cnx))))</pre></tr><tr><td class="docs"><p>Defines an action applicable to an optional abstract schema or
+  database connection. <em>Actions</em> are simply a special kind of
   functions. They will have an augmented argument list, which is the
-  given one prepended by the optional `cnx-or-schema` argument.
+  given one prepended by the optional <code>cnx-or-schema</code> argument.</p>
 
-  All actions must return a built statement (or list of statements)
+<p>  All actions must return a built statement (or list of statements)
   using one of the protocol method available. This statement(s) will get
   executed and if a schema as been given as argument, it will be updated
-  using the `update-global-schema` function.
+  using the <code>update-global-schema</code> function.</p>
 
-  The defined actions will have access to two extra local variables. The
-  `schema` variable will contain the given schema if `cnx-or-schema` is
-  one else it be nil. The `db-spec` argument will contain the db-spec
+<p>  The defined actions will have access to two extra local variables. The
+  <code>schema</code> variable will contain the given schema if <code>cnx-or-schema</code> is
+  one else it be nil. The <code>db-spec</code> argument will contain the db-spec
   map found with the given connection or in the given schema. *For
-  internal use*."
+  internal use*.</p>
+</td><td class="codes" /><pre class="brush: clojure">(defmacro defaction
   {:arglists '([name doc-string? attr-map? [params*] & body])}
   [name & args]
   (let [params (seq (first (filter vector? args)))
@@ -2770,32 +2766,32 @@ the case, have a look at the <code>defschema</code> macro and the
                  (merge (.meta #'~name)
                         {:arglists '(~(vec (conj params 'cnx-or-schema?)))})))))</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Actions</h2>
-</td><td class="codes" /></tr><tr><td class="docs">
+</td><td class="codes" /></tr><tr><td class="docs"><p>Builds a create statement with the given schema element and execute
+  it. See the <code>lobos.schema</code> namespace for more details on schema
+  elements definition. e.g.:</p>
+
+<pre><code>user&gt; (create (table :foo (integer :a)))
+</code></pre>
 </td><td class="codes" /><pre class="brush: clojure">(defaction create
-  "Builds a create statement with the given schema element and execute
-  it. See the `lobos.schema` namespace for more details on schema
-  elements definition. e.g.:
-
-    user> (create (table :foo (integer :a)))"
   [element]
-  (schema/build-create-statement element db-spec))</pre></tr><tr><td class="docs">
+  (schema/build-create-statement element db-spec))</pre></tr><tr><td class="docs"><p>Builds an alter statement with the given schema element and execute
+  it. There's four types of alter actions: <code>:add</code>, <code>:drop</code>, <code>:modify</code>
+  and <code>:rename</code>. See the <code>lobos.schema</code> namespace for more details on
+  schema elements definition. e.g.:</p>
+
+<pre><code>user&gt; (alter :add (table :foo (integer :a)))
+user&gt; (alter :modify (table :foo (column :a [:default 0])))
+user&gt; (alter :rename (table :foo (column :a :to :b)))
+</code></pre>
 </td><td class="codes" /><pre class="brush: clojure">(defaction alter
-  "Builds an alter statement with the given schema element and execute
-  it. There's four types of alter actions: `:add`, `:drop`, `:modify`
-  and `:rename`. See the `lobos.schema` namespace for more details on
-  schema elements definition. e.g.:
-
-    user> (alter :add (table :foo (integer :a)))
-    user> (alter :modify (table :foo (column :a [:default 0])))
-    user> (alter :rename (table :foo (column :a :to :b)))"
   [action element]
-  (schema/build-alter-statement element action db-spec))</pre></tr><tr><td class="docs">
-</td><td class="codes" /><pre class="brush: clojure">(defaction drop
-  "Builds a drop statement with the given schema element and execute
-  it. It can take an optional `behavior` argument, when `:cascade` is
-  specified drops all elements relying on the one being dropped. e.g.:
+  (schema/build-alter-statement element action db-spec))</pre></tr><tr><td class="docs"><p>Builds a drop statement with the given schema element and execute
+  it. It can take an optional <code>behavior</code> argument, when <code>:cascade</code> is
+  specified drops all elements relying on the one being dropped. e.g.:</p>
 
-    user> (drop (table :foo) :cascade)"
+<pre><code>user&gt; (drop (table :foo) :cascade)
+</code></pre>
+</td><td class="codes" /><pre class="brush: clojure">(defaction drop
   [element & [behavior]]
   (schema/build-drop-statement element behavior db-spec))</pre></tr><tr><td class="docs"><p>Create a new schema with the given name or create one using the given
   abstract schema definition. See the <code>lobos.schema</code> namespace for more
@@ -2881,7 +2877,6 @@ can be be construct using the <code>constraint</code> function.
 <em>For internal use</em>.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defrecord Constraint [cname]
   Buildable
-
   (build-definition [this db-spec]
     (ConstraintDefinition. db-spec cname)))</pre></tr><tr><td class="docs"><p>Constructs an unspecified abstract constraint definition and add it
   to the given table. To be used with alter action while dropping a
@@ -2894,7 +2889,6 @@ can be be construct using the <code>constraint</code> function.
 constraint. <em>For internal use</em>.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defrecord UniqueConstraint [cname ctype columns]
   Buildable
-  
   (build-definition [this db-spec]
     (UniqueConstraintDefinition.
      db-spec
@@ -2923,7 +2917,6 @@ constraint. <em>For internal use</em>.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defrecord ForeignKeyConstraint
   [cname columns parent-table parent-columns match triggered-actions]
   Buildable
-
   (build-definition [this db-spec]
     (ForeignKeyConstraintDefinition.
      db-spec
@@ -2975,7 +2968,6 @@ constraint. <em>For internal use</em>.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defrecord CheckConstraint
   [cname condition identifiers]
   Buildable
-
   (build-definition [this db-spec]
     (CheckConstraintDefinition.
      db-spec
@@ -2992,11 +2984,10 @@ constraint. <em>For internal use</em>.</p>
              [constraint-name
               (CheckConstraint. constraint-name
                                 condition
-                                identifiers)]))</pre></tr><tr><td class="docs">
-</td><td class="codes" /><pre class="brush: clojure">(defmacro check
-  "Constructs an abstract check constraint definition and add it to the
+                                identifiers)]))</pre></tr><tr><td class="docs"><p>Constructs an abstract check constraint definition and add it to the
   given table. Replace core predicates by custom one from ClojureQL
-  predicates namespace."
+  predicates namespace.</p>
+</td><td class="codes" /><pre class="brush: clojure">(defmacro check
   [table constraint-name condition]
   `(check*
     ~table
@@ -3044,7 +3035,6 @@ definitions and <code>ValueExpression</code> for default values.
 <em>For internal use</em>.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defrecord Column [cname data-type default auto-inc not-null others]
   Buildable
-  
   (build-definition [this db-spec]
     (let [{:keys [dtype args options]} data-type]
       (ColumnDefinition.
@@ -3153,19 +3143,17 @@ each types have their own functions.</p>
                      ~'table
                      ~'column-name
                      (data-type ~(keyword n) dargs#)
-                     options#))))))</pre></tr><tr><td class="docs">
+                     options#))))))</pre></tr><tr><td class="docs"><p>Defines typed columns for simple data-types taking no arguments.
+  <em>For internal use</em>.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defmacro def-simple-typed-columns
-  "Defines typed columns for simple data-types taking no arguments.
-  *For internal use*."
   [& names]
   (def-typed-columns*
     names
     '[table column-name & options]
     '[]
-    'options))</pre></tr><tr><td class="docs">
+    'options))</pre></tr><tr><td class="docs"><p>Defines numeric-like typed columns. These typed column funcitons can
+  take an optional <code>precision</code> and <code>scale</code> argument. <em>For internal use</em>.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defmacro def-numeric-like-typed-columns
-  "Defines numeric-like typed columns. These typed column funcitons can
-  take an optional `precision` and `scale` argument. *For internal use*."
   [& names]
   (def-typed-columns*
     names
@@ -3176,30 +3164,27 @@ each types have their own functions.</p>
     '(-> options
          (conj-when (not (integer? precision)) precision)
          (conj-when (not (integer? scale)) scale))
-    "Takes an optional `precision` and `scale` arguments."))</pre></tr><tr><td class="docs">
+    "Takes an optional `precision` and `scale` arguments."))</pre></tr><tr><td class="docs"><p>Defines typed columns with optional precision. Used by <code>float</code> and
+  time data-types. <em>For internal use</em>.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defmacro def-optional-precision-typed-columns
-  "Defines typed columns with optional precision. Used by `float` and
-  time data-types. *For internal use*."
   [& names]
   (def-typed-columns*
     names
     '[table column-name & [precision & options]]
     '(conj-when [] (integer? precision) precision)
     '(conj-when options (not (integer? precision)) precision)
-    "Takes an optional `precision` argument."))</pre></tr><tr><td class="docs">
+    "Takes an optional `precision` argument."))</pre></tr><tr><td class="docs"><p>Defines optionally length-bounded typed columns. Used by binary and
+  character types. <em>For internal use</em>.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defmacro def-optional-length-typed-columns
-  "Defines optionally length-bounded typed columns. Used by binary and
-  character types. *For internal use*."
   [& names]
   (def-typed-columns*
     names
     '[table column-name & [length & options]]
     '(conj-when [] (integer? length) length)
     '(conj-when options (not (integer? length)) length)
-    "Takes an optional `length` argument."))</pre></tr><tr><td class="docs">
+    "Takes an optional `length` argument."))</pre></tr><tr><td class="docs"><p>Defines length-bounded typed columns. Used by variable binary and
+  character types. <em>For internal use</em>.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defmacro def-length-bounded-typed-columns
-  "Defines length-bounded typed columns. Used by variable binary and
-  character types. *For internal use*."
   [& names]
   (def-typed-columns*
     names
@@ -3207,43 +3192,43 @@ each types have their own functions.</p>
     '(conj-when [] (integer? length) length)
     '(conj-when options (not (integer? length)) length)
     "The `length` arguemnt is mandatory."))</pre></tr><tr><td class="docs"><h3>Numeric Types</h3>
-</td><td class="codes" /></tr><tr><td class="docs">
+</td><td class="codes" /></tr><tr><td class="docs"><p>Constructs an abstract smallint column definition and add it to the given table.</p>
 </td><td class="codes" /><pre class="brush: clojure">(def-simple-typed-columns
   smallint
   integer
-  bigint)</pre></tr><tr><td class="docs">
+  bigint)</pre></tr><tr><td class="docs"><p>Constructs an abstract numeric column definition and add it to the given table.Takes an optional <code>precision</code> and <code>scale</code> arguments.</p>
 </td><td class="codes" /><pre class="brush: clojure">(def-numeric-like-typed-columns
   numeric
-  decimal)</pre></tr><tr><td class="docs">
+  decimal)</pre></tr><tr><td class="docs"><p>Constructs an abstract real column definition and add it to the given table.</p>
 </td><td class="codes" /><pre class="brush: clojure">(def-simple-typed-columns
   real
-  double-precision)</pre></tr><tr><td class="docs">
-</td><td class="codes" /><pre class="brush: clojure">(defalias double double-precision)</pre></tr><tr><td class="docs">
+  double-precision)</pre></tr><tr><td class="docs"><p>Constructs an abstract double-precision column definition and add it to the given table.</p>
+</td><td class="codes" /><pre class="brush: clojure">(defalias double double-precision)</pre></tr><tr><td class="docs"><p>Constructs an abstract float column definition and add it to the given table.Takes an optional <code>precision</code> argument.</p>
 </td><td class="codes" /><pre class="brush: clojure">(def-optional-precision-typed-columns
   float)</pre></tr><tr><td class="docs"><h3>Character Types</h3>
-</td><td class="codes" /></tr><tr><td class="docs">
+</td><td class="codes" /></tr><tr><td class="docs"><p>Constructs an abstract char column definition and add it to the given table.Takes an optional <code>length</code> argument.</p>
 </td><td class="codes" /><pre class="brush: clojure">(def-optional-length-typed-columns
   char
   nchar
   clob
-  nclob)</pre></tr><tr><td class="docs">
-</td><td class="codes" /><pre class="brush: clojure">(defalias text clob)</pre></tr><tr><td class="docs">
-</td><td class="codes" /><pre class="brush: clojure">(defalias ntext nclob)</pre></tr><tr><td class="docs">
+  nclob)</pre></tr><tr><td class="docs"><p>Constructs an abstract clob column definition and add it to the given table.Takes an optional <code>length</code> argument.</p>
+</td><td class="codes" /><pre class="brush: clojure">(defalias text clob)</pre></tr><tr><td class="docs"><p>Constructs an abstract nclob column definition and add it to the given table.Takes an optional <code>length</code> argument.</p>
+</td><td class="codes" /><pre class="brush: clojure">(defalias ntext nclob)</pre></tr><tr><td class="docs"><p>Constructs an abstract varchar column definition and add it to the given table.The <code>length</code> arguemnt is mandatory.</p>
 </td><td class="codes" /><pre class="brush: clojure">(def-length-bounded-typed-columns  
   varchar
   nvarchar)</pre></tr><tr><td class="docs"><h3>Binary Types</h3>
-</td><td class="codes" /></tr><tr><td class="docs">
+</td><td class="codes" /></tr><tr><td class="docs"><p>Constructs an abstract binary column definition and add it to the given table.Takes an optional <code>length</code> argument.</p>
 </td><td class="codes" /><pre class="brush: clojure">(def-optional-length-typed-columns
   binary
-  blob)</pre></tr><tr><td class="docs">
+  blob)</pre></tr><tr><td class="docs"><p>Constructs an abstract varbinary column definition and add it to the given table.The <code>length</code> arguemnt is mandatory.</p>
 </td><td class="codes" /><pre class="brush: clojure">(def-length-bounded-typed-columns
   varbinary)</pre></tr><tr><td class="docs"><h3>Boolean Type</h3>
-</td><td class="codes" /></tr><tr><td class="docs">
+</td><td class="codes" /></tr><tr><td class="docs"><p>Constructs an abstract boolean column definition and add it to the given table.</p>
 </td><td class="codes" /><pre class="brush: clojure">(def-simple-typed-columns
   boolean)</pre></tr><tr><td class="docs"><h3>Data/time Types</h3>
-</td><td class="codes" /></tr><tr><td class="docs">
+</td><td class="codes" /></tr><tr><td class="docs"><p>Constructs an abstract date column definition and add it to the given table.</p>
 </td><td class="codes" /><pre class="brush: clojure">(def-simple-typed-columns
-  date)</pre></tr><tr><td class="docs">
+  date)</pre></tr><tr><td class="docs"><p>Constructs an abstract time column definition and add it to the given table.Takes an optional <code>precision</code> argument.</p>
 </td><td class="codes" /><pre class="brush: clojure">(def-optional-precision-typed-columns
   time
   timestamp)</pre></tr><tr><td class="docs"><hr />
@@ -3252,7 +3237,6 @@ each types have their own functions.</p>
 the <code>table</code> macro. <em>For internal use</em>.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defrecord Table [name columns constraints options]
   Alterable Creatable Dropable
-
   (build-alter-statement [this action db-spec]
     (let [elements (map #(build-definition (second %) db-spec)
                         (concat columns constraints))]
@@ -3262,14 +3246,12 @@ the <code>table</code> macro. <em>For internal use</em>.</p>
          name
          action
          element))))
-
   (build-create-statement [this db-spec]
     (CreateTableStatement.
      db-spec
      name
      (map #(build-definition (second %) db-spec)
           (concat columns constraints))))
-
   (build-drop-statement [this behavior db-spec]
     (DropStatement. db-spec :table name behavior)))</pre></tr><tr><td class="docs"><p>Constructs an abstract table definition. The <code>table-name</code> is
   mandatory.</p>
@@ -3279,10 +3261,9 @@ the <code>table</code> macro. <em>For internal use</em>.</p>
   (Table. table-name
           (or columns {})
           (or constraints {})
-          (or options {})))</pre></tr><tr><td class="docs">
+          (or options {})))</pre></tr><tr><td class="docs"><p>Constructs an abstract table definition containing the given
+  elements. Takes an arbitrary number of table elements.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defmacro table
-  "Constructs an abstract table definition containing the given
-  elements. Takes an arbitrary number of table elements."
   [name & elements]
   `(-> (table* ~name {} {} {}) ~@elements))</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Schema Definition</h2>
@@ -3290,13 +3271,11 @@ the <code>table</code> macro. <em>For internal use</em>.</p>
 <em>For internal use</em>.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defrecord Schema [sname elements options]
   Creatable Dropable
-  
   (build-create-statement [this db-spec]
     (CreateSchemaStatement.
      db-spec
      sname
      (map #(build-create-statement (second %) db-spec) elements)))
-
   (build-drop-statement [this behavior db-spec]
     (DropStatement. db-spec :schema sname behavior)))</pre></tr><tr><td class="docs"><p>Returns true if the given object is a Schema.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defn schema?
@@ -3330,22 +3309,20 @@ predicate.</p>
   (:use (clojure.contrib [def :only [defalias defvar]])
         lobos.utils))</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Globals</h2>
-</td><td class="codes" /></tr><tr><td class="docs">
+</td><td class="codes" /></tr><tr><td class="docs"><p>This atom contains a map of all opened global connections.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defonce global-connections
-  (atom {})
-  "This atom contains a map of all opened global connections.")</pre></tr><tr><td class="docs"><hr />
+  (atom {}))</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Helpers</h2>
-</td><td class="codes" /></tr><tr><td class="docs">
+</td><td class="codes" /></tr><tr><td class="docs"><p>Returns the current database connection (or throws if there is none)</p>
 </td><td class="codes" /><pre class="brush: clojure">(defalias connection sqlint/connection*)</pre></tr><tr><td class="docs"><p>Returns the associated db-spec or itself. <em>For internal use</em>.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defn get-db-spec
   [& [connection-info]]
   (let [connection-info (or connection-info :default-connection)]
     (if (keyword? connection-info)
       (-> @global-connections connection-info :db-spec)
-      connection-info)))</pre></tr><tr><td class="docs">
+      connection-info)))</pre></tr><tr><td class="docs"><p>Replaces <code>get-connection</code> from <code>contrib.sql.internal</code>
+  namespace. Dissociates the <code>:schema</code> key to prevent conflit.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defn- get-cnx
-  "Replaces `get-connection` from `contrib.sql.internal`
-  namespace. Dissociates the `:schema` key to prevent conflit."
   [db-spec]
   (let [db-spec (dissoc db-spec :schema)]
     (sqlint/get-connection db-spec)))</pre></tr><tr><td class="docs"><hr />
@@ -3409,36 +3386,38 @@ predicate.</p>
                             :db-spec db-spec)]
       (when-let [ac (-> db-spec :auto-commit)]
         (.setAutoCommit cnx ac))
-      (func))))</pre></tr><tr><td class="docs">
-</td><td class="codes" /><pre class="brush: clojure">(defmacro with-connection
-  "Evaluates body in the context of a new connection or a named global
+      (func))))</pre></tr><tr><td class="docs"><p>Evaluates body in the context of a new connection or a named global
   connection to a database then closes the connection if it's a new
   one. The connection-info parameter can be a keyword denoting a global
   connection or a map containing values for one of the following
-  parameter sets:
+  parameter sets:</p>
 
-   *  Factory:
-     * `:factory` (required) a function of one argument, a map of params
-     * (others) (optional) passed to the factory function in a map
+<ul>
+<li><p>Factory:</p>
 
-   * DriverManager:
-     * `:classname` (required) a String, the jdbc driver class name
-     * `:subprotocol` (required) a String, the jdbc subprotocol
-     * `:subname` (required) a String, the jdbc subname
-     * (others) (optional) passed to the driver as properties.
+<ul><li><code>:factory</code> (required) a function of one argument, a map of params</li>
+<li>(others) (optional) passed to the factory function in a map</li></ul></li>
+<li><p>DriverManager:</p>
 
-   * DataSource:
-     * `:datasource` (required) a javax.sql.DataSource
-     * `:username` (optional) a String
-     * `:password` (optional) a String, required if :username is supplied
+<ul><li><code>:classname</code> (required) a String, the jdbc driver class name</li>
+<li><code>:subprotocol</code> (required) a String, the jdbc subprotocol</li>
+<li><code>:subname</code> (required) a String, the jdbc subname</li>
+<li>(others) (optional) passed to the driver as properties.</li></ul></li>
+<li><p>DataSource:</p>
 
-   * JNDI:
-     * `:name` (required) a String or javax.naming.Name
-     * `:environment` (optional) a java.util.Map
+<ul><li><code>:datasource</code> (required) a javax.sql.DataSource</li>
+<li><code>:username</code> (optional) a String</li>
+<li><code>:password</code> (optional) a String, required if :username is supplied</li></ul></li>
+<li><p>JNDI:</p>
 
-   * Options (for ClojureQL):
-     * `:auto-commit` (optional) a Boolean
-     * `:fetch-size`  (optional) an integer"
+<ul><li><code>:name</code> (required) a String or javax.naming.Name</li>
+<li><code>:environment</code> (optional) a java.util.Map</li></ul></li>
+<li><p>Options (for ClojureQL):</p>
+
+<ul><li><code>:auto-commit</code> (optional) a Boolean</li>
+<li><code>:fetch-size</code>  (optional) an integer</li></ul></li>
+</ul>
+</td><td class="codes" /><pre class="brush: clojure">(defmacro with-connection
   [connection-info & body]
   `(let [connection-info# (or ~connection-info :default-connection)]
      ((if (keyword? connection-info#)
