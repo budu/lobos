@@ -93,6 +93,7 @@
      [:style {:type "text/css"} page-style]
      ;; jQuery
      (include-js "https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js")
+     (include-js "js/main.js")
      ;; SyntaxHighlighter
      (include-js "sh/js/shCore.js" "sh/js/shBrushXml.js" "sh/js/shBrushClojure.js")
      (include-css "sh/css/shCore.css" "sh/css/shThemeDjango.css")]
@@ -107,19 +108,6 @@
          (link-to "documentation.html" "Documention")
          (link-to "contribute.html" "Contribute")])]
       [:div#content body]
-      (javascript-tag
-       "function rsz_to_min_sz(elem, min_sz, sz) {
-          if (elem.height() < min_sz)
-            elem.css('height', sz + 'px'); };
-        function rsz() {
-          var w = $(window).width().toString();
-          $('body').css('font-size', w.substring(0, w.length - 2) + 'pt');
-          var min_sz = $(window).height() * 0.5;
-          rsz_to_min_sz($('#wrapper'), min_sz, $(window).height() - 10);
-          rsz_to_min_sz($('#content'), min_sz, min_sz); };
-        rsz();
-        window.onresize = function() { rsz(); };
-        SyntaxHighlighter.all();")
       [:div#footer
        [:p "&copy; 2011 Nicolas Buduroi. All rights reserved."]]]]]))
 
@@ -192,10 +180,32 @@
          (download-links tag))))))
 
 (defpage documentation ["Documentation"]
-  [:h1 "Documentation..."])
+  (section "Documentation"
+    [:p "For now, only the commented code generated with Marginalia is
+    available:"]
+    [:ul
+     [:li (link-to "doc/uberdoc.frontend.html" "Frontend documentation")]
+     [:li (link-to "doc/uberdoc.backend.html"  "Backend documentation for the compiler")]
+     [:li (link-to "doc/uberdoc.analyzer.html" "Documentation for the analyzer")]]))
+
 
 (defpage contribute ["Contribute"]
-  [:h1 "Contribute..."])
+  (section "Contributing to Lobos"
+    [:p "As this project hasn't yet reached the magical 1.0 version,
+    this is the best time for anyone to contribute their idea and/or
+    code. If you want to participate the first step would be to visit
+    the online repository on "
+    (link-to "https://github.com/budu/lobos" "Github") "."]
+    [:p "You can also " (link-to "nbuduroi@gmail.com" "contact-me")
+    " directly for any questions about this project."])
+  (section "Issue Tracker"
+    [:p "All issues, suggestions and requests should be added to the
+    project's " (link-to "https://github.com/budu/lobos/issues" "issue
+    tracker") "."])
+  (section "Wiki"
+    [:p "Finally a " (link-to "https://github.com/budu/lobos/wiki" "wiki")
+    " is also available. Its main purpose is to discuss upcoming
+    features in more depth before being implemented."]))
 
 (defn www
   "Creates this project website."
