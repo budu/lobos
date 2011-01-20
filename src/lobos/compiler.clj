@@ -37,8 +37,7 @@
 (defmulti compile
   "Compiles the given object into SQL."
   (fn [o]
-    [(keyword (or (-> o :db-spec :subprotocol)
-                  ::standard))
+    [(-> o :db-spec :subprotocol (or ::standard) keyword)
      (type o)])
   :hierarchy backends-hierarchy)
 
