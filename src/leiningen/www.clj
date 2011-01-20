@@ -196,7 +196,7 @@
     code. If you want to participate the first step would be to visit
     the online repository on "
     (link-to "https://github.com/budu/lobos" "Github") "."]
-    [:p "You can also " (link-to "nbuduroi@gmail.com" "contact-me")
+    [:p "You can also " (link-to "mailto:nbuduroi@gmail.com" "contact me")
     " directly for any questions about this project."])
   (section "Issue Tracker"
     [:p "All issues, suggestions and requests should be added to the
