@@ -24,6 +24,7 @@
    ;; tags
    [:body :font-family :$font-main]
    [:pre :display :inline]
+   [(each :h2 :p) :margin "0.7em 0"]
    ;; sections
    [:#wrapper :background-color :$color-main
               :border "solid 5px $color-main"
@@ -62,8 +63,18 @@
               :border-radius :1em
               :clear :both
               :color :$color-main
-              :padding :1.5em
-              :padding-left :200px]
+              :padding "0.5em 1.5em"
+              :padding-left :200px
+    [:div.section :padding-left :0.5em
+     [:h2 :margin-left :-0.5em]]
+    ;; downloads
+    [:div#downloads :text-align :center
+     [:div.download :border "solid 1px $color-main"
+                    :border-radius :0.5em
+                    :display :inline-block
+                    :margin :0.5em
+                    :padding "0.5em 1em"
+      [:a :margin "0 0 0 1em"]]]]
    ;; footer
    [($ :#footer :p) :font-size :0.7em
                     :padding-bottom :3em
@@ -114,42 +125,71 @@
 
 (defmacro defpage [pname [title & [filename]] & body]
   `(def ~pname {:filename ~(or filename (name pname))
-                :content (page-layout ~title (html ~@body))}))
+                :content (page-layout ~title
+                           (html [:div {:id ~(name pname)} ~@body]))}))
+
+(defn section [title & content]
+  (-> content
+      (conj [:h2 title] :div.section)
+      vec))
 
 (defpage home ["Home" "index"]
-  [:h2 "Description"]
+  (section "Description"
 
-  [:p [:b "Lobos"] " is a library to help you create and modify database
-   schemas using Clojure code."]
+    [:p [:b "Lobos"] " is a library to help you create and modify
+    database schemas using Clojure code."]
 
-  [:p "It is currently being actively developed and its API isn't stable
-   yet. In its present form, it only provide an imperative DSL to
-   generated database specific data definition statements. That is the
-   foundation upon which the migration and declarative schema features
-   will be built."]
+    [:p "It is currently being actively developed and its API isn't
+    stable yet. In its present form, it only provide an imperative DSL
+    to generated database specific data definition statements. That is
+    the foundation upon which the migration and declarative schema
+    features will be built."])
 
-  [:h2 "Installation"]
+  (section "Installation"
   
-  [:p "You can use " [:b "Lobos"] " in your projects using either
-  Leiningen or Cake by adding the following dependency to you project
-  file:"]
+    [:p "You can use " [:b "Lobos"] " in your projects using either
+    Leiningen or Cake by adding the following dependency to you project
+    file:"]
 
-  [:pre.brush:.clojure "[lobos \"0.7.0-SNAPSHOT\"]"]
+    [:pre.brush:.clojure "[lobos \"0.6.0-SNAPSHOT\"]"]
 
-  [:p [:b "Lobos"] " is also available through Maven:"]
+    [:p [:b "Lobos"] " is also available through Maven:"]
 
-  [:pre.brush:.xml (h "<dependency>
+    [:pre.brush:.xml (h
+"<dependency>
   <groupId>lobos</groupId>
   <artifactId>lobos</artifactId>
-  <version>0.7.0-SNAPSHOT</version>
+  <version>0.6.0-SNAPSHOT</version>
 </dependency>")]
 
-  [:p "You can always add the current or previous version manually,
-  consult the " (link-to "downloads.html" "downloads page") " to find
-  the version you want."])
+    [:p "You can always add the current or previous version manually,
+    consult the " (link-to "downloads.html" "downloads page") " to find
+    the version you want."]))
+
+(defn download-link [tag type text]
+  (link-to (str "https://github.com/budu/lobos/" type "ball/" tag)
+           text))
+
+(defn download-links [tag & [text]]
+  (html
+   [:div.download (or text (str "Lobos version " tag ":") " ")
+    (download-link tag "zip" "download .zip")
+    (download-link tag "tar" "download .tar.gz")] [:br]))
 
 (defpage downloads ["Downloads"]
-  [:h1 "Downloads..."])
+  (let [tags (->> ".git/refs/tags"
+                  java.io.File.
+                  .listFiles
+                  (map #(.getName %))
+                  (reverse))]
+    (html
+     (section "Latest Stable Version"
+       (download-links (first tags)))
+     (section "Latest Snapshot"
+       (download-links "master" "Current Lobos snapshot:"))
+     (section "Previous Versions"
+       (for [tag (next tags)]
+         (download-links tag))))))
 
 (defpage documentation ["Documentation"]
   [:h1 "Documentation..."])
