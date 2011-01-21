@@ -3330,19 +3330,19 @@ predicate.</p>
 </td><td class="codes" /></tr><tr><td class="docs"><p>Opens a global connection to the database specified by <code>db-spec</code>. If
   no <code>connection-name</code> is given, opens a default global connection.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defn open-global
-  [db-spec & [connection-name]]
-  (let [connection-name (or connection-name :default-connection)]
-    (if-let [cnx (connection-name @global-connections)]
-      (throw
-       (Exception.
-        (format "A global connection by that name already exists (%s)"
-                connection-name)))
-      (let [cnx (get-cnx db-spec)]
-        (when-let [ac (-> db-spec :auto-commit)]
-          (.setAutoCommit cnx ac))
-        (swap! global-connections assoc
-               (or connection-name :default-connection)
-               {:connection cnx :db-spec db-spec})))))</pre></tr><tr><td class="docs"><p>Supplied with a keyword identifying a global connection, that connection
+  ([db-spec] (open-global :default-connection db-spec))
+  ([connection-name db-spec]
+     (if-let [cnx (connection-name @global-connections)]
+       (throw
+        (Exception.
+         (format "A global connection by that name already exists (%s)"
+                 connection-name)))
+       (let [cnx (get-cnx db-spec)]
+         (when-let [ac (-> db-spec :auto-commit)]
+           (.setAutoCommit cnx ac))
+         (swap! global-connections assoc
+                (or connection-name :default-connection)
+                {:connection cnx :db-spec db-spec})))))</pre></tr><tr><td class="docs"><p>Supplied with a keyword identifying a global connection, that connection
   is closed and the reference dropped.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defn close-global
   [& [connection-name]]
