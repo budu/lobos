@@ -202,7 +202,7 @@ in Maven:
 
 ## License
 
-Copyright (C) 2010 Nicolas Buduroi. All rights reserved
+Copyright (C) 2011 Nicolas Buduroi. All rights reserved
 
 Distributed under the Eclipse Public License, the same as Clojure. See
 the file epl-v10.html in the project root directory.
