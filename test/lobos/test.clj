@@ -138,7 +138,7 @@
                        (:classname db-spec)))))
   (doseq [db-spec available-specs]
     (try
-      (open-global db-spec (test-db-name db-spec))
+      (open-global (test-db-name db-spec) db-spec)
       (catch Exception _
         (println "WARNING: Failed to connect to" (:subprotocol db-spec)))))
   (f)

@@ -27,14 +27,14 @@
   (close-global)
   (is (= @global-connections {})
       "Closing a default global connection")
-  (open-global {} :foo)
+  (open-global :foo {})
   (is (= @global-connections
          {:foo {:connection *cnx* :db-spec {}}})
       "Opening a named global connection")
   (close-global :foo)
   (is (= @global-connections {})
       "Closing a named global connection")
-  (open-global {} :foo)
+  (open-global :foo {})
   (is (thrown? Exception
                (open-global nil :foo))
       "Opening a global connection with a existing name")
@@ -48,7 +48,7 @@
                (with-named-connection :test
                  #(identity)))
       "With inexistant named connection")
-  (open-global {} :test)
+  (open-global :test {})
   (is (= (with-named-connection :test
            #(connection))
          *cnx*)
@@ -70,7 +70,7 @@
                (with-connection :test
                  nil))
       "With inexistant named connection")
-  (open-global {} :test)
+  (open-global :test {})
   (is (= (with-connection :test
            (connection))
          *cnx*)

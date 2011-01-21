@@ -49,19 +49,19 @@
 (defn open-global
   "Opens a global connection to the database specified by `db-spec`. If
   no `connection-name` is given, opens a default global connection."
-  [db-spec & [connection-name]]
-  (let [connection-name (or connection-name :default-connection)]
-    (if-let [cnx (connection-name @global-connections)]
-      (throw
-       (Exception.
-        (format "A global connection by that name already exists (%s)"
-                connection-name)))
-      (let [cnx (get-cnx db-spec)]
-        (when-let [ac (-> db-spec :auto-commit)]
-          (.setAutoCommit cnx ac))
-        (swap! global-connections assoc
-               (or connection-name :default-connection)
-               {:connection cnx :db-spec db-spec})))))
+  ([db-spec] (open-global :default-connection db-spec))
+  ([connection-name db-spec]
+     (if-let [cnx (connection-name @global-connections)]
+       (throw
+        (Exception.
+         (format "A global connection by that name already exists (%s)"
+                 connection-name)))
+       (let [cnx (get-cnx db-spec)]
+         (when-let [ac (-> db-spec :auto-commit)]
+           (.setAutoCommit cnx ac))
+         (swap! global-connections assoc
+                (or connection-name :default-connection)
+                {:connection cnx :db-spec db-spec})))))
 
 (defn close-global
   "Supplied with a keyword identifying a global connection, that connection
