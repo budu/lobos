@@ -22,8 +22,11 @@
 (defrecord ScalarExpression
   [db-spec scalar])
 
+(defrecord ListExpression
+  [db-spec values])
+
 (defrecord IdentifierExpression
-  [db-spec value level]) ; TODO: replace level by qualifiers
+  [db-spec name level qualifiers])
 
 (defrecord FunctionExpression
   [db-spec name args])
@@ -92,6 +95,7 @@
   (import
    '(lobos.ast ValueExpression
                ScalarExpression
+               ListExpression
                IdentifierExpression
                FunctionExpression
                OperatorExpression)))
