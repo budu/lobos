@@ -1,0 +1,11 @@
+#!/bin/bash
+
+./script/gendoc
+cd www
+git add .
+if [ -n "$1" ]; then
+    git commit "$@"
+else
+    git commit -m "Updated uberdoc files."
+fi
+cd ..

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+lein www
+cd www
+git add .
+if [ -n "$1" ]; then
+    git commit "$@"
+else
+    git commit -m "Updated the website content."
+fi
+cd ..
