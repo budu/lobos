@@ -2550,8 +2550,7 @@ default standard compiler.</p>
             (derive :sqlserver ::standard))))</pre></tr><tr><td class="docs"><p>Compiles the given object into SQL.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defmulti compile
   (fn [o]
-    [(keyword (or (-> o :db-spec :subprotocol)
-                  ::standard))
+    [(-> o :db-spec :subprotocol (or ::standard) keyword)
      (type o)])
   :hierarchy backends-hierarchy)</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Helpers</h2>
@@ -2603,8 +2602,7 @@ default standard compiler.</p>
 </td><td class="codes" /></tr><tr><td class="docs"><p>The default compiler is based on the SQL standard and does not prefer
 any particular implementation.</p>
 </td><td class="codes" /></tr><tr><td class="docs"><p>Compiling <code>Mode</code> instance returns nil by default.</p>
-</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard Mode] [_]
-  nil)</pre></tr><tr><td class="docs"><p>In the standard, identifiers are delimited by double quotes. When the
+</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard Mode] [_] nil)</pre></tr><tr><td class="docs"><p>In the standard, identifiers are delimited by double quotes. When the
 <code>level</code> property is set to <code>:schema</code>, qualifies the resulting
 identifier using the schema name found in the `db-spec property.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard Identifier]
