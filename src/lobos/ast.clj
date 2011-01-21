@@ -14,27 +14,30 @@
 (defrecord Mode
   [db-spec])
 
-;; ### Atomic Records
-
-(defrecord Identifier
-  [db-spec value level])
-
-(defrecord Literal
-  [db-spec value])
-
 ;; ### Expression Records
 
-(defrecord DataTypeExpression
-  [db-spec dtype args options])
-
-;; Not going down the rabbit hole yet!
 (defrecord ValueExpression
   [db-spec specification])
+
+(defrecord ScalarExpression
+  [db-spec scalar])
+
+(defrecord IdentifierExpression
+  [db-spec value level]) ; TODO: replace level by qualifiers
+
+(defrecord FunctionExpression
+  [db-spec name args])
+
+(defrecord OperatorExpression
+  [db-spec op left right])
 
 ;; ### Clause Records
 
 (defrecord AutoIncClause
   [db-spec])
+
+(defrecord DataTypeClause
+  [db-spec dtype args options])
 
 ;; ### Definition Records
 
@@ -83,26 +86,57 @@
 
 ;; ## Helpers
 
-(defn import-all
-  "Import all AST record into the calling namespace."
+(defn import-expressions
+  "Import all expression AST records into the calling namespace."
+  []
+  (import
+   '(lobos.ast ValueExpression
+               ScalarExpression
+               IdentifierExpression
+               FunctionExpression
+               OperatorExpression)))
+
+(defn import-clauses
+  "Import all clause AST records into the calling namespace."
+  []
+  (import
+   '(lobos.ast AutoIncClause
+               DataTypeClause)))
+
+(defn import-definitions
+  "Import all definition AST records into the calling namespace."
+  []
+  (import
+   '(lobos.ast ColumnDefinition
+               ConstraintDefinition
+               UniqueConstraintDefinition
+               ForeignKeyConstraintDefinition
+               CheckConstraintDefinition)))
+
+(defn import-statements
+  "Import all statement AST records into the calling namespace."
+  []
+  (import
+   '(lobos.ast CreateSchemaStatement
+               CreateTableStatement
+               DropStatement
+               AlterTableStatement)))
+
+(defn import-actions
+  "Import all action AST records into the calling namespace."
   []
   (import
    '(lobos.ast AlterAddAction
                AlterDropAction
                AlterModifyAction
-               AlterRenameAction
-               AlterTableStatement
-               AutoIncClause
-               CheckConstraintDefinition
-               ColumnDefinition
-               ConstraintDefinition
-               CreateTableStatement
-               CreateSchemaStatement
-               DataTypeExpression
-               DropStatement
-               ForeignKeyConstraintDefinition
-               Identifier
-               Literal
-               Mode
-               UniqueConstraintDefinition
-               ValueExpression)))
+               AlterRenameAction)))
+
+(defn import-all
+  "Import all AST records into the calling namespace."
+  []
+  (import '(lobos.ast Mode))
+  (import-expressions)
+  (import-clauses)
+  (import-definitions)
+  (import-statements)
+  (import-actions))
