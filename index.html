@@ -6,17 +6,17 @@ h3 {margin:0;padding:0}
 h4 {margin:0;padding:0}
 h5 {margin:0;padding:0}</style><style type="text/css">body {font-family:Verdana, Arial}
 pre {display:inline}
-h2 {margin:0.7em 0}
-p {margin:0.7em 0}
+h2 {margin:0.3em 0}
+p {margin:0.3em 0}
 #wrapper {background-color:#404a3e;border:solid 5px #404a3e;margin:0 10%}
 #header {padding:1em}
 #content {padding:1em}
 #footer {padding:1em}
 #header {color:white}
 #footer {color:white}
-a {color:#69a;text-decoration:none}
-a:hover {color:#8aa;text-decoration:underline}
-a:visited {color:#479}
+a {color:#6a9;text-decoration:none}
+a:visited {color:#497}
+a:hover {color:#798;text-decoration:underline}
 #header {}
 #header h1 {font-family:'Palatino Linotype','Book Antiqua',Palatino,FreeSerif,serif;font-style:italic;font-size:4em;margin-left:155px}
 #header img {float:left;margin-bottom:1em}
@@ -26,9 +26,9 @@ a:visited {color:#479}
 #header ul li a {border-radius:0.5em;-moz-border-radius:0.5em;background-color:#243;color:#fa0;padding:0.5em 1.5em}
 #header ul li a.visited {border-radius:0.5em;-moz-border-radius:0.5em;background-color:#243;color:#fa0;padding:0.5em 1.5em}
 #header ul li a:hover {background-color:#687;text-decoration:none}
-#content {background-color:#eee;background-image:url('img/tracks.png');background-repeat:repeat-y;border-radius:1em;-moz-border-radius:1em;clear:both;color:#404a3e;padding:0.5em 1.5em;padding-left:200px}
+#content {background-color:#f6f6f6;background-image:url('img/tracks.png');background-repeat:repeat-y;border-radius:1em;-moz-border-radius:1em;clear:both;color:#404a3e;padding:0.5em 1.5em;padding-left:200px}
 #content div.section {padding-left:0.5em}
-#content div.section h2 {margin-left:-0.5em}
+#content div.section h2 {margin-left:-0.5em;font-family:'Palatino Linotype','Book Antiqua',Palatino,FreeSerif,serif;font-size:2em}
 #content div#downloads {text-align:center}
 #content div#downloads div.download {border:solid 1px #404a3e;border-radius:0.5em;-moz-border-radius:0.5em;display:inline-block;margin:0.5em;padding:0.5em 1em}
 #content div#downloads div.download a {margin:0 0 0 1em}
@@ -37,7 +37,7 @@ div.syntaxhighlighter {border-radius:0.3em;-moz-border-radius:0.3em;padding:0.5e
     database schemas using Clojure code.</p><p>It is currently being actively developed and its API isn't
     stable yet. In its present form, it only provide an imperative DSL
     to generated database specific data definition statements. That is
-    the foundation upon which the migration and declarative schema
+    the foundation upon which the migrations and declarative schema
     features will be built.</p></div><div class="section"><h2>Installation</h2><p>You can use <b>Lobos</b> in your projects using either
     Leiningen or Cake by adding the following dependency to you project
     file:</p><pre class="brush: clojure">[lobos "0.6.0-SNAPSHOT"]</pre><p><b>Lobos</b> is also available through Maven:</p><pre class="brush: xml">&lt;dependency&gt;
