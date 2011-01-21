@@ -1,0 +1,5 @@
+#!/bin/bash
+
+ORIGIN=`git remote -v | grep "origin\(.*\)fetch" | grep -o "git@.*/"`
+
+git clone ${ORIGIN}lobos.wiki.git wiki
