@@ -9,6 +9,5 @@ $(document).ready(
             rsz_if($('#wrapper').height() < h - 10, $('#wrapper'), h - 10);
             rsz_if($('#content').height() < h * 0.5, $('#content'), h * 0.5); };
         SyntaxHighlighter.all();
-        window.onresize = function() { rsz(); };
         rsz();
     });
