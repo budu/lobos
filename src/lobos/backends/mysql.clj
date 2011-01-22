@@ -82,7 +82,7 @@
   {:clob :text
    :nclob :text})
 
-(defmethod compile [:mysql DataTypeExpression]
+(defmethod compile [:mysql DataTypeClause]
   [expression]
   (let [{:keys [dtype args options]} expression
         {:keys [encoding collate]} options

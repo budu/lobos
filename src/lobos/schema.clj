@@ -280,7 +280,7 @@
 
 ;; `Column` records can be constructed using the `column` function or
 ;; the more specific typed column functions. The `build-definition`
-;; method will create the appropriate `DataTypeExpression` for data-type
+;; method will create the appropriate `DataTypeClause` for data-type
 ;; definitions and `ValueExpression` for default values.
 ;; *For internal use*.
 (defrecord Column [cname data-type default auto-inc not-null others]
@@ -291,7 +291,7 @@
       (ColumnDefinition.
        db-spec
        cname
-       (DataTypeExpression. db-spec dtype args options)
+       (DataTypeClause. db-spec dtype args options)
        (if (= default :drop)
          default
          (when default

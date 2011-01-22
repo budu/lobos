@@ -19,7 +19,7 @@
                       AutoIncClause
                       CreateSchemaStatement
                       CreateTableStatement
-                      DataTypeExpression
+                      DataTypeClause
                       DropStatement
                       Identifier)
            (lobos.schema Column
@@ -132,7 +132,7 @@
   [identifier]
   (as-str (:value identifier)))
 
-(defmethod compile [:sqlite DataTypeExpression]
+(defmethod compile [:sqlite DataTypeClause]
   [expression]
   (let [{:keys [dtype args options]} expression
         {:keys [collate time-zone]} options]

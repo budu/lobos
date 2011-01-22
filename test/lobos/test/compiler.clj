@@ -16,7 +16,7 @@
                       ColumnDefinition
                       CreateTableStatement
                       CreateSchemaStatement
-                      DataTypeExpression
+                      DataTypeClause
                       DropStatement
                       ForeignKeyConstraintDefinition
                       UniqueConstraintDefinition
@@ -45,7 +45,7 @@
       "Compiling an auto-incrementing clause"))
 
 (def column-definition-stub
-  (let [data-type (DataTypeExpression. nil :integer nil nil)]
+  (let [data-type (DataTypeClause. nil :integer nil nil)]
     (ColumnDefinition. nil :foo data-type nil false false [])))
 
 (deftest test-compile-column-definition

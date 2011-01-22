@@ -15,14 +15,14 @@
   (:import (lobos.ast AlterRenameAction
                       AutoIncClause
                       CreateSchemaStatement
-                      DataTypeExpression
+                      DataTypeClause
                       DropStatement)))
 
 ;; -----------------------------------------------------------------------------
 
 ;; ## Compiler
 
-(defmethod compile [:h2 DataTypeExpression]
+(defmethod compile [:h2 DataTypeClause]
   [expression]
   (let [{:keys [dtype args options]} expression]
     (unsupported (= dtype :binary)

@@ -134,11 +134,11 @@
           (string? specification) (str "'" specification "'")
           :else specification)))
 
-;; `DataTypeExpression` instances are compiled with their `dtype`
+;; `DataTypeClause` instances are compiled with their `dtype`
 ;; property made into SQL keywords using the `as-sql-keyword`
 ;; function. If the data-type has an argument list, it will be passed
 ;; through the `as-list` function.
-(defmethod compile [::standard DataTypeExpression]
+(defmethod compile [::standard DataTypeClause]
   [expression]
   (let [{:keys [dtype args options]} expression
         {:keys [encoding collate time-zone]} options]

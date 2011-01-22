@@ -22,7 +22,7 @@
                       AlterRenameAction
                       AlterTableStatement
                       AutoIncClause
-                      DataTypeExpression
+                      DataTypeClause
                       DropStatement
                       Identifier)
            (lobos.schema DataType)))
@@ -80,7 +80,7 @@
    :nclob     :ntext
    :timestamp :datetime2})
 
-(defmethod compile [:sqlserver DataTypeExpression]
+(defmethod compile [:sqlserver DataTypeClause]
   [expression]
   (let [{:keys [dtype args options]} expression
         {:keys [collate time-zone]} options

@@ -16,7 +16,7 @@
         lobos.utils)
   (:import (lobos.ast AlterRenameAction
                       ColumnDefinition
-                      DataTypeExpression)
+                      DataTypeClause)
            (lobos.schema DataType)))
 
 ;; -----------------------------------------------------------------------------
@@ -58,7 +58,7 @@
    :nclob :text
    :nvarchar :varchar})
 
-(defmethod compile [:postgresql DataTypeExpression]
+(defmethod compile [:postgresql DataTypeClause]
   [expression]
   (let [{:keys [dtype args options]} expression
         {:keys [time-zone]} options
