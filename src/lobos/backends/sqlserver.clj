@@ -24,7 +24,7 @@
                       AutoIncClause
                       DataTypeClause
                       DropStatement
-                      Identifier)
+                      IdentifierExpression)
            (lobos.schema DataType)))
 
 ;; -----------------------------------------------------------------------------
@@ -63,7 +63,7 @@
 
 ;; ## Compiler
 
-(defmethod compile [:sqlserver Identifier]
+(defmethod compile [:sqlserver IdentifierExpression]
   [identifier]
   (let [{:keys [db-spec value level]} identifier
         schema (:schema db-spec)]

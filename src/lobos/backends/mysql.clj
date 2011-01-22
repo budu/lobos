@@ -69,7 +69,7 @@
 
 ;; ## Compiler
 
-(defmethod compile [:mysql Identifier]
+(defmethod compile [:mysql IdentifierExpression]
   [identifier]
   (let [{:keys [db-spec value level]} identifier
         schema (:schema db-spec)]

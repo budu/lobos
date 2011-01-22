@@ -46,11 +46,11 @@
 ;; ## Helpers
 
 (defn as-identifier
-  "Constructs an Identifier AST form and compiles it. Takes an optional
-  `level` argument to determine which qualification level to output,
-  only support `:schema` for now."
-  [db-spec name & [level]]
-  (compile (Identifier. db-spec name level)))
+  "Constructs an IdentifierExpression AST form and compiles it. Takes an
+  optional `level` argument to determine which qualification level to
+  output, only support `:schema` for now."
+  [db-spec name & [level qualifiers]]
+  (compile (IdentifierExpression. db-spec name level qualifiers)))
 
 (defn unsupported
   "Throws an UnsupportedOperationException using the given message. Can
@@ -113,7 +113,7 @@
 ;; In the standard, identifiers are delimited by double quotes. When the
 ;; `level` property is set to `:schema`, qualifies the resulting
 ;; identifier using the schema name found in the `db-spec property.
-(defmethod compile [::standard Identifier]
+(defmethod compile [::standard IdentifierExpression]
   [identifier]
   (let [{:keys [db-spec value level]} identifier
         schema (:schema db-spec)]

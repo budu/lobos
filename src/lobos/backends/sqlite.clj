@@ -21,7 +21,7 @@
                       CreateTableStatement
                       DataTypeClause
                       DropStatement
-                      Identifier)
+                      IdentifierExpression)
            (lobos.schema Column
                          DataType
                          ForeignKeyConstraint
@@ -128,7 +128,7 @@
 
 ;; ## Compiler
 
-(defmethod compile [:sqlite Identifier]
+(defmethod compile [:sqlite IdentifierExpression]
   [identifier]
   (as-str (:value identifier)))
 
