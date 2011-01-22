@@ -65,12 +65,12 @@
 
 (defmethod compile [:sqlserver IdentifierExpression]
   [identifier]
-  (let [{:keys [db-spec value level]} identifier
+  (let [{:keys [db-spec name level]} identifier
         schema (:schema db-spec)]
     (if (and (= level :schema) schema)
       (str (when schema (str (as-identifier db-spec schema) "."))
-           (as-identifier db-spec value))
-      (as-str \[ value \]))))
+           (as-identifier db-spec name))
+      (as-str \[ name \]))))
 
 (defvar- compiler-data-type-aliases
   {:blob      :image

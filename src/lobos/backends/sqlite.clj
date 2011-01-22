@@ -130,7 +130,7 @@
 
 (defmethod compile [:sqlite IdentifierExpression]
   [identifier]
-  (as-str (:value identifier)))
+  (as-str (:name identifier)))
 
 (defmethod compile [:sqlite DataTypeClause]
   [expression]

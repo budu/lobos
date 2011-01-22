@@ -115,12 +115,12 @@
 ;; identifier using the schema name found in the `db-spec property.
 (defmethod compile [::standard IdentifierExpression]
   [identifier]
-  (let [{:keys [db-spec value level]} identifier
+  (let [{:keys [db-spec name level]} identifier
         schema (:schema db-spec)]
     (if (and (= level :schema) schema)
       (str (when schema (str (as-identifier db-spec schema) "."))
-           (as-identifier db-spec value))
-      (as-str \" value \"))))
+           (as-identifier db-spec name))
+      (as-str \" name \"))))
 
 ;; ### Expressions
 
