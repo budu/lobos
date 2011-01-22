@@ -9,18 +9,10 @@
 (ns lobos.test.compiler
   (:refer-clojure :exclude [compile])
   (:use clojure.test
-        lobos.compiler)
-  (:import (lobos.ast AlterTableStatement
-                      AutoIncClause
-                      CheckConstraintDefinition
-                      ColumnDefinition
-                      CreateTableStatement
-                      CreateSchemaStatement
-                      DataTypeClause
-                      DropStatement
-                      ForeignKeyConstraintDefinition
-                      UniqueConstraintDefinition
-                      ValueExpression)))
+        lobos.compiler
+        lobos.ast))
+
+(import-all)
 
 ;;;; Helpers
 
