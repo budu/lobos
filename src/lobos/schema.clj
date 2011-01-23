@@ -121,9 +121,9 @@
                 (if (keyword? f)
                   (condp contains? (-> f name symbol)
                     sql-infix-operators
-                    (OperatorExpression. db-spec f (first n) (second n))
+                    (OperatorExpression. db-spec f (first n) (next n))
                     sql-prefix-operators
-                    (OperatorExpression. db-spec f nil (first n))
+                    (OperatorExpression. db-spec f nil n)
                     sql-functions
                     (FunctionExpression. db-spec f n))
                   %))

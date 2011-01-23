@@ -142,10 +142,15 @@
 (defmethod compile [::standard OperatorExpression]
   [operator]
   (let [{:keys [db-spec op left right]} operator]
-    (join \space
-          (compile left)
-          (as-sql-keyword op)
-          (compile right))))
+    (if (vector? (first right))
+      (str "("
+           (compile left) " "
+           (as-sql-keyword op) " "
+           (as-list (map compile (first right)))
+           ")")
+      (str "(" (apply join
+                      (str " " (as-sql-keyword op) " ")
+                      (map compile (conj right left))) ")"))))
 
 ;; `DataTypeClause` instances are compiled with their `dtype`
 ;; property made into SQL keywords using the `as-sql-keyword`
@@ -229,7 +234,7 @@
       "CONSTRAINT"
       (as-identifier db-spec cname)
       "CHECK"
-      (str "(" (compile condition) ")"))))
+      (compile condition))))
 
 ;; ### Create and Drop Statements
 
