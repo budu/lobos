@@ -24,6 +24,7 @@
                       AutoIncClause
                       DataTypeClause
                       DropStatement
+                      FunctionExpression
                       IdentifierExpression)
            (lobos.schema DataType
                          Expression)))
@@ -73,6 +74,15 @@
       (str (when schema (str (as-identifier db-spec schema) "."))
            (as-identifier db-spec name))
       (as-str \[ name \]))))
+
+(defmethod compile [:sqlserver FunctionExpression]
+  [function]
+  (let [{:keys [db-spec name args]} function
+        name (if (= name :length)
+               :len
+               name)]
+    (str (as-sql-keyword name)
+         (as-list (map compile args)))))
 
 (defvar- compiler-data-type-aliases
   {:blob      :image
