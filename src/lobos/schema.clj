@@ -102,7 +102,7 @@
      ;; numeric functions
      abs ceil floor mod
      ;; datetime functions
-     extract date time timestamp}
+     extract now current_date current_time current_timestamp}
   "A set of symbol representing SQL functions.")
 
 (defvar sql-symbols
@@ -321,11 +321,11 @@
   the specified data-type. *For internal use*."
   [dtype default]
   (let [value (:value default)]
-    (if (= value :now)
+    (if (= value [:now])
       (Expression.
-       (or ({:date :current_date
-             :time :current_time
-             :timestamp :current_timestamp} dtype) value))
+       (or ({:date [:current_date]
+             :time [:current_time]
+             :timestamp [:current_timestamp]} dtype) value))
       default)))
 
 ;; `Column` records can be constructed using the `column` function or
