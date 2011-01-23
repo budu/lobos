@@ -91,7 +91,7 @@ tables, here's a more complex example defining a complete schema:
     (defn datetime-tracked [table]
       (-> table
           (timestamp :updated_on)
-          (timestamp :created_on [:default :now])))
+          (timestamp :created_on (default (now)))))
     
     (defn refer-to [table ptable]
       (let [cname (-> (->> ptable name butlast (apply str))
@@ -109,7 +109,7 @@ tables, here's a more complex example defining a complete schema:
       
       (tabl :users
         (varchar :name 100 :unique)
-        (check :name (> :length/name 1)))
+        (check :name (> (length :name) 1)))
     
       (tabl :posts
         (varchar :title 200 :unique)
@@ -136,9 +136,9 @@ There also the `alter` action that let you manipulate tables:
                         (text :location)
                         (text :occupation)))
     #:lobos.schema.Schema{...}
-    user> (alter :add (table :comments (check :comment-limit (< :length/content 144))))
+    user> (alter :add (table :comments (check :comment-limit (< (length :content) 144))))
     #:lobos.schema.Schema{...}
-    user> (alter :modify (table :users (column :location [:default "Somewhere"])))
+    user> (alter :modify (table :users (column :location (default "Somewhere"))))
     #:lobos.schema.Schema{...}
     user> (alter :drop (table :users (column :occupation)))
     #:lobos.schema.Schema{...}
