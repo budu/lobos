@@ -16,14 +16,8 @@
 
 ;; ### Expression Records
 
-(defrecord ValueExpression
-  [db-spec specification])
-
 (defrecord ScalarExpression
   [db-spec scalar])
-
-(defrecord ListExpression
-  [db-spec values])
 
 (defrecord IdentifierExpression
   [db-spec name level qualifiers])
@@ -57,7 +51,7 @@
   [db-spec cname columns parent-table parent-columns match triggered-actions])
 
 (defrecord CheckConstraintDefinition
-  [db-spec cname condition identifiers])
+  [db-spec cname condition])
 
 ;; ### Statement Records
 
@@ -93,9 +87,7 @@
   "Import all expression AST records into the calling namespace."
   []
   (import
-   '(lobos.ast ValueExpression
-               ScalarExpression
-               ListExpression
+   '(lobos.ast ScalarExpression
                IdentifierExpression
                FunctionExpression
                OperatorExpression)))

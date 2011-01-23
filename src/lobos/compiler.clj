@@ -110,6 +110,17 @@
 ;; Compiling `Mode` instance returns nil by default.
 (defmethod compile [::standard Mode] [_] nil)
 
+;; ### Expressions
+
+;; Keywords will be made into SQL keywords using the `as-sql-keyword`
+;; function while strings will be properly delimited by single quotes.
+(defmethod compile [::standard ScalarExpression]
+  [expression]
+  (let [{:keys [scalar]} expression]
+    (cond (keyword? scalar) (str (as-sql-keyword scalar))
+          (string? scalar) (str "'" scalar "'")
+          :else scalar)))
+
 ;; In the standard, identifiers are delimited by double quotes. When the
 ;; `level` property is set to `:schema`, qualifies the resulting
 ;; identifier using the schema name found in the `db-spec property.
@@ -122,17 +133,19 @@
            (as-identifier db-spec name))
       (as-str \" name \"))))
 
-;; ### Expressions
+(defmethod compile [::standard FunctionExpression]
+  [function]
+  (let [{:keys [db-spec name args]} function]
+    (str (as-sql-keyword name)
+         (as-list args))))
 
-;; This is a simplified implementation, keywords will be made into SQL
-;; keywords using the `as-sql-keyword` function while strings will be
-;; properly delimited by single quotes.
-(defmethod compile [::standard ValueExpression]
-  [expression]
-  (let [{:keys [specification]} expression]
-    (cond (keyword? specification) (str (as-sql-keyword specification))
-          (string? specification) (str "'" specification "'")
-          :else specification)))
+(defmethod compile [::standard OperatorExpression]
+  [operator]
+  (let [{:keys [db-spec op left right]} operator]
+    (join \space
+          (compile left)
+          (as-sql-keyword op)
+          (compile right))))
 
 ;; `DataTypeClause` instances are compiled with their `dtype`
 ;; property made into SQL keywords using the `as-sql-keyword`
@@ -209,31 +222,14 @@
       (when (contains? triggered-actions :on-update)
         (str "ON UPDATE " (as-sql-keyword (:on-update triggered-actions)))))))
 
-;; `CheckConstraintDefinition` are using the output from ClojureQL
-;; predicates namespace, namely the APredicate record.
-
-;; It will use the `identifiers` property to go over that output and
-;; replace all mention of them using their properly delimited
-;; names. Only after that, it will replace `?` parameters by their
-;; corresponding values.
 (defmethod compile [::standard CheckConstraintDefinition]
   [definition]
-  (let [{:keys [db-spec cname condition identifiers]} definition
-        identifiers-re (re-pattern (apply join \| identifiers))
-        {:keys [stmt env]} condition
-        condition (replace (first stmt)
-                           identifiers-re
-                           #(as-identifier db-spec %))
-        condition (apply format
-                         (replace condition "?" "%s")
-                         (map #(if (string? %)
-                                 (str \' % \')
-                                 %) env))]
+  (let [{:keys [db-spec cname condition]} definition]
     (join \space
       "CONSTRAINT"
       (as-identifier db-spec cname)
       "CHECK"
-      condition)))
+      (compile condition))))
 
 ;; ### Create and Drop Statements
 

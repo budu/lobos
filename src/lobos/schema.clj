@@ -25,11 +25,11 @@
   definitons and the typed data definitions."
   (:refer-clojure :exclude [defonce replace
                             bigint boolean char double float time])
-  (:require clojureql.predicates
-            (lobos [ast :as ast]))
-  (:use (clojure [walk :only [postwalk-replace]]
+  (:require (lobos [ast :as ast]))
+  (:use (clojure [walk   :only [postwalk prewalk postwalk-replace]]
+                 [set    :only [union]]
                  [string :only [replace]])
-        (clojure.contrib [def :only [defalias]])
+        (clojure.contrib [def :only [defalias defvar]])
         lobos.utils))
 
 (ast/import-all)
@@ -80,6 +80,71 @@
   definition. *For internal use*."
   [o]
   (isa? (type o) ::definition))
+
+;; -----------------------------------------------------------------------------
+
+;; ## Expression Definitions
+
+(defvar sql-infix-operators
+  '#{;; math operators
+     + - * /
+     ;; boolean operators
+     < > <= >= = != or and in like}
+  "A set of symbol representing SQL infix operators.")
+
+(defvar sql-prefix-operators
+  '#{not}
+  "A set of symbol representing SQL prefix operators.")
+
+(defvar sql-functions
+  '#{;; string functions
+     length lower position replace str subs trim upper
+     ;; numeric functions
+     abs ceil floor mod
+     ;; datetime functions
+     extract date time timestamp}
+  "A set of symbol representing SQL functions.")
+
+(defvar sql-symbols
+  (union sql-infix-operators
+         sql-prefix-operators
+         sql-functions))
+
+(defrecord Expression [value]
+  Buildable
+
+  (build-definition [this db-spec]
+    (postwalk
+     #(do
+        (cond (vector? %)
+              (let [[f & n] %]
+                (if (keyword? f)
+                  (condp contains? (-> f name symbol)
+                    sql-infix-operators
+                    (OperatorExpression. db-spec f (first n) (second n))
+                    sql-prefix-operators
+                    (OperatorExpression. db-spec f nil (first n))
+                    sql-functions
+                    (FunctionExpression. db-spec f n))
+                  %))
+              (and (keyword? %)
+                   (not (contains? sql-symbols (-> % name symbol))))
+              (IdentifierExpression. db-spec % :column [])
+              (not (keyword? %))
+              (ScalarExpression. db-spec %)
+              :else %))
+     value)))
+
+(defmacro expression [form]
+  `(Expression.
+    ~(postwalk
+      #(if (and (seq? %)
+                (sql-symbols (first %)))
+         (apply vector
+                (keyword (first %))
+                (rest %))
+         %)
+      form)))
 
 ;; -----------------------------------------------------------------------------
 
@@ -199,50 +264,33 @@
 ;; `CheckConstraint` record can be constructed using the
 ;; `check` macro or the `chech*` function. *For internal use*.
 (defrecord CheckConstraint
-  [cname condition identifiers]
+  [cname condition]
   Buildable
 
   (build-definition [this db-spec]
     (CheckConstraintDefinition.
      db-spec
      cname
-     condition
-     identifiers)))
+     condition)))
 
 (defn check*
   "Constructs an abstract check constraint definition and add it to the
-  given table. The `constraint-name` argument is mandatory. For the
-  condition argument, see ClojureQL predicates namespace. Also a list of
-  identifiers used must be provided as keywords."
-  [table constraint-name condition identifiers]
+  given table. The `constraint-name` argument is mandatory."
+  [table constraint-name condition]
   (name-required constraint-name "check constraint")
   (update-in table [:constraints] conj
              [constraint-name
               (CheckConstraint. constraint-name
-                                condition
-                                identifiers)]))
+                                condition)]))
 
 (defmacro check
   "Constructs an abstract check constraint definition and add it to the
-  given table. Replace core predicates by custom one from ClojureQL
-  predicates namespace."
+  given table."
   [table constraint-name condition]
   `(check*
     ~table
     ~constraint-name
-    ~(postwalk-replace
-      '{=   clojureql.predicates/=*
-        !=  clojureql.predicates/!=*
-        <   clojureql.predicates/<*
-        >   clojureql.predicates/>*
-        <=  clojureql.predicates/<=*
-        >=  clojureql.predicates/>=*
-        and clojureql.predicates/and*
-        or  clojureql.predicates/or*
-        not clojureql.predicates/not*
-        in  clojureql.predicates/in}
-      condition)
-    ~(capture-keywords condition)))
+    (expression ~condition)))
 
 ;; -----------------------------------------------------------------------------
 
@@ -272,16 +320,18 @@
   function returning the current time, date or timestamp depending on
   the specified data-type. *For internal use*."
   [dtype default]
-  (if (= default :now)
-    (or ({:date :current_date
-          :time :current_time
-          :timestamp :current_timestamp} dtype) default)
-    default))
+  (let [value (:value default)]
+    (if (= value :now)
+      (Expression.
+       (or ({:date :current_date
+             :time :current_time
+             :timestamp :current_timestamp} dtype) value))
+      default)))
 
 ;; `Column` records can be constructed using the `column` function or
 ;; the more specific typed column functions. The `build-definition`
 ;; method will create the appropriate `DataTypeClause` for data-type
-;; definitions and `ValueExpression` for default values.
+;; definitions and `*Expression` AST for default values.
 ;; *For internal use*.
 (defrecord Column [cname data-type default auto-inc not-null others]
   Buildable
@@ -292,13 +342,16 @@
        db-spec
        cname
        (DataTypeClause. db-spec dtype args options)
-       (if (= default :drop)
-         default
+       (if (= (:value default) :drop)
+         :drop
          (when default
-           (ValueExpression. db-spec (datetime-now-alias dtype default))))
+           (datetime-now-alias dtype default)))
        (when auto-inc (AutoIncClause. db-spec))
        not-null
        others))))
+
+(defmacro default [form]
+  `[:default (expression ~form)])
 
 (defn column*
   "Constructs an abstract column definition. It'll parse the column
