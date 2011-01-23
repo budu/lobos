@@ -342,10 +342,12 @@
        db-spec
        cname
        (DataTypeClause. db-spec dtype args options)
-       (if (= (:value default) :drop)
+       (if (= default :drop)
          :drop
          (when default
-           (datetime-now-alias dtype default)))
+           (build-definition
+            (datetime-now-alias dtype default)
+            db-spec)))
        (when auto-inc (AutoIncClause. db-spec))
        not-null
        others))))
