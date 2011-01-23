@@ -25,18 +25,20 @@
                       DataTypeClause
                       DropStatement
                       IdentifierExpression)
-           (lobos.schema DataType)))
+           (lobos.schema DataType
+                         Expression)))
 
 ;; -----------------------------------------------------------------------------
 
 ;; ## Analyzer
 
-(defmethod analyze [:microsoft-sql-server nil]
+(defmethod analyze [:microsoft-sql-server Expression]
   [_ expr]
   (when expr
-    (cond (re-find #"^\(\((\d+)\)\)$" expr)
-          (let [[[_ n]] (re-seq #"(\w+)(\(\))?" expr)]
-            (Integer/parseInt n)))))
+    (Expression.
+     (cond (re-find #"^\(\((\d+)\)\)$" expr)
+           (let [[[_ n]] (re-seq #"(\w+)(\(\))?" expr)]
+             (Integer/parseInt n))))))
 
 (defvar- analyzer-data-type-aliases
   {:bit :boolean

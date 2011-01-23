@@ -16,6 +16,7 @@
         lobos.utils)
   (:import (java.sql DatabaseMetaData)
            (lobos.schema Column
+                         Expression
                          ForeignKeyConstraint
                          DataType
                          Schema
@@ -46,17 +47,18 @@
 
 ;; ## Default Analyzer
 
-(defmethod analyze [::standard nil]
+(defmethod analyze [::standard Expression]
   [_ expr]
   (when expr
-    (cond (re-find #"^(.*)::(.*)$" expr)
-          (let [[_ & [value dtype]] (first (re-seq #"(.*)::(.*)" expr))]
-            (read-string (replace (str value) \' \"))) ;; HACK: to replace!
-          (re-find #"^\d+$" expr) (Integer/parseInt expr)
-          (re-find #"^(\w+)(\(\))?$" expr)
-          (let [[[_ func]] (re-seq #"(\w+)(\(\))?" expr)]
-            (keyword func))
-          :else (str expr))))
+    (Expression.
+     (cond (re-find #"^(.*)::(.*)$" expr)
+           (let [[_ & [value dtype]] (first (re-seq #"(.*)::(.*)" expr))]
+             (read-string (replace (str value) \' \"))) ;; HACK: to replace!
+           (re-find #"^\d+$" expr) (Integer/parseInt expr)
+           (re-find #"^(\w+)(\(\))?$" expr)
+           (let [[[_ func]] (re-seq #"(\w+)(\(\))?" expr)]
+             (keyword func))
+           :else (str expr)))))
 
 (defmethod analyze [::standard UniqueConstraint]
   [_ sname tname cname index-meta]
@@ -129,7 +131,7 @@
     (Column. (-> column-meta :column_name keyword)
              (analyze DataType column-meta)
              (when-not auto-inc
-               (analyze nil (:column_def column-meta)))
+               (analyze Expression (:column_def column-meta)))
              auto-inc
              (= (:is_nullable column-meta) "NO")
              [])))
