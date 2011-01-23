@@ -97,12 +97,12 @@
   (is (= (-> (table :foo (check :bar (and (> :a 1) (< :a 10)
                                           (or (= :b "foo")
                                               (= :b "bar"))
-                                          (in :ab 1 2 3)))) :constraints :bar)
+                                          (in :ab [1 2 3])))) :constraints :bar)
          (CheckConstraint. :bar
                            (expression (and (> :a 1) (< :a 10)
                                             (or (= :b "foo")
                                                 (= :b "bar"))
-                                            (in :ab 1 2 3)))))
+                                            (in :ab [1 2 3])))))
       "Complex check constraint definition"))
 
 ;;;; Column definition tests
