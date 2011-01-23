@@ -271,7 +271,7 @@
     (CheckConstraintDefinition.
      db-spec
      cname
-     condition)))
+     (build-definition condition db-spec))))
 
 (defn check*
   "Constructs an abstract check constraint definition and add it to the
