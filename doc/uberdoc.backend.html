@@ -2526,7 +2526,7 @@ $(document).ready(function() {
   color: #2a00ff !important;
 }
 </style><style type="text/css">html{margin:0;padding:0;}h1{margin:0;padding:0;}h2{margin:0;padding:0;}h3{margin:0;padding:0;}h4{margin:0;padding:0;}a{color:#261A3B;}a:visited{color:#261A3B;}</style><style type="text/css">.header{margin-top:30px;}h1.project-name{font-size:34px;display:inline;}h2.project-version{font-size:18px;margin-top:0;display:inline;margin-left:10px;}.toc-link{font-size:12px;margin-left:10px;color:#252519;text-decoration:none;}.toc-link:hover{color:#5050A6;}.toc h1{font-size:34px;margin:0;}.docs-header{border-bottom:dotted #aaa 1px;padding-bottom:10px;margin-bottom:25px;}.toc h1{font-size:24px;}.toc{border-bottom:solid #bbb 1px;margin-bottom:40px;}.toc ul{margin-left:20px;padding-left:0px;padding-top:0;margin-top:0;}.toc li{list-style-type:none;padding-left:0;}.dependencies{}.dependencies table{font-size:16px;width:99.99%;border:none;margin-left:20px;}.dependencies td{padding-right:20px;;white-space:nowrap;}.dependencies .dotted{width:99%;}.dependencies .dotted hr{margin-bottom:-6px;noshade:noshade;border-top:none;color:transparent;border-left:none;border-bottom:dotted #bbb 1px;border-right:none;background-color:transparent;height:0;}.dependencies .dep-version{text-align:right;}.plugins ul{margin-left:20px;padding-left:0px;padding-top:0;margin-top:0;}.plugins li{list-style-type:none;padding-left:0;}.header p{margin-left:20px;}</style><style type="text/css">#floating-toc{position:fixed;top:10px;right:20px;height:20px;overflow:hidden;text-align:right;}#floating-toc li{list-style-type:none;margin:0;padding:0;}</style><style type="text/css">body{margin:0;padding:0;font-family:'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;;font-size:16px;color:#252519;}h1{font-size:20px;margin-top:0;}a.anchor{text-decoration:none;color:#252519;}a.anchor:hover{color:#5050A6;}table{border-spacing:0;border-bottom:solid #ddd 1px;;margin-bottom:10px;}code{display:inline;}p{margin-top:8px;}tr{margin:0px;padding:0px;}td.docs{width:410px;max-width:410px;vertical-align:top;margin:0px;padding-left:55px;padding-right:20px;border:none;}td.docs pre{font-size:12px;overflow:hidden;}td.codes{border:none;margin:0px;padding-left:20px;width:55%;border-left:solid #E5E5EE 1px;font-size:10pt;vertical-align:top;overflow:hidden;background-color:#F5F5FF;}td.spacer{padding-bottom:40px;}pre code{display:block;padding:4px;}code{background-color:ghostWhite;border:solid #DEDEDE 1px;padding-left:3px;padding-right:3px;font-size:14px;}.syntaxhighlighter code{font-size:13px;}.footer{text-align:center;}</style><title>lobos -- Marginalia</title></head><body><table><tr><td class="docs"><div class="header"><h1 class="project-name">lobos</h1><h2 class="project-version">0.6.0-SNAPSHOT</h2><br /><p>A library to create and manipulate SQL database schemas.</p>
-</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.2.0</td></tr><tr><td class="dep-name">org.clojure/clojure-contrib</td><td class="dotted"><hr /></td><td class="dep-version">1.2.0</td></tr><tr><td class="dep-name">lobos/clojureql</td><td class="dotted"><hr /></td><td class="dep-version">1.1.0-SNAPSHOT</td></tr></table></div><div class="dependencies"><h3>dev dependencies</h3><table><tr><td class="dep-name">swank-clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.2.1</td></tr><tr><td class="dep-name">lein-clojars</td><td class="dotted"><hr /></td><td class="dep-version">0.6.0</td></tr><tr><td class="dep-name">marginalia</td><td class="dotted"><hr /></td><td class="dep-version">0.5.0-alpha</td></tr><tr><td class="dep-name">cljss</td><td class="dotted"><hr /></td><td class="dep-version">0.1.1</td></tr><tr><td class="dep-name">hiccup</td><td class="dotted"><hr /></td><td class="dep-version">0.3.1</td></tr><tr><td class="dep-name">clj-help</td><td class="dotted"><hr /></td><td class="dep-version">0.2.0</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#lobos.compiler">lobos.compiler</a></li><li><a href="#lobos.backends.h2">lobos.backends.h2</a></li><li><a href="#lobos.backends.mysql">lobos.backends.mysql</a></li><li><a href="#lobos.backends.postgresql">lobos.backends.postgresql</a></li><li><a href="#lobos.backends.sqlite">lobos.backends.sqlite</a></li><li><a href="#lobos.backends.sqlserver">lobos.backends.sqlserver</a></li><li><a href="#lobos.ast">lobos.ast</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#lobos.compiler" name="lobos.compiler"><h1 class="project-name">lobos.compiler</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>This namespace include the <code>compile</code> multimethod, a default
+</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.2.0</td></tr><tr><td class="dep-name">org.clojure/clojure-contrib</td><td class="dotted"><hr /></td><td class="dep-version">1.2.0</td></tr></table></div><div class="dependencies"><h3>dev dependencies</h3><table><tr><td class="dep-name">clojureql</td><td class="dotted"><hr /></td><td class="dep-version">1.1.0-SNAPSHOT</td></tr><tr><td class="dep-name">swank-clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.2.1</td></tr><tr><td class="dep-name">lein-clojars</td><td class="dotted"><hr /></td><td class="dep-version">0.6.0</td></tr><tr><td class="dep-name">marginalia</td><td class="dotted"><hr /></td><td class="dep-version">0.5.0-alpha</td></tr><tr><td class="dep-name">cljss</td><td class="dotted"><hr /></td><td class="dep-version">0.1.1</td></tr><tr><td class="dep-name">hiccup</td><td class="dotted"><hr /></td><td class="dep-version">0.3.1</td></tr><tr><td class="dep-name">clj-help</td><td class="dotted"><hr /></td><td class="dep-version">0.2.0</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#lobos.compiler">lobos.compiler</a></li><li><a href="#lobos.backends.h2">lobos.backends.h2</a></li><li><a href="#lobos.backends.mysql">lobos.backends.mysql</a></li><li><a href="#lobos.backends.postgresql">lobos.backends.postgresql</a></li><li><a href="#lobos.backends.sqlite">lobos.backends.sqlite</a></li><li><a href="#lobos.backends.sqlserver">lobos.backends.sqlserver</a></li><li><a href="#lobos.ast">lobos.ast</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#lobos.compiler" name="lobos.compiler"><h1 class="project-name">lobos.compiler</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>This namespace include the <code>compile</code> multimethod, a default
   implementation based on the SQL standard and some helpers
   functions. The compiler works on an AST defined in the <code>lobos.ast</code>
   namespace. Database specific implementations can be found in the
@@ -2554,12 +2554,12 @@ default standard compiler.</p>
      (type o)])
   :hierarchy backends-hierarchy)</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Helpers</h2>
-</td><td class="codes" /></tr><tr><td class="docs"><p>Constructs an Identifier AST form and compiles it. Takes an optional
-  <code>level</code> argument to determine which qualification level to output,
-  only support <code>:schema</code> for now.</p>
+</td><td class="codes" /></tr><tr><td class="docs"><p>Constructs an IdentifierExpression AST form and compiles it. Takes an
+  optional <code>level</code> argument to determine which qualification level to
+  output, only support <code>:schema</code> for now.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defn as-identifier
-  [db-spec name & [level]]
-  (compile (Identifier. db-spec name level)))</pre></tr><tr><td class="docs"><p>Throws an UnsupportedOperationException using the given message. Can
+  [db-spec name & [level qualifiers]]
+  (compile (IdentifierExpression. db-spec name level qualifiers)))</pre></tr><tr><td class="docs"><p>Throws an UnsupportedOperationException using the given message. Can
   be given a test, in which case it throw an exception only if it's
   true.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defn unsupported
@@ -2602,30 +2602,46 @@ default standard compiler.</p>
 </td><td class="codes" /></tr><tr><td class="docs"><p>The default compiler is based on the SQL standard and does not prefer
 any particular implementation.</p>
 </td><td class="codes" /></tr><tr><td class="docs"><p>Compiling <code>Mode</code> instance returns nil by default.</p>
-</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard Mode] [_] nil)</pre></tr><tr><td class="docs"><p>In the standard, identifiers are delimited by double quotes. When the
+</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard Mode] [_] nil)</pre></tr><tr><td class="docs"><h3>Expressions</h3>
+</td><td class="codes" /></tr><tr><td class="docs"><p>Keywords will be made into SQL keywords using the <code>as-sql-keyword</code>
+function while strings will be properly delimited by single quotes.</p>
+</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard ScalarExpression]
+  [expression]
+  (let [{:keys [scalar]} expression]
+    (cond (keyword? scalar) (str (as-sql-keyword scalar))
+          (string? scalar) (str "'" scalar "'")
+          :else scalar)))</pre></tr><tr><td class="docs"><p>In the standard, identifiers are delimited by double quotes. When the
 <code>level</code> property is set to <code>:schema</code>, qualifies the resulting
 identifier using the schema name found in the `db-spec property.</p>
-</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard Identifier]
+</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard IdentifierExpression]
   [identifier]
-  (let [{:keys [db-spec value level]} identifier
+  (let [{:keys [db-spec name level]} identifier
         schema (:schema db-spec)]
     (if (and (= level :schema) schema)
       (str (when schema (str (as-identifier db-spec schema) "."))
-           (as-identifier db-spec value))
-      (as-str \" value \"))))</pre></tr><tr><td class="docs"><h3>Expressions</h3>
-</td><td class="codes" /></tr><tr><td class="docs"><p>This is a simplified implementation, keywords will be made into SQL
-keywords using the <code>as-sql-keyword</code> function while strings will be
-properly delimited by single quotes.</p>
-</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard ValueExpression]
-  [expression]
-  (let [{:keys [specification]} expression]
-    (cond (keyword? specification) (str (as-sql-keyword specification))
-          (string? specification) (str "'" specification "'")
-          :else specification)))</pre></tr><tr><td class="docs"><p><code>DataTypeExpression</code> instances are compiled with their <code>dtype</code>
+           (as-identifier db-spec name))
+      (as-str \" name \"))))</pre></tr><tr><td class="docs">
+</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard FunctionExpression]
+  [function]
+  (let [{:keys [db-spec name args]} function]
+    (str (as-sql-keyword name)
+         (as-list (map compile args)))))</pre></tr><tr><td class="docs">
+</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard OperatorExpression]
+  [operator]
+  (let [{:keys [db-spec op left right]} operator]
+    (if (vector? (first right))
+      (str "("
+           (compile left) " "
+           (as-sql-keyword op) " "
+           (as-list (map compile (first right)))
+           ")")
+      (str "(" (apply join
+                      (str " " (as-sql-keyword op) " ")
+                      (map compile (conj right left))) ")"))))</pre></tr><tr><td class="docs"><p><code>DataTypeClause</code> instances are compiled with their <code>dtype</code>
 property made into SQL keywords using the <code>as-sql-keyword</code>
 function. If the data-type has an argument list, it will be passed
 through the <code>as-list</code> function.</p>
-</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard DataTypeExpression]
+</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard DataTypeClause]
   [expression]
   (let [{:keys [dtype args options]} expression
         {:keys [encoding collate time-zone]} options]
@@ -2685,30 +2701,15 @@ actions.</p>
       (when (contains? triggered-actions :on-delete)
         (str "ON DELETE " (as-sql-keyword (:on-delete triggered-actions))))
       (when (contains? triggered-actions :on-update)
-        (str "ON UPDATE " (as-sql-keyword (:on-update triggered-actions)))))))</pre></tr><tr><td class="docs"><p><code>CheckConstraintDefinition</code> are using the output from ClojureQL
-predicates namespace, namely the APredicate record.</p>
-</td><td class="codes" /></tr><tr><td class="docs"><p>It will use the <code>identifiers</code> property to go over that output and
-replace all mention of them using their properly delimited
-names. Only after that, it will replace <code>?</code> parameters by their
-corresponding values.</p>
+        (str "ON UPDATE " (as-sql-keyword (:on-update triggered-actions)))))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard CheckConstraintDefinition]
   [definition]
-  (let [{:keys [db-spec cname condition identifiers]} definition
-        identifiers-re (re-pattern (apply join \| identifiers))
-        {:keys [stmt env]} condition
-        condition (replace (first stmt)
-                           identifiers-re
-                           #(as-identifier db-spec %))
-        condition (apply format
-                         (replace condition "?" "%s")
-                         (map #(if (string? %)
-                                 (str \' % \')
-                                 %) env))]
+  (let [{:keys [db-spec cname condition]} definition]
     (join \space
       "CONSTRAINT"
       (as-identifier db-spec cname)
       "CHECK"
-      condition)))</pre></tr><tr><td class="docs"><h3>Create and Drop Statements</h3>
+      (compile condition))))</pre></tr><tr><td class="docs"><h3>Create and Drop Statements</h3>
 </td><td class="codes" /></tr><tr><td class="docs"><p>The default create statement will extract all foreign key constraint
 from its create table statements to be added afterward using alter
 add statements.</p>
@@ -2796,11 +2797,11 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
   (:import (lobos.ast AlterRenameAction
                       AutoIncClause
                       CreateSchemaStatement
-                      DataTypeExpression
+                      DataTypeClause
                       DropStatement)))</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Compiler</h2>
 </td><td class="codes" /></tr><tr><td class="docs">
-</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:h2 DataTypeExpression]
+</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:h2 DataTypeClause]
   [expression]
   (let [{:keys [dtype args options]} expression]
     (unsupported (= dtype :binary)
@@ -2903,18 +2904,18 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
       (.getColumns (db-meta) (name sname) nil (name tname) (name cname))))))</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Compiler</h2>
 </td><td class="codes" /></tr><tr><td class="docs">
-</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:mysql Identifier]
+</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:mysql IdentifierExpression]
   [identifier]
-  (let [{:keys [db-spec value level]} identifier
+  (let [{:keys [db-spec name level]} identifier
         schema (:schema db-spec)]
     (if (and (= level :schema) schema)
       (str (when schema (str (as-identifier db-spec schema) "."))
-           (as-identifier db-spec value))
-      (as-str \` value \`))))</pre></tr><tr><td class="docs">
+           (as-identifier db-spec name))
+      (as-str \` name \`))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defvar- compiler-data-type-aliases
   {:clob :text
    :nclob :text})</pre></tr><tr><td class="docs">
-</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:mysql DataTypeExpression]
+</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:mysql DataTypeClause]
   [expression]
   (let [{:keys [dtype args options]} expression
         {:keys [encoding collate]} options
@@ -2989,7 +2990,7 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
         lobos.utils)
   (:import (lobos.ast AlterRenameAction
                       ColumnDefinition
-                      DataTypeExpression)
+                      DataTypeClause)
            (lobos.schema DataType)))</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Analyzer</h2>
 </td><td class="codes" /></tr><tr><td class="docs">
@@ -3023,7 +3024,7 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
    :double :double-precision
    :nclob :text
    :nvarchar :varchar})</pre></tr><tr><td class="docs">
-</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:postgresql DataTypeExpression]
+</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:postgresql DataTypeClause]
   [expression]
   (let [{:keys [dtype args options]} expression
         {:keys [time-zone]} options
@@ -3064,9 +3065,9 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
                       AutoIncClause
                       CreateSchemaStatement
                       CreateTableStatement
-                      DataTypeExpression
+                      DataTypeClause
                       DropStatement
-                      Identifier)
+                      IdentifierExpression)
            (lobos.schema Column
                          DataType
                          ForeignKeyConstraint
@@ -3159,10 +3160,10 @@ I'll use Contrib or ClojureQL...</p>
                                        (analyze-foreign-keys tname))))))</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Compiler</h2>
 </td><td class="codes" /></tr><tr><td class="docs">
-</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:sqlite Identifier]
+</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:sqlite IdentifierExpression]
   [identifier]
-  (as-str (:value identifier)))</pre></tr><tr><td class="docs">
-</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:sqlite DataTypeExpression]
+  (as-str (:name identifier)))</pre></tr><tr><td class="docs">
+</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:sqlite DataTypeClause]
   [expression]
   (let [{:keys [dtype args options]} expression
         {:keys [collate time-zone]} options]
@@ -3209,18 +3210,21 @@ I'll use Contrib or ClojureQL...</p>
                       AlterRenameAction
                       AlterTableStatement
                       AutoIncClause
-                      DataTypeExpression
+                      DataTypeClause
                       DropStatement
-                      Identifier)
-           (lobos.schema DataType)))</pre></tr><tr><td class="docs"><hr />
+                      FunctionExpression
+                      IdentifierExpression)
+           (lobos.schema DataType
+                         Expression)))</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Analyzer</h2>
 </td><td class="codes" /></tr><tr><td class="docs">
-</td><td class="codes" /><pre class="brush: clojure">(defmethod analyze [:microsoft-sql-server nil]
+</td><td class="codes" /><pre class="brush: clojure">(defmethod analyze [:microsoft-sql-server Expression]
   [_ expr]
   (when expr
-    (cond (re-find #"^\(\((\d+)\)\)$" expr)
-          (let [[[_ n]] (re-seq #"(\w+)(\(\))?" expr)]
-            (Integer/parseInt n)))))</pre></tr><tr><td class="docs">
+    (Expression.
+     (cond (re-find #"^\(\((\d+)\)\)$" expr)
+           (let [[[_ n]] (re-seq #"(\w+)(\(\))?" expr)]
+             (Integer/parseInt n))))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defvar- analyzer-data-type-aliases
   {:bit :boolean
    :datetime2 :timestamp
@@ -3242,14 +3246,22 @@ I'll use Contrib or ClojureQL...</p>
      options)))</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Compiler</h2>
 </td><td class="codes" /></tr><tr><td class="docs">
-</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:sqlserver Identifier]
+</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:sqlserver IdentifierExpression]
   [identifier]
-  (let [{:keys [db-spec value level]} identifier
+  (let [{:keys [db-spec name level]} identifier
         schema (:schema db-spec)]
     (if (and (= level :schema) schema)
       (str (when schema (str (as-identifier db-spec schema) "."))
-           (as-identifier db-spec value))
-      (as-str \[ value \]))))</pre></tr><tr><td class="docs">
+           (as-identifier db-spec name))
+      (as-str \[ name \]))))</pre></tr><tr><td class="docs">
+</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:sqlserver FunctionExpression]
+  [function]
+  (let [{:keys [db-spec name args]} function
+        name (if (= name :length)
+               :len
+               name)]
+    (str (as-sql-keyword name)
+         (as-list (map compile args)))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defvar- compiler-data-type-aliases
   {:blob      :image
    :boolean   :bit
@@ -3257,7 +3269,7 @@ I'll use Contrib or ClojureQL...</p>
    :double    :float
    :nclob     :ntext
    :timestamp :datetime2})</pre></tr><tr><td class="docs">
-</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:sqlserver DataTypeExpression]
+</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:sqlserver DataTypeClause]
   [expression]
   (let [{:keys [dtype args options]} expression
         {:keys [collate time-zone]} options
@@ -3271,25 +3283,7 @@ I'll use Contrib or ClojureQL...</p>
       (str (as-sql-keyword dtype) (as-list args))
       (when collate (str "COLLATE " (as-str collate))))))</pre></tr><tr><td class="docs"><p>IDENTITY</p>
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:sqlserver AutoIncClause]
-  [_])</pre></tr><tr><td class="docs"><p>HACK: quick fix for len function</p>
-</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:sqlserver lobos.ast.CheckConstraintDefinition]
-  [definition]
-  (let [{:keys [db-spec cname condition identifiers]} definition
-        identifiers-re (re-pattern (apply join \| identifiers))
-        {:keys [stmt env]} condition
-        condition (clojure.string/replace (first stmt)
-                                          identifiers-re
-                                          #(as-identifier db-spec %))
-        condition (apply format
-                         (.replace condition "?" "%s")
-                         (map #(if (string? %)
-                                 (str \' % \')
-                                 %) env))]
-    (join \space
-      "CONSTRAINT"
-      (as-identifier db-spec cname)
-      "CHECK"
-      (.replace condition "length" "len"))))</pre></tr><tr><td class="docs">
+  [_])</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:sqlserver DropStatement]
   [statement]
   (let [{:keys [db-spec otype oname behavior]} statement
@@ -3353,20 +3347,21 @@ I'll use Contrib or ClojureQL...</p>
 </td><td class="codes" /><pre class="brush: clojure">(ns lobos.ast)</pre></tr><tr><td class="docs"><h3>Special Records</h3>
 </td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defrecord Mode
-  [db-spec])</pre></tr><tr><td class="docs"><h3>Atomic Records</h3>
+  [db-spec])</pre></tr><tr><td class="docs"><h3>Expression Records</h3>
 </td><td class="codes" /></tr><tr><td class="docs">
-</td><td class="codes" /><pre class="brush: clojure">(defrecord Identifier
-  [db-spec value level])</pre></tr><tr><td class="docs">
-</td><td class="codes" /><pre class="brush: clojure">(defrecord Literal
-  [db-spec value])</pre></tr><tr><td class="docs"><h3>Expression Records</h3>
-</td><td class="codes" /></tr><tr><td class="docs">
-</td><td class="codes" /><pre class="brush: clojure">(defrecord DataTypeExpression
-  [db-spec dtype args options])</pre></tr><tr><td class="docs"><p>Not going down the rabbit hole yet!</p>
-</td><td class="codes" /><pre class="brush: clojure">(defrecord ValueExpression
-  [db-spec specification])</pre></tr><tr><td class="docs"><h3>Clause Records</h3>
+</td><td class="codes" /><pre class="brush: clojure">(defrecord ScalarExpression
+  [db-spec scalar])</pre></tr><tr><td class="docs">
+</td><td class="codes" /><pre class="brush: clojure">(defrecord IdentifierExpression
+  [db-spec name level qualifiers])</pre></tr><tr><td class="docs">
+</td><td class="codes" /><pre class="brush: clojure">(defrecord FunctionExpression
+  [db-spec name args])</pre></tr><tr><td class="docs">
+</td><td class="codes" /><pre class="brush: clojure">(defrecord OperatorExpression
+  [db-spec op left right])</pre></tr><tr><td class="docs"><h3>Clause Records</h3>
 </td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defrecord AutoIncClause
-  [db-spec])</pre></tr><tr><td class="docs"><h3>Definition Records</h3>
+  [db-spec])</pre></tr><tr><td class="docs">
+</td><td class="codes" /><pre class="brush: clojure">(defrecord DataTypeClause
+  [db-spec dtype args options])</pre></tr><tr><td class="docs"><h3>Definition Records</h3>
 </td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defrecord ColumnDefinition
   [db-spec cname data-type default auto-inc not-null others])</pre></tr><tr><td class="docs">
@@ -3377,7 +3372,7 @@ I'll use Contrib or ClojureQL...</p>
 </td><td class="codes" /><pre class="brush: clojure">(defrecord ForeignKeyConstraintDefinition
   [db-spec cname columns parent-table parent-columns match triggered-actions])</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defrecord CheckConstraintDefinition
-  [db-spec cname condition identifiers])</pre></tr><tr><td class="docs"><h3>Statement Records</h3>
+  [db-spec cname condition])</pre></tr><tr><td class="docs"><h3>Statement Records</h3>
 </td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defrecord CreateSchemaStatement
   [db-spec sname elements])</pre></tr><tr><td class="docs">
@@ -3396,27 +3391,47 @@ I'll use Contrib or ClojureQL...</p>
   [db-spec element])</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defrecord AlterRenameAction
   [db-spec element])</pre></tr><tr><td class="docs"><h2>Helpers</h2>
-</td><td class="codes" /></tr><tr><td class="docs"><p>Import all AST record into the calling namespace.</p>
-</td><td class="codes" /><pre class="brush: clojure">(defn import-all
+</td><td class="codes" /></tr><tr><td class="docs"><p>Import all expression AST records into the calling namespace.</p>
+</td><td class="codes" /><pre class="brush: clojure">(defn import-expressions
+  []
+  (import
+   '(lobos.ast ScalarExpression
+               IdentifierExpression
+               FunctionExpression
+               OperatorExpression)))</pre></tr><tr><td class="docs"><p>Import all clause AST records into the calling namespace.</p>
+</td><td class="codes" /><pre class="brush: clojure">(defn import-clauses
+  []
+  (import
+   '(lobos.ast AutoIncClause
+               DataTypeClause)))</pre></tr><tr><td class="docs"><p>Import all definition AST records into the calling namespace.</p>
+</td><td class="codes" /><pre class="brush: clojure">(defn import-definitions
+  []
+  (import
+   '(lobos.ast ColumnDefinition
+               ConstraintDefinition
+               UniqueConstraintDefinition
+               ForeignKeyConstraintDefinition
+               CheckConstraintDefinition)))</pre></tr><tr><td class="docs"><p>Import all statement AST records into the calling namespace.</p>
+</td><td class="codes" /><pre class="brush: clojure">(defn import-statements
+  []
+  (import
+   '(lobos.ast CreateSchemaStatement
+               CreateTableStatement
+               DropStatement
+               AlterTableStatement)))</pre></tr><tr><td class="docs"><p>Import all action AST records into the calling namespace.</p>
+</td><td class="codes" /><pre class="brush: clojure">(defn import-actions
   []
   (import
    '(lobos.ast AlterAddAction
                AlterDropAction
                AlterModifyAction
-               AlterRenameAction
-               AlterTableStatement
-               AutoIncClause
-               CheckConstraintDefinition
-               ColumnDefinition
-               ConstraintDefinition
-               CreateTableStatement
-               CreateSchemaStatement
-               DataTypeExpression
-               DropStatement
-               ForeignKeyConstraintDefinition
-               Identifier
-               Literal
-               Mode
-               UniqueConstraintDefinition
-               ValueExpression)))</pre></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a><div id="floating-toc"><ul><li class="floating-toc-li" id="floating-toc_lobos.compiler">lobos.compiler</li><li class="floating-toc-li" id="floating-toc_lobos.backends.h2">lobos.backends.h2</li><li class="floating-toc-li" id="floating-toc_lobos.backends.mysql">lobos.backends.mysql</li><li class="floating-toc-li" id="floating-toc_lobos.backends.postgresql">lobos.backends.postgresql</li><li class="floating-toc-li" id="floating-toc_lobos.backends.sqlite">lobos.backends.sqlite</li><li class="floating-toc-li" id="floating-toc_lobos.backends.sqlserver">lobos.backends.sqlserver</li><li class="floating-toc-li" id="floating-toc_lobos.ast">lobos.ast</li></ul></div></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
+               AlterRenameAction)))</pre></tr><tr><td class="docs"><p>Import all AST records into the calling namespace.</p>
+</td><td class="codes" /><pre class="brush: clojure">(defn import-all
+  []
+  (import '(lobos.ast Mode))
+  (import-expressions)
+  (import-clauses)
+  (import-definitions)
+  (import-statements)
+  (import-actions))</pre></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a><div id="floating-toc"><ul><li class="floating-toc-li" id="floating-toc_lobos.compiler">lobos.compiler</li><li class="floating-toc-li" id="floating-toc_lobos.backends.h2">lobos.backends.h2</li><li class="floating-toc-li" id="floating-toc_lobos.backends.mysql">lobos.backends.mysql</li><li class="floating-toc-li" id="floating-toc_lobos.backends.postgresql">lobos.backends.postgresql</li><li class="floating-toc-li" id="floating-toc_lobos.backends.sqlite">lobos.backends.sqlite</li><li class="floating-toc-li" id="floating-toc_lobos.backends.sqlserver">lobos.backends.sqlserver</li><li class="floating-toc-li" id="floating-toc_lobos.ast">lobos.ast</li></ul></div></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
        SyntaxHighlighter.all()</script></body></html>

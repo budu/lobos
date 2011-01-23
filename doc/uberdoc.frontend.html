@@ -2526,7 +2526,7 @@ $(document).ready(function() {
   color: #2a00ff !important;
 }
 </style><style type="text/css">html{margin:0;padding:0;}h1{margin:0;padding:0;}h2{margin:0;padding:0;}h3{margin:0;padding:0;}h4{margin:0;padding:0;}a{color:#261A3B;}a:visited{color:#261A3B;}</style><style type="text/css">.header{margin-top:30px;}h1.project-name{font-size:34px;display:inline;}h2.project-version{font-size:18px;margin-top:0;display:inline;margin-left:10px;}.toc-link{font-size:12px;margin-left:10px;color:#252519;text-decoration:none;}.toc-link:hover{color:#5050A6;}.toc h1{font-size:34px;margin:0;}.docs-header{border-bottom:dotted #aaa 1px;padding-bottom:10px;margin-bottom:25px;}.toc h1{font-size:24px;}.toc{border-bottom:solid #bbb 1px;margin-bottom:40px;}.toc ul{margin-left:20px;padding-left:0px;padding-top:0;margin-top:0;}.toc li{list-style-type:none;padding-left:0;}.dependencies{}.dependencies table{font-size:16px;width:99.99%;border:none;margin-left:20px;}.dependencies td{padding-right:20px;;white-space:nowrap;}.dependencies .dotted{width:99%;}.dependencies .dotted hr{margin-bottom:-6px;noshade:noshade;border-top:none;color:transparent;border-left:none;border-bottom:dotted #bbb 1px;border-right:none;background-color:transparent;height:0;}.dependencies .dep-version{text-align:right;}.plugins ul{margin-left:20px;padding-left:0px;padding-top:0;margin-top:0;}.plugins li{list-style-type:none;padding-left:0;}.header p{margin-left:20px;}</style><style type="text/css">#floating-toc{position:fixed;top:10px;right:20px;height:20px;overflow:hidden;text-align:right;}#floating-toc li{list-style-type:none;margin:0;padding:0;}</style><style type="text/css">body{margin:0;padding:0;font-family:'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;;font-size:16px;color:#252519;}h1{font-size:20px;margin-top:0;}a.anchor{text-decoration:none;color:#252519;}a.anchor:hover{color:#5050A6;}table{border-spacing:0;border-bottom:solid #ddd 1px;;margin-bottom:10px;}code{display:inline;}p{margin-top:8px;}tr{margin:0px;padding:0px;}td.docs{width:410px;max-width:410px;vertical-align:top;margin:0px;padding-left:55px;padding-right:20px;border:none;}td.docs pre{font-size:12px;overflow:hidden;}td.codes{border:none;margin:0px;padding-left:20px;width:55%;border-left:solid #E5E5EE 1px;font-size:10pt;vertical-align:top;overflow:hidden;background-color:#F5F5FF;}td.spacer{padding-bottom:40px;}pre code{display:block;padding:4px;}code{background-color:ghostWhite;border:solid #DEDEDE 1px;padding-left:3px;padding-right:3px;font-size:14px;}.syntaxhighlighter code{font-size:13px;}.footer{text-align:center;}</style><title>lobos -- Marginalia</title></head><body><table><tr><td class="docs"><div class="header"><h1 class="project-name">lobos</h1><h2 class="project-version">0.6.0-SNAPSHOT</h2><br /><p>A library to create and manipulate SQL database schemas.</p>
-</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.2.0</td></tr><tr><td class="dep-name">org.clojure/clojure-contrib</td><td class="dotted"><hr /></td><td class="dep-version">1.2.0</td></tr><tr><td class="dep-name">lobos/clojureql</td><td class="dotted"><hr /></td><td class="dep-version">1.1.0-SNAPSHOT</td></tr></table></div><div class="dependencies"><h3>dev dependencies</h3><table><tr><td class="dep-name">swank-clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.2.1</td></tr><tr><td class="dep-name">lein-clojars</td><td class="dotted"><hr /></td><td class="dep-version">0.6.0</td></tr><tr><td class="dep-name">marginalia</td><td class="dotted"><hr /></td><td class="dep-version">0.5.0-alpha</td></tr><tr><td class="dep-name">cljss</td><td class="dotted"><hr /></td><td class="dep-version">0.1.1</td></tr><tr><td class="dep-name">hiccup</td><td class="dotted"><hr /></td><td class="dep-version">0.3.1</td></tr><tr><td class="dep-name">clj-help</td><td class="dotted"><hr /></td><td class="dep-version">0.2.0</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#lobos.core">lobos.core</a></li><li><a href="#lobos.schema">lobos.schema</a></li><li><a href="#lobos.connectivity">lobos.connectivity</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#lobos.core" name="lobos.core"><h1 class="project-name">lobos.core</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>The <code>core</code> namespace provide the basic interface to interact with a
+</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.2.0</td></tr><tr><td class="dep-name">org.clojure/clojure-contrib</td><td class="dotted"><hr /></td><td class="dep-version">1.2.0</td></tr></table></div><div class="dependencies"><h3>dev dependencies</h3><table><tr><td class="dep-name">clojureql</td><td class="dotted"><hr /></td><td class="dep-version">1.1.0-SNAPSHOT</td></tr><tr><td class="dep-name">swank-clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.2.1</td></tr><tr><td class="dep-name">lein-clojars</td><td class="dotted"><hr /></td><td class="dep-version">0.6.0</td></tr><tr><td class="dep-name">marginalia</td><td class="dotted"><hr /></td><td class="dep-version">0.5.0-alpha</td></tr><tr><td class="dep-name">cljss</td><td class="dotted"><hr /></td><td class="dep-version">0.1.1</td></tr><tr><td class="dep-name">hiccup</td><td class="dotted"><hr /></td><td class="dep-version">0.3.1</td></tr><tr><td class="dep-name">clj-help</td><td class="dotted"><hr /></td><td class="dep-version">0.2.0</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#lobos.core">lobos.core</a></li><li><a href="#lobos.schema">lobos.schema</a></li><li><a href="#lobos.connectivity">lobos.connectivity</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#lobos.core" name="lobos.core"><h1 class="project-name">lobos.core</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>The <code>core</code> namespace provide the basic interface to interact with a
   database. It contains a set of functions and <em>actions</em> (a special kind
   of functions acting on abstract schemas or their elements) used to
   manipulate database schemas in an implementation agnostic way.</p>
@@ -2834,11 +2834,11 @@ user&gt; (create-schema sample-schema)
 </td><td class="codes" /><pre class="brush: clojure">(ns lobos.schema
   (:refer-clojure :exclude [defonce replace
                             bigint boolean char double float time])
-  (:require clojureql.predicates
-            (lobos [ast :as ast]))
-  (:use (clojure [walk :only [postwalk-replace]]
+  (:require (lobos [ast :as ast]))
+  (:use (clojure [walk   :only [postwalk prewalk postwalk-replace]]
+                 [set    :only [union]]
                  [string :only [replace]])
-        (clojure.contrib [def :only [defalias]])
+        (clojure.contrib [def :only [defalias defvar]])
         lobos.utils))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(ast/import-all)</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Protocols</h2>
@@ -2870,6 +2870,59 @@ user&gt; (create-schema sample-schema)
 </td><td class="codes" /><pre class="brush: clojure">(defn definition?
   [o]
   (isa? (type o) ::definition))</pre></tr><tr><td class="docs"><hr />
+</td><td class="codes" /></tr><tr><td class="docs"><h2>Expression Definitions</h2>
+</td><td class="codes" /></tr><tr><td class="docs"><p>A set of symbol representing SQL infix operators.</p>
+</td><td class="codes" /><pre class="brush: clojure">(defvar sql-infix-operators
+  '#{;; math operators
+     + - * /
+     ;; boolean operators
+     < > <= >= = != or and in like})</pre></tr><tr><td class="docs"><p>A set of symbol representing SQL prefix operators.</p>
+</td><td class="codes" /><pre class="brush: clojure">(defvar sql-prefix-operators
+  '#{not})</pre></tr><tr><td class="docs"><p>A set of symbol representing SQL functions.</p>
+</td><td class="codes" /><pre class="brush: clojure">(defvar sql-functions
+  '#{;; string functions
+     length lower position replace str subs trim upper
+     ;; numeric functions
+     abs ceil floor mod
+     ;; datetime functions
+     extract now current_date current_time current_timestamp})</pre></tr><tr><td class="docs">
+</td><td class="codes" /><pre class="brush: clojure">(defvar sql-symbols
+  (union sql-infix-operators
+         sql-prefix-operators
+         sql-functions))</pre></tr><tr><td class="docs">
+</td><td class="codes" /><pre class="brush: clojure">(defrecord Expression [value]
+  Buildable
+  (build-definition [this db-spec]
+    (postwalk
+     #(do
+        (cond (vector? %)
+              (let [[f & n] %]
+                (if (keyword? f)
+                  (condp contains? (-> f name symbol)
+                    sql-infix-operators
+                    (OperatorExpression. db-spec f (first n) (next n))
+                    sql-prefix-operators
+                    (OperatorExpression. db-spec f nil n)
+                    sql-functions
+                    (FunctionExpression. db-spec f n))
+                  %))
+              (and (keyword? %)
+                   (not (contains? sql-symbols (-> % name symbol))))
+              (IdentifierExpression. db-spec % :column [])
+              (not (keyword? %))
+              (ScalarExpression. db-spec %)
+              :else %))
+     value)))</pre></tr><tr><td class="docs">
+</td><td class="codes" /><pre class="brush: clojure">(defmacro expression [form]
+  `(Expression.
+    ~(postwalk
+      #(if (and (seq? %)
+                (sql-symbols (first %)))
+         (apply vector
+                (keyword (first %))
+                (rest %))
+         %)
+      form)))</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Constraint Definitions</h2>
 </td><td class="codes" /></tr><tr><td class="docs"><p><code>Constraint</code> records are only used to define unspecified constraint.
 These type of constraints are useful with the alter drop action. They
@@ -2966,45 +3019,28 @@ constraint. <em>For internal use</em>.</p>
                                        triggered-actions)])))</pre></tr><tr><td class="docs"><p><code>CheckConstraint</code> record can be constructed using the
 <code>check</code> macro or the <code>chech*</code> function. <em>For internal use</em>.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defrecord CheckConstraint
-  [cname condition identifiers]
+  [cname condition]
   Buildable
   (build-definition [this db-spec]
     (CheckConstraintDefinition.
      db-spec
      cname
-     condition
-     identifiers)))</pre></tr><tr><td class="docs"><p>Constructs an abstract check constraint definition and add it to the
-  given table. The <code>constraint-name</code> argument is mandatory. For the
-  condition argument, see ClojureQL predicates namespace. Also a list of
-  identifiers used must be provided as keywords.</p>
+     (build-definition condition db-spec))))</pre></tr><tr><td class="docs"><p>Constructs an abstract check constraint definition and add it to the
+  given table. The <code>constraint-name</code> argument is mandatory.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defn check*
-  [table constraint-name condition identifiers]
+  [table constraint-name condition]
   (name-required constraint-name "check constraint")
   (update-in table [:constraints] conj
              [constraint-name
               (CheckConstraint. constraint-name
-                                condition
-                                identifiers)]))</pre></tr><tr><td class="docs"><p>Constructs an abstract check constraint definition and add it to the
-  given table. Replace core predicates by custom one from ClojureQL
-  predicates namespace.</p>
+                                condition)]))</pre></tr><tr><td class="docs"><p>Constructs an abstract check constraint definition and add it to the
+  given table.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defmacro check
   [table constraint-name condition]
   `(check*
     ~table
     ~constraint-name
-    ~(postwalk-replace
-      '{=   clojureql.predicates/=*
-        !=  clojureql.predicates/!=*
-        <   clojureql.predicates/<*
-        >   clojureql.predicates/>*
-        <=  clojureql.predicates/<=*
-        >=  clojureql.predicates/>=*
-        and clojureql.predicates/and*
-        or  clojureql.predicates/or*
-        not clojureql.predicates/not*
-        in  clojureql.predicates/in}
-      condition)
-    ~(capture-keywords condition)))</pre></tr><tr><td class="docs"><hr />
+    (expression ~condition)))</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Data-type Definition</h2>
 </td><td class="codes" /></tr><tr><td class="docs"><p><code>DataType</code> records can be constructed using the <code>data-type</code> function.
 <em>For internal use</em>.</p>
@@ -3024,14 +3060,16 @@ constraint. <em>For internal use</em>.</p>
   the specified data-type. <em>For internal use</em>.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defn datetime-now-alias
   [dtype default]
-  (if (= default :now)
-    (or ({:date :current_date
-          :time :current_time
-          :timestamp :current_timestamp} dtype) default)
-    default))</pre></tr><tr><td class="docs"><p><code>Column</code> records can be constructed using the <code>column</code> function or
+  (let [value (:value default)]
+    (if (= value [:now])
+      (Expression.
+       (or ({:date [:current_date]
+             :time [:current_time]
+             :timestamp [:current_timestamp]} dtype) value))
+      default)))</pre></tr><tr><td class="docs"><p><code>Column</code> records can be constructed using the <code>column</code> function or
 the more specific typed column functions. The <code>build-definition</code>
-method will create the appropriate <code>DataTypeExpression</code> for data-type
-definitions and <code>ValueExpression</code> for default values.
+method will create the appropriate <code>DataTypeClause</code> for data-type
+definitions and <code>*Expression</code> AST for default values.
 <em>For internal use</em>.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defrecord Column [cname data-type default auto-inc not-null others]
   Buildable
@@ -3040,14 +3078,18 @@ definitions and <code>ValueExpression</code> for default values.
       (ColumnDefinition.
        db-spec
        cname
-       (DataTypeExpression. db-spec dtype args options)
+       (DataTypeClause. db-spec dtype args options)
        (if (= default :drop)
-         default
+         :drop
          (when default
-           (ValueExpression. db-spec (datetime-now-alias dtype default))))
+           (build-definition
+            (datetime-now-alias dtype default)
+            db-spec)))
        (when auto-inc (AutoIncClause. db-spec))
        not-null
-       others))))</pre></tr><tr><td class="docs"><p>Constructs an abstract column definition. It'll parse the column
+       others))))</pre></tr><tr><td class="docs">
+</td><td class="codes" /><pre class="brush: clojure">(defmacro default [form]
+  `[:default (expression ~form)])</pre></tr><tr><td class="docs"><p>Constructs an abstract column definition. It'll parse the column
   specific options. See the <code>column</code> function for more details.
   <em>For internal use</em>.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defn column*
