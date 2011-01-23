@@ -17,7 +17,7 @@
 (defn datetime-tracked [table]
   (-> table
       (timestamp :updated_on)
-      (timestamp :created_on [:default :now])))
+      (timestamp :created_on (default (now)))))
 
 (defn refer-to [table ptable]
   (let [cname (-> (->> ptable name butlast (apply str))
@@ -35,7 +35,7 @@
   
   (tabl :users
     (varchar :name 100 :unique)
-    (check :name (> :length/name 1)))
+    (check :name (> (length :name) 1)))
 
   (tabl :posts
     (varchar :title 200 :unique)

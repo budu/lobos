@@ -59,8 +59,8 @@
                  (table :foo (integer :a))
                  "Checking if the constraint has been dropped")
       (are-equal (actual (alter lobos :modify
-                                (table :foo (column :a [:default 0]))))
-                 (table :foo (integer :a [:default 0]))
+                                (table :foo (column :a (default 0)))))
+                 (table :foo (integer :a (default 0)))
                  "Checking if the default clause has been set")
       (are-equal (actual (alter lobos :modify
                                 (table :foo (column :a :drop-default))))
