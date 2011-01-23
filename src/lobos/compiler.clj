@@ -137,7 +137,7 @@
   [function]
   (let [{:keys [db-spec name args]} function]
     (str (as-sql-keyword name)
-         (as-list args))))
+         (as-list (map compile args)))))
 
 (defmethod compile [::standard OperatorExpression]
   [operator]
@@ -229,7 +229,7 @@
       "CONSTRAINT"
       (as-identifier db-spec cname)
       "CHECK"
-      (compile condition))))
+      (str "(" (compile condition) ")"))))
 
 ;; ### Create and Drop Statements
 
