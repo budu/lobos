@@ -9,6 +9,7 @@
 (ns lobos.test.compiler
   (:refer-clojure :exclude [compile])
   (:use clojure.test
+        (lobos [schema :only [expression build-definition]])
         lobos.compiler
         lobos.ast))
 
@@ -23,13 +24,13 @@
 
 ;;;; Default compiler
 
-(deftest test-compile-value-expression
-  (is (= (compile (ValueExpression. nil :foo))
+(deftest test-compile-scalar-expression
+  (is (= (compile (ScalarExpression. nil :foo))
          "FOO")
-      "Compiling a parameter-less function")
-  (is (= (compile (ValueExpression. nil "foo"))
+      "Compiling a SQL keyword")
+  (is (= (compile (ScalarExpression. nil "foo"))
          "'foo'")
-      "Compiling a string value"))
+      "Compiling a string"))
 
 (deftest test-compile-auto-inc-clause
   (is (= (compile (AutoIncClause. nil))
@@ -45,7 +46,7 @@
          "\"foo\" INTEGER")
       "Compiling a simple column definition")
   (is (= (compile (assoc column-definition-stub
-                    :default (ValueExpression. nil 0)))
+                    :default (ScalarExpression. nil 0)))
          "\"foo\" INTEGER DEFAULT 0")
       "Compiling a column definition with default value")
   (is (= (compile (assoc column-definition-stub
@@ -116,22 +117,22 @@
   (is (= (compile (CheckConstraintDefinition.
                    nil
                    :bar
-                   {:stmt ["(a > ?)"] :env [1]}
-                   #{"a"}))
+                   (build-definition (expression (> :a 1)) nil)))
          "CONSTRAINT \"bar\" CHECK (\"a\" > 1)")
       "Compiling a simple check constraint definition")
   (is (= (compile (CheckConstraintDefinition.
                    nil
                    :bar
-                   {:stmt [(str "((a > ?) AND (a < ?) AND "
-                                "((b = ?) OR (b = ?)) AND "
-                                "ab IN (?,?,?))")]
-                    :env [1 10 "foo" "bar" 1 2 3]}
-                   #{"ab" "a" "b"}))
+                   (build-definition
+                    (expression (and (> :a 1) (< :a 10)
+                                     (or (= :b "foo")
+                                         (= :b "bar"))
+                                     (in :ab [1 2 3])))
+                    nil)))
          (str "CONSTRAINT \"bar\" CHECK "
               "((\"a\" > 1) AND (\"a\" < 10) AND "
               "((\"b\" = 'foo') OR (\"b\" = 'bar')) AND "
-              "\"ab\" IN (1,2,3))"))
+              "(\"ab\" IN (1, 2, 3)))"))
       "Compiling a complex check constraint definition"))
 
 (def create-schema-statement-stub
@@ -189,7 +190,7 @@
   (is (= (compile (assoc alter-statement-stub
                     :action :modify
                     :element (assoc column-definition-stub
-                               :default (ValueExpression. nil 1))))
+                               :default (ScalarExpression. nil 1))))
          "ALTER TABLE \"foo\" ALTER COLUMN \"foo\" SET DEFAULT 1")
       "Compiling an alter table statement to set default clause")
   (is (= (compile (assoc alter-statement-stub
