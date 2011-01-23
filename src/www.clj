@@ -131,7 +131,7 @@
     Leiningen or Cake by adding the following dependency to you project
     file:"]
 
-    [:pre.brush:.clojure "[lobos \"0.6.0-SNAPSHOT\"]"]
+    [:pre.brush:.clojure "[lobos \"0.7.0-SNAPSHOT\"]"]
 
     [:p [:b "Lobos"] " is also available through Maven:"]
 
@@ -139,7 +139,7 @@
 "<dependency>
   <groupId>lobos</groupId>
   <artifactId>lobos</artifactId>
-  <version>0.6.0-SNAPSHOT</version>
+  <version>0.7.0-SNAPSHOT</version>
 </dependency>")]
 
     [:p "You can always add the current or previous version manually,
