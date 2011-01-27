@@ -95,7 +95,7 @@
      (include-js "sh/js/shCore.js" "sh/js/shBrushXml.js" "sh/js/shBrushClojure.js")
      (include-css "sh/css/shCore.css" "sh/css/shThemeDjango.css")
      ;; Google Analytics Tracker
-     (include-js "js/ga-tracker.js")]
+     (javascript-tag (slurp "www/js/ga-tracker.js"))]
     [:body
      [:div#wrapper
       [:div#header
