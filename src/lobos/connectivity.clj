@@ -25,6 +25,8 @@
 
 ;; ## Helpers
 
+(defalias find-connection sqlint/find-connection*)
+
 (defalias connection sqlint/connection*)
 
 (defn get-db-spec
@@ -156,4 +158,4 @@
   (try
     (with-named-connection :default-connection
       connection)
-    (catch Exception e nil)))
+    (catch Exception _ nil)))

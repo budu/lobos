@@ -271,7 +271,8 @@
                cnx-or-schema# (or cnx-or-schema# (get-default-schema))
                ~'schema (cond (schema/schema? cnx-or-schema#) cnx-or-schema#
                               (fn? cnx-or-schema#) (cnx-or-schema#))
-               cnx# (or (-> ~'schema :options :db-spec)
+               cnx# (or (conn/find-connection)
+                        (-> ~'schema :options :db-spec)
                         cnx-or-schema#
                         :default-connection)
                ~'db-spec (merge (conn/get-db-spec cnx#)
