@@ -33,9 +33,10 @@
   "Returns the associated db-spec or itself. *For internal use*."
   [& [connection-info]]
   (let [connection-info (or connection-info :default-connection)]
-    (if (keyword? connection-info)
-      (-> @global-connections connection-info :db-spec)
-      connection-info)))
+    (or (:db-spec sqlint/*db*)
+        (if (keyword? connection-info)
+          (-> @global-connections connection-info :db-spec)
+          connection-info))))
 
 (defn- get-cnx
   "Replaces `get-connection` from `contrib.sql.internal`
