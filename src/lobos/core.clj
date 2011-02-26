@@ -219,6 +219,8 @@
         db-spec (conn/get-db-spec connection-info)
         mode (compiler/compile (compiler/mode db-spec))]
     (conn/with-connection connection-info
+      (require (symbol (str "lobos.backends."
+                            (:subprotocol connection-info))))
       (when mode (execute* mode))
       (doseq [statement statements]
         (let [sql (if (string? statement)
