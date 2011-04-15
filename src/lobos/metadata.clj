@@ -8,7 +8,9 @@
 
 (ns lobos.metadata
   "Helpers to query the database's meta-data."
-  (:require (lobos [connectivity :as conn]))
+  (:require (lobos [compiler :as compiler]
+                   [connectivity :as conn]
+                   [schema :as schema]))
   (:use (clojure.contrib [def :only [defvar-]]))
   (:import (java.sql DatabaseMetaData)))
 
@@ -17,6 +19,7 @@
 ;; ## Database Metadata
 
 (defvar- *db-meta* nil)
+(defvar- *db-meta-spec* nil)
 
 (defn db-meta
   "Returns the binded DatabaseMetaData object found in *db-meta* or get
@@ -26,6 +29,11 @@
       (conn/with-connection :default-connection
         (.getMetaData (conn/connection)))))
 
+(defn db-meta-spec
+  []
+  (or *db-meta-spec*
+      (conn/get-db-spec :default-connection)))
+
 (defmacro with-db-meta
   "Evaluates body in the context of a new connection or a named global
   connection to a database then closes the connection while binding its
@@ -33,9 +41,32 @@
   [db-spec & body]
   `(if ~db-spec
      (conn/with-connection ~db-spec
-       (binding [*db-meta* (.getMetaData (conn/connection))]
+       (binding [*db-meta-spec* ~db-spec
+                 *db-meta* (.getMetaData (conn/connection))]
          ~@body))
      (do ~@body)))
+
+;; -----------------------------------------------------------------------------
+
+;; ## Helpers
+
+(defn raw-query [sql-string]
+  (with-open [stmt (.createStatement (conn/connection))]
+    (doall (resultset-seq
+            (.executeQuery stmt sql-string)))))
+
+(defmacro query-schema [table & [conditions]]
+  `(let [db-spec# (db-meta-spec)]
+     (require (symbol (str "lobos.backends."
+                           (:subprotocol db-spec#))))
+     (raw-query 
+      (str "select * from information_schema." (name ~table)
+           (when '~conditions
+             (str
+              " where "
+              (compiler/compile
+               (schema/build-definition (schema/expression ~conditions)
+                                        db-spec#))))))))
 
 ;; -----------------------------------------------------------------------------
 
