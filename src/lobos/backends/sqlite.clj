@@ -22,21 +22,9 @@
                       DataTypeClause
                       DropStatement
                       IdentifierExpression)
-           (lobos.schema Column
-                         DataType
+           (lobos.schema DataType
                          ForeignKeyConstraint
-                         UniqueConstraint
-                         Table)))
-
-;; Temporary code: need more think more about where to put it or if
-;; I'll use Contrib or ClojureQL...
-(use 'lobos.connectivity)
-(defn- query [sql-string]
-  (try
-    (with-open [stmt (.createStatement (connection))]
-      (doall (resultset-seq
-              (.executeQuery stmt sql-string))))
-    (catch Exception _)))
+                         UniqueConstraint)))
 
 ;; -----------------------------------------------------------------------------
 
@@ -66,10 +54,10 @@
   [_ sname tname cname index-meta]
   (let [columns (vec (map #(-> % :column_name keyword)
                           index-meta))]
-  (UniqueConstraint.
-   (make-constraint-name tname :unique columns)
-   :unique
-   columns)))
+    (UniqueConstraint.
+     (make-constraint-name tname :unique columns)
+     :unique
+     columns)))
 
 (defn- analyze-primary-keys [tname]
   (let [columns (reduce
@@ -84,8 +72,8 @@
         columns)])))
 
 (defn- analyze-foreign-keys [tname]
-  (let [fks (group-by :id (query (format "pragma foreign_key_list(%s);"
-                                         (name tname))))]
+  (let [fks (group-by :id (raw-query (format "pragma foreign_key_list(%s);"
+                                             (name tname))))]
     (for [fk fks]
       (let [fk (second fk)
             pcolumns (reduce #(conj %1 (-> %2 :to keyword)) [] fk)
@@ -108,21 +96,16 @@
          match
          (into {} [on-delete on-update]))))))
 
-(defn- sqlite-constraints [sname tname]
+(defn- analyze-unique [sname tname]
   (map (fn [[cname meta]] (analyze UniqueConstraint sname tname cname meta))
        (indexes-meta sname tname #(let [nu (:non_unique %)]
                                     (or (false? nu) (= nu 0))))))
 
-(defmethod analyze [:sqlite Table]
+(defmethod analyze [:sqlite :constraints]
   [_ sname tname]
-  (schema/table* tname
-                 (into {} (map #(let [c (analyze Column %)]
-                                  [(:cname c) c])
-                               (columns-meta sname tname)))
-                 (into {} (map #(vector (:cname %) %)
-                               (concat (sqlite-constraints sname tname)
-                                       (analyze-primary-keys tname)
-                                       (analyze-foreign-keys tname))))))
+  (concat (analyze-unique sname tname)
+          (analyze-primary-keys tname)
+          (analyze-foreign-keys tname)))
 
 ;; -----------------------------------------------------------------------------
 

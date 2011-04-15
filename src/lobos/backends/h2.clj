@@ -9,14 +9,37 @@
 (ns lobos.backends.h2
   "Compiler implementation for H2."
   (:refer-clojure :exclude [compile defonce])
-  (:use (clojure.contrib [def :only [defvar-]])
-        lobos.compiler
-        lobos.utils)
+  (:require (lobos [schema :as schema]))
+  (:use (clojure [string :only [split]])
+        (clojure.contrib [def :only [defvar-]])
+        (lobos analyzer compiler connectivity metadata utils))
   (:import (lobos.ast AlterRenameAction
                       AutoIncClause
                       CreateSchemaStatement
                       DataTypeClause
-                      DropStatement)))
+                      DropStatement)
+           (lobos.schema ForeignKeyConstraint
+                         UniqueConstraint)))
+
+;; -----------------------------------------------------------------------------
+
+;; ## Analyzer
+
+(defmethod analyze [:h2 UniqueConstraint]
+  [_ sname tname cname meta]
+  (let [columns (split (:column_list meta) #",")]
+    (UniqueConstraint.
+     (make-constraint-name tname :unique columns)
+     :unique
+     columns)))
+
+(defmethod analyze [:h2 :constraints]
+  [_ sname tname]
+  (concat
+   (map (fn [[cname meta]] (analyze UniqueConstraint sname tname cname meta))
+        (query-schema :constraints (= :CONSTRAINT_TYPE "UNIQUE")))
+   (map (fn [[cname meta]] (analyze ForeignKeyConstraint cname meta))
+        (references-meta sname tname))))
 
 ;; -----------------------------------------------------------------------------
 

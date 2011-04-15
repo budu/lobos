@@ -96,7 +96,8 @@
      nil
      (into {} [on-delete on-update]))))
 
-(defn constraints [sname tname]
+(defmethod analyze [::standard :constraints]
+  [_ sname tname]
   (concat
    (map (fn [[cname meta]] (analyze UniqueConstraint sname tname cname meta))
         (indexes-meta sname tname #(let [nu (:non_unique %)]
@@ -143,7 +144,7 @@
                                   [(:cname c) c])
                                (columns-meta sname tname)))
                  (into {} (map #(vector (:cname %) %)
-                               (constraints sname tname)))))
+                               (analyze :constraints sname tname)))))
 
 (defmethod analyze [::standard Schema]
   [_ sname]
