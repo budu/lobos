@@ -157,7 +157,7 @@
     (CreateIndexStatement. db-spec iname tname columns options))
 
   (build-drop-statement [this behavior db-spec]
-    (DropStatement. db-spec :index name behavior)))
+    (DropStatement. db-spec :index iname nil)))
 
 (defn index
   ([table columns] (index table nil columns))
