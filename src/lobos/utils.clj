@@ -45,7 +45,8 @@
   (when s (replace (-> s as-str upper-case) \- \space)))
 
 (defn as-keyword [s]
-  (-> s lower-case (replace #"[_ ]" "-") keyword))
+  (when s
+    (-> s lower-case (replace #"[_ ]" "-") keyword)))
 
 (defn make-constraint-name [table ctype columns]
   (keyword
