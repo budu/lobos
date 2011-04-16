@@ -24,8 +24,7 @@
 
 (defn drop-schemas-for-all-db []
   (doseq [db (available-global-cnx)]
-    (try (drop-schema sample-schema :cascade db)
-         (catch Exception _))))
+    (drop-schema sample-schema :cascade db)))
 
 (defn use-sample-schema-fixture [f]
   (try (create-schemas-for-all-db)
@@ -34,7 +33,9 @@
 
 (use-fixtures :once
   remove-tmp-files-fixture
-  open-global-connections-fixture
+  open-global-connections-fixture)
+
+(use-fixtures :each
   use-sample-schema-fixture)
 
 ;;;; Helpers
@@ -59,26 +60,30 @@
           "An exception should have been thrown because of a check constraint")
       (is (nil? (sql/insert-records (table :users)
                                     {(identifier :name) "foo"}))
-          "A new record should have been inserted into the users table"))))
+          "The insert statement should not throw an exception"))))
 
 (def-db-test test-unique-constraint
   (sql/with-connection (conn/get-db-spec *db*)
+    (sql/insert-records (table :users) {(identifier :name) "foo"})
     (is (thrown? Exception
                  (sql/insert-records (table :users)
                                      {(identifier :name) "foo"}))
         "An exception should have been thrown because of an unique constraint")
     (is (nil? (sql/insert-records (table :users)
                                   {(identifier :name) "bar"}))
-        "A new record should have been inserted into the users table")))
+        "The insert statement should not throw an exception")))
 
+;;; Using hardcoded id is a bad idea!
 (def-db-test test-foreign-key-constraint
-  (sql/with-connection (conn/get-db-spec *db*)
-    (is (thrown? Exception
-                 (sql/insert-records (table :posts)
-                                     {(identifier :title) "foo"
-                                      (identifier :user_id) 1}))
-        "An exception should have been thrown because of a foreign key constraint")
-    (is (nil? (sql/insert-records (table :posts)
-                                  {(identifier :title) "foo"
-                                   (identifier :user_id) 2}))
-        "A new record should have been inserted into the posts table")))
+  (when-not (= *db* :sqlite)
+    (sql/with-connection (conn/get-db-spec *db*)
+      (sql/insert-records (table :users) {(identifier :name) "foo"})
+      (is (thrown? Exception
+                   (sql/insert-records (table :posts)
+                                       {(identifier :title) "foo"
+                                        (identifier :user_id) 2}))
+          "An exception should have been thrown because of a foreign key constraint")
+      (is (nil? (sql/insert-records (table :posts)
+                                    {(identifier :title) "foo"
+                                     (identifier :user_id) 1}))
+          "The insert statement should not throw an exception"))))
