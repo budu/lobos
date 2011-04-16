@@ -185,7 +185,7 @@
   "Constructs an abstract unique (or primary-key depending on the given
   type) constraint definition and add it to the given table."
   [table name type columns]
-  (let [name (or name (make-constraint-name table type columns))]
+  (let [name (or name (make-index-name table type columns))]
     (update-in table [:constraints] conj
                [name (UniqueConstraint. name type (vec columns))])))
 
@@ -251,7 +251,7 @@
         [match args]           (optional #{:full :partial :simple} args)
         triggered-actions      (apply hash-map args)
         constraint-name        (or constraint-name
-                                   (make-constraint-name table "fkey" columns))]
+                                   (make-index-name table "fkey" columns))]
     (update-in table [:constraints] conj
                [constraint-name
                 (ForeignKeyConstraint. constraint-name

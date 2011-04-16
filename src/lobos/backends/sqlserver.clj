@@ -133,9 +133,9 @@
   (let [{:keys [db-spec element]} action
         default (:default element)
         cname (when default
-                (make-constraint-name (:tname element)
-                                      "default"
-                                      (list (:cname element))))]
+                (make-index-name (:tname element)
+                                 "default"
+                                 (list (:cname element))))]
     (cond (= default :drop)
           (join \space
                 "DROP CONSTRAINT"

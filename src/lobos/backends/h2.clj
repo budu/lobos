@@ -29,7 +29,7 @@
   [_ sname tname cname meta]
   (let [columns (split (:column_list meta) #",")]
     (UniqueConstraint.
-     (make-constraint-name tname :unique columns)
+     (make-index-name tname :unique columns)
      :unique
      columns)))
 

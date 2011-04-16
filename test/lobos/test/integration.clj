@@ -150,7 +150,7 @@
 (def-db-test test-unique-constraint
   (with-schema [lobos :lobos]
     (doseq [ctype [:unique :primary-key]]
-      (let [cname (make-constraint-name :foo ctype [:a])]
+      (let [cname (make-index-name :foo ctype [:a])]
         (are-equal (-> lobos (create (table :foo (integer :a ctype)))
                        :elements :foo :constraints cname)
                    (UniqueConstraint. cname ctype [:a])
@@ -160,7 +160,7 @@
 
 (def-db-test test-foreign-key-constraint
   (with-schema [lobos :lobos]
-    (let [cname (make-constraint-name :baz :fkey [:bar])]
+    (let [cname (make-index-name :baz :fkey [:bar])]
       (are-equal (-> lobos
                      (create (table :foo (integer :bar :primary-key)))
                      (create (table :baz (integer :bar)

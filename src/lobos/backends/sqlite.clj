@@ -56,7 +56,7 @@
   (let [columns (vec (map #(-> % :column_name keyword)
                           index-meta))]
     (UniqueConstraint.
-     (make-constraint-name tname :unique columns)
+     (make-index-name tname :unique columns)
      :unique
      columns)))
 
@@ -68,7 +68,7 @@
                   (.getPrimaryKeys (db-meta) nil nil (name tname))))]
     (when (not-empty columns)
       [(UniqueConstraint.
-        (make-constraint-name tname :primary-key columns)
+        (make-index-name tname :primary-key columns)
         :primary-key
         columns)])))
 
@@ -90,7 +90,7 @@
             on-update (when-not (= on-update :no-action) on-update)
             on-update (when on-delete [:on-update on-update])]
         (ForeignKeyConstraint.
-         (make-constraint-name tname :fkey fcolumns)
+         (make-index-name tname :fkey fcolumns)
          fcolumns
          ptable
          pcolumns

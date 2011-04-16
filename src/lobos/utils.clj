@@ -48,10 +48,10 @@
   (when s
     (-> s lower-case (replace #"[_ ]" "-") keyword)))
 
-(defn make-constraint-name [table ctype columns]
+(defn make-index-name [table type columns]
   (keyword
    (replace (apply join "_" (conj (map name columns)
-                                  (name ctype)
+                                  (name type)
                                   (name (if (keyword? table)
                                           table
                                           (:name table)))))

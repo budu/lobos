@@ -52,7 +52,7 @@
                           index-meta))]
     (UniqueConstraint.
      (if pkey
-       (make-constraint-name tname :primary-key columns)
+       (make-index-name tname :primary-key columns)
        (keyword cname))
      (if pkey
        :primary-key
