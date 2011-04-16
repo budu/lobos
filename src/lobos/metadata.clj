@@ -52,8 +52,10 @@
 
 (defn raw-query [sql-string]
   (with-open [stmt (.createStatement (conn/connection))]
-    (doall (resultset-seq
-            (.executeQuery stmt sql-string)))))
+    (let [resultset (try (.executeQuery stmt sql-string)
+                         (catch Exception _))]
+      (when resultset
+        (doall (resultset-seq resultset))))))
 
 (defmacro query-schema [table & [conditions]]
   `(let [db-spec# (db-meta-spec)]
