@@ -25,7 +25,7 @@
                   keyword)]
     (integer table cname [:refer ptable :id :on-delete :set-null])))
 
-(defmacro tabl [name & elements]
+(defmacro tbl [name & elements]
   `(-> (table ~name
          (surrogate-key)
          (datetime-tracked))
@@ -33,16 +33,16 @@
 
 (defschema sample-schema :lobos
   
-  (tabl :users
+  (tbl :users
     (varchar :name 100 :unique)
     (check :name (> (length :name) 1)))
 
-  (tabl :posts
+  (tbl :posts
     (varchar :title 200 :unique)
     (text :content)
     (refer-to :users))
 
-  (tabl :comments
+  (tbl :comments
     (text :content)
     (refer-to :users)
     (refer-to :posts)))
