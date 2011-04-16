@@ -661,7 +661,9 @@ It also can be used in alter modify and rename actions. In that
     (CreateSchemaStatement.
      db-spec
      sname
-     (map #(build-create-statement (second %) db-spec) elements)))
+     (flatten
+      (map #(build-create-statement (second %) db-spec)
+           elements))))
 
   (build-drop-statement [this behavior db-spec]
     (DropStatement. db-spec :schema sname behavior)))
