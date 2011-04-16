@@ -148,6 +148,30 @@
 
 ;; -----------------------------------------------------------------------------
 
+;; ## Index Definitions
+
+(defrecord Index [iname tname columns options]
+  Creatable Dropable
+
+  (build-create-statement [this db-spec]
+    (CreateIndexStatement. db-spec iname tname columns options))
+
+  (build-drop-statement [this behavior db-spec]
+    (DropStatement. db-spec :index name behavior)))
+
+(defn index
+  ([table columns] (index table nil columns))
+  ([table name columns & options]
+     (let [tname (if (keyword? table) table (:name table))
+           cnames (map #(if (keyword? %) % (first %)) columns)
+           name (or name (make-index-name tname :index cnames))]
+       (if (keyword? table)
+         (Index. name tname columns options)
+         (update-in table [:indexes] conj
+                    [name (Index. name tname columns options)])))))
+
+;; -----------------------------------------------------------------------------
+
 ;; ## Constraint Definitions
 
 ;; `Constraint` records are only used to define unspecified constraint.
@@ -582,7 +606,7 @@ It also can be used in alter modify and rename actions. In that
 
 ;; `Table` records can be constructed using the `table*` function or
 ;; the `table` macro. *For internal use*.
-(defrecord Table [name columns constraints options]
+(defrecord Table [name columns constraints indexes]
   Alterable Creatable Dropable
 
   (build-alter-statement [this action db-spec]
@@ -596,11 +620,14 @@ It also can be used in alter modify and rename actions. In that
          element))))
 
   (build-create-statement [this db-spec]
-    (CreateTableStatement.
-     db-spec
-     name
-     (map #(build-definition (second %) db-spec)
-          (concat columns constraints))))
+    (conj
+     (map #(build-create-statement (second %) db-spec)
+          indexes)
+     (CreateTableStatement.
+      db-spec
+      name
+      (map #(build-definition (second %) db-spec)
+           (concat columns constraints)))))
 
   (build-drop-statement [this behavior db-spec]
     (DropStatement. db-spec :table name behavior)))
@@ -608,12 +635,12 @@ It also can be used in alter modify and rename actions. In that
 (defn table*
   "Constructs an abstract table definition. The `table-name` is
   mandatory."
-  [table-name & [columns constraints options]]
+  [table-name & [columns constraints indexes]]
   (name-required table-name "table")
   (Table. table-name
           (or columns {})
           (or constraints {})
-          (or options {})))
+          (or indexes {})))
 
 (defmacro table
   "Constructs an abstract table definition containing the given
@@ -663,6 +690,7 @@ It also can be used in alter modify and rename actions. In that
 ;; The definition hierarchy makes it easy to test if an object represent
 ;; an abstract schema element definition. See the `definition?`
 ;; predicate.
+(derive Index                ::definition)
 (derive Constraint           ::definition)
 (derive UniqueConstraint     ::definition)
 (derive ForeignKeyConstraint ::definition)
