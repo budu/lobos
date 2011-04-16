@@ -13,6 +13,7 @@
   (:use (clojure.contrib [def :only [defvar-]])
         lobos.analyzer
         lobos.compiler
+        lobos.connectivity
         lobos.metadata
         lobos.utils)
   (:import (lobos.ast AlterTableStatement
@@ -133,20 +134,25 @@
 (defmethod compile [:sqlite CreateSchemaStatement]
   [statement]
   (let [{:keys [db-spec sname elements]} statement]
-    (not-empty
-     (apply join ";\n\n"
-            (map (comp compile
-                       #(assoc-in % [:db-spec :schema] sname))
-                 elements)))))
+    (map compile elements)))
+
+(defn- drop-schema [db-spec]
+  (map (comp compile
+             #(schema/build-drop-statement % :cascade db-spec)
+             #(schema/table %)
+             :name)
+       (with-connection db-spec
+         (raw-query (format "select name from sqlite_master where type <> 'index';")))))
 
 (defmethod compile [:sqlite DropStatement]
   [statement]
   (let [{:keys [db-spec otype oname behavior]} statement]
-    (when (#{:table} otype)
-      (join \space
-        "DROP"
-        (as-sql-keyword otype)
-        (as-identifier db-spec oname)))))
+    (case otype
+      :table (join \space
+                   "DROP"
+                   (as-sql-keyword otype)
+                   (as-identifier db-spec oname))
+      :schema (drop-schema db-spec))))
 
 (defmethod compile [:sqlite AlterTableStatement]
   [statement]
