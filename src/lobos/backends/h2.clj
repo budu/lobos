@@ -36,7 +36,9 @@
 (defmethod analyze [:h2 :constraints]
   [_ sname tname]
   (concat
-   (map (fn [[cname meta]] (analyze UniqueConstraint sname tname cname meta))
+   (map (fn [meta] (analyze UniqueConstraint sname tname
+                            (-> meta :constraint_name keyword)
+                            meta))
         (query-schema :constraints (= :CONSTRAINT_TYPE "UNIQUE")))
    (map (fn [[cname meta]] (analyze ForeignKeyConstraint cname meta))
         (references-meta sname tname))))
