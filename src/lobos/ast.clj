@@ -61,6 +61,9 @@
 (defrecord CreateTableStatement
   [db-spec tname elements])
 
+(defrecord CreateIndexStatement
+  [db-spec iname tname columns options])
+
 (defrecord DropStatement
   [db-spec otype oname behavior])
 
@@ -115,6 +118,7 @@
   (import
    '(lobos.ast CreateSchemaStatement
                CreateTableStatement
+               CreateIndexStatement
                DropStatement
                AlterTableStatement)))
 
