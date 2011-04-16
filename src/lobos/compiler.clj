@@ -263,6 +263,22 @@
             (or (as-list (map compile elements))
                 "()"))))
 
+(defmethod compile [::standard CreateIndexStatement]
+  [statement]
+  (let [{:keys [db-spec iname tname columns options]} statement
+        index-column #(if (keyword? %)
+                        (as-identifier db-spec %)
+                        (let [col (first %)
+                              options (set (rest %))]
+                          (apply join \space
+                            (as-identifier db-spec (first %))
+                            (map as-sql-keyword options))))]
+    (format "CREATE %sINDEX %s ON %s %s"
+            (str (when ((set options) :unique) "UNIQUE "))
+            (as-identifier db-spec iname :schema)
+            (as-identifier db-spec tname :schema)
+            (as-list (map index-column columns)))))
+
 (defmethod compile [::standard DropStatement]
   [statement]
   (let [{:keys [db-spec otype oname behavior]} statement]
