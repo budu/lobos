@@ -32,7 +32,7 @@
     (UniqueConstraint.
      (make-index-name tname ctype columns)
      ctype
-     columns)))
+     (map as-keyword columns))))
 
 (defmethod analyze [:h2 :constraints]
   [_ sname tname]
