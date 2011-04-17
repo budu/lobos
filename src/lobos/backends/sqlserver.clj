@@ -110,23 +110,33 @@
   [_]
   "IDENTITY")
 
+(defn- drop-schema-cascade [db-spec oname]
+  (vec (for [element (with-db-meta db-spec
+                       (-> (analyze-schema oname) :elements keys))]
+         (compile (schema/build-drop-statement
+                   (schema/table element)
+                   :cascade
+                   (assoc db-spec :schema oname))))))
+
 (defmethod compile [:sqlserver DropStatement]
   [statement]
-  (let [{:keys [db-spec otype oname behavior]} statement
+  (let [{:keys [db-spec otype oname behavior options]} statement
         sql-string (join \space
                      "DROP"
                      (as-sql-keyword otype)
                      (as-identifier db-spec oname :schema))]
-    (apply join \;
-      (conj (when (and (= otype :schema)
-                       (= behavior :cascade))
-              (vec (for [element (with-db-meta db-spec
-                                   (-> (analyze-schema oname) :elements keys))]
-                     (compile (schema/build-drop-statement
-                               (schema/table element)
-                               :cascade
-                               (assoc db-spec :schema oname))))))
-            sql-string))))
+    (if (= otype :index)
+      (join \space
+        "DROP INDEX"
+        (as-identifier db-spec oname)
+        "ON"
+        (as-identifier db-spec (:tname options) :schema))
+      (apply join \;
+             (conj
+              (when (and (= otype :schema)
+                         (= behavior :cascade))
+                (drop-schema-cascade db-spec oname))
+              sql-string)))))
 
 (defmethod compile [:sqlserver AlterModifyAction]
   [action]
