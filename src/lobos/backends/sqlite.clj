@@ -142,17 +142,18 @@
              #(schema/table %)
              :name)
        (with-connection db-spec
-         (raw-query (format "select name from sqlite_master where type <> 'index';")))))
+         (raw-query
+          (format "select name from sqlite_master where type <> 'index';")))))
 
 (defmethod compile [:sqlite DropStatement]
   [statement]
   (let [{:keys [db-spec otype oname behavior]} statement]
-    (case otype
-      :table (join \space
-                   "DROP"
-                   (as-sql-keyword otype)
-                   (as-identifier db-spec oname))
-      :schema (drop-schema db-spec))))
+    (if (= otype :schema)
+      (drop-schema db-spec)
+      (join \space
+        "DROP"
+        (as-sql-keyword otype)
+        (as-identifier db-spec oname)))))
 
 (defmethod compile [:sqlite AlterTableStatement]
   [statement]
