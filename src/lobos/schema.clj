@@ -26,7 +26,7 @@
   (:refer-clojure :exclude [defonce replace
                             bigint boolean char double float time])
   (:require (lobos [ast :as ast]))
-  (:use (clojure [walk   :only [postwalk prewalk postwalk-replace]]
+  (:use (clojure [walk   :only [postwalk]]
                  [set    :only [union]]
                  [string :only [replace]])
         (clojure.contrib [def :only [defalias defvar]])
