@@ -156,7 +156,7 @@
       "Compiling a create table statement"))
 
 (def drop-statement-stub
-  (DropStatement. nil :schema :foo nil))
+  (DropStatement. nil :schema :foo nil nil))
 
 (deftest test-compile-drop-statement
   (is (= (compile drop-statement-stub)
