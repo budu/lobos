@@ -57,9 +57,22 @@
     (is (nil? (-> (drop lobos (table :foo)) :elements :foo))
         "Checking if the table has been dropped")))
 
+(def-db-test test-create-and-drop-index
+  (with-schema [lobos :lobos]
+    (let [lobos (create lobos (table :foo (integer :bar)))]
+      (let [cname (make-index-name :foo :index [:bar])]
+        (is (= (-> (create lobos (index :foo [:bar]))
+                   :elements :foo :indexes cname)
+               (index :foo [:bar]))
+            "An index should have been created")
+        (is (empty? (-> (drop lobos (index :foo [:bar]))
+                        :elements :foo :indexes))
+            "An index should have been dropped"))
+      (drop lobos (table :foo)))))
+
 (def-db-test test-alter-table
   (with-schema [lobos :lobos]
-    (let [actual #(-> % :elements :foo)]
+    (let [actual #(-> % :elements :foo (assoc :indexes {}))]
       (create lobos (table :foo (integer :a)))
       (are-equal (actual (alter lobos :add (table :foo (integer :b))))
                  (table :foo (integer :a) (integer :b))
