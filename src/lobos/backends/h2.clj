@@ -27,10 +27,11 @@
 
 (defmethod analyze [:h2 UniqueConstraint]
   [_ sname tname cname meta]
-  (let [columns (split (:column_list meta) #",")]
+  (let [columns (split (:column_list meta) #",")
+        ctype (-> meta :constraint_type as-keyword)]
     (UniqueConstraint.
-     (make-index-name tname :unique columns)
-     :unique
+     (make-index-name tname ctype columns)
+     ctype
      columns)))
 
 (defmethod analyze [:h2 :constraints]
@@ -41,7 +42,8 @@
                               (-> meta :constraint_name keyword)
                               meta))
           (query-schema :constraints
-                        (and (= :CONSTRAINT_TYPE "UNIQUE")
+                        (and (or (= :CONSTRAINT_TYPE "UNIQUE")
+                                 (= :CONSTRAINT_TYPE "PRIMARY KEY"))
                              (= :TABLE_SCHEMA (as-str sname))
                              (= :TABLE_NAME (as-str tname)))))
      (map (fn [[cname meta]] (analyze ForeignKeyConstraint cname meta))
