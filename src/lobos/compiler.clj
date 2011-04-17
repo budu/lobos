@@ -275,7 +275,7 @@
                             (map as-sql-keyword options))))]
     (format "CREATE %sINDEX %s ON %s %s"
             (str (when ((set options) :unique) "UNIQUE "))
-            (as-identifier db-spec iname :schema)
+            (as-identifier db-spec iname)
             (as-identifier db-spec tname :schema)
             (as-list (map index-column columns)))))
 
