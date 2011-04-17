@@ -65,7 +65,7 @@
   [db-spec iname tname columns options])
 
 (defrecord DropStatement
-  [db-spec otype oname behavior])
+  [db-spec otype oname behavior options])
 
 (defrecord AlterTableStatement
   [db-spec tname action element])

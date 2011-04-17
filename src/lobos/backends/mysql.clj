@@ -118,13 +118,19 @@
 
 (defmethod compile [:mysql DropStatement]
   [statement]
-  (let [{:keys [db-spec otype oname behavior]} statement]
-    (join \space
-      "DROP"
-      (as-sql-keyword otype)
-      (as-identifier db-spec oname :schema)
-      (when (and behavior (#{:table} otype))
-        [(as-sql-keyword behavior)]))))
+  (let [{:keys [db-spec otype oname behavior options]} statement]
+    (if (= otype :index)
+      (join \space
+        "DROP INDEX"
+        (as-identifier db-spec oname)
+        "ON"
+        (as-identifier db-spec (:tname options) :schema))
+      (join \space
+        "DROP"
+        (as-sql-keyword otype)
+        (as-identifier db-spec oname :schema)
+        (when (and behavior (#{:table} otype))
+          [(as-sql-keyword behavior)])))))
 
 (defmethod compile [:mysql AlterDropAction]
   [action]

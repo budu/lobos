@@ -157,7 +157,7 @@
     (CreateIndexStatement. db-spec iname tname columns options))
 
   (build-drop-statement [this behavior db-spec]
-    (DropStatement. db-spec :index iname nil)))
+    (DropStatement. db-spec :index iname nil {:tname tname})))
 
 (defn index
   ([table columns] (index table nil columns))
@@ -630,7 +630,7 @@ It also can be used in alter modify and rename actions. In that
            (concat columns constraints)))))
 
   (build-drop-statement [this behavior db-spec]
-    (DropStatement. db-spec :table name behavior)))
+    (DropStatement. db-spec :table name behavior nil)))
 
 (defn table*
   "Constructs an abstract table definition. The `table-name` is
@@ -666,7 +666,7 @@ It also can be used in alter modify and rename actions. In that
            elements))))
 
   (build-drop-statement [this behavior db-spec]
-    (DropStatement. db-spec :schema sname behavior)))
+    (DropStatement. db-spec :schema sname behavior nil)))
 
 (defn schema?
   "Returns true if the given object is a Schema."
