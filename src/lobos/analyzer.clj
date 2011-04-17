@@ -16,9 +16,10 @@
         lobos.utils)
   (:import (java.sql DatabaseMetaData)
            (lobos.schema Column
+                         DataType
                          Expression
                          ForeignKeyConstraint
-                         DataType
+                         Index
                          Schema
                          Table
                          UniqueConstraint)))
@@ -105,6 +106,22 @@
    (map (fn [[cname meta]] (analyze ForeignKeyConstraint cname meta))
         (references-meta sname tname))))
 
+(defmethod analyze [::standard Index]
+  [_ sname tname iname index-meta]
+  (let [pkeys (primary-keys sname tname)]
+    (Index.
+     (keyword iname)
+     tname
+     (vec (map #(-> % :column_name keyword)
+               index-meta))
+     (when (-> index-meta first :non_unique not)
+       (list :unique)))))
+
+(defmethod analyze [::standard :indexes]
+  [_ sname tname]
+  (map (fn [[iname meta]] (analyze Index sname tname iname meta))
+       (indexes-meta sname tname)))
+
 (defn analyze-data-type-args
   "Returns a vector containing the data type arguments for the given
   column meta data."
@@ -144,7 +161,9 @@
                                   [(:cname c) c])
                                (columns-meta sname tname)))
                  (into {} (map #(vector (:cname %) %)
-                               (analyze :constraints sname tname)))))
+                               (analyze :constraints sname tname)))
+                 (into {} (map #(vector (:iname %) %)
+                               (analyze :indexes sname tname)))))
 
 (defmethod analyze [::standard Schema]
   [_ sname]
