@@ -144,11 +144,10 @@
                (optional #(or (schema/schema? %)
                               (connection? %)) params#)
                ~params* params#
-               ~'schema (cond (schema/schema? cnx-or-schema#) cnx-or-schema#
-                              (fn? cnx-or-schema#) (cnx-or-schema#))
+               ~'schema (when (schema/schema? cnx-or-schema#) cnx-or-schema#)
                cnx# (or (conn/find-connection)
                         (-> ~'schema :options :db-spec)
-                        cnx-or-schema#
+                        (when-not ~'schema cnx-or-schema#)
                         :default-connection)
                ~'db-spec (merge (conn/get-db-spec cnx#)
                                 (when ~'schema
@@ -171,7 +170,7 @@
 
     user> (create (table :foo (integer :a)))"
   [element]
-  (schema/build-create-statement element db-spec))
+  (schema/build-create-statement (or element schema) db-spec))
 
 (defaction alter
   "Builds an alter statement with the given schema element and execute
