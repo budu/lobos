@@ -10,7 +10,8 @@
   (:refer-clojure :exclude [alter defonce drop])
   (:use clojure.test
         (clojure.contrib [io :only [delete-file file]])
-        (lobos connectivity core utils))
+        (lobos connectivity core utils)
+        (lobos [schema :only [schema]]))
   (:import (java.lang UnsupportedOperationException)))
 
 ;;;; DB connection specifications
@@ -97,7 +98,8 @@
 
 (defmacro with-schema [[var-name sname] & body]
   `(try
-     (let [~var-name (create-schema ~sname *db*)]
+     (let [~var-name (schema ~sname {:db-spec (get-db-spec *db*)})]
+       (create-schema ~var-name *db*)
        ~@body)
      (finally (try (drop-schema ~sname :cascade *db*)
                    (catch Exception _#)))))

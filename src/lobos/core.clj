@@ -49,11 +49,6 @@
 
 ;; ## Global Schema Map
 
-;; This section contains mainly functions for internal use. You can skip
-;; most of it if you only mean to use **Lobos** as a library. If that's
-;; the case, have a look at the `defschema` macro and the
-;; `set-default-schema` and `get-default-schema` functions.
-
 (defonce global-schemas
   (atom {})
   "This atom keeps a map of all schemas in use. See `schema-key` for
@@ -126,38 +121,6 @@
              (-> schema :options :db-spec))
       schema
       (assoc-in schema [:options :db-spec] db-spec))))
-
-(defmacro defschema
-  "This macro take two mandatory argument, the name of the variable
-  being defined and the name of the schema it represent. When used
-  without specifying elements, it defines a var containing the specified
-  schema constructed from database meta-data. e.g.:
-
-    user> (defschema sample-schema :tmp)
-
-  If used with elements, the defined var will keep the abstract schema
-  definition to be later created using the `create-schema` action. e.g.:
-
-    user> (defschema sample-schema :tmp
-             (table :foo (integer :a)))
-
-  It can also take an optional `connection-info` argument from which the
-  db-spec map will be used."
-  {:arglists '([connection-info? var-name schema-name & elements])}
-  [& args]
-  (let [[connection-info args] (optional map? args)
-        var-name (first args)
-        schema-name (second args)
-        elements (nnext args)]
-    `(let [db-spec# (conn/get-db-spec ~connection-info)
-           options# {:db-spec db-spec#}
-           elements# (list ~@elements)
-           key# (schema-key
-                 (if elements#
-                   (update-global-schema
-                    (apply schema/schema ~schema-name options# elements#))
-                   (update-global-schema ~schema-name db-spec#)))]
-       (defn ~var-name [] (@global-schemas key#)))))
 
 (defn set-default-schema
   "Set the given schema as the default one."
@@ -333,9 +296,9 @@
     user> (create-schema sample-schema)"
   [schema-or-name & [connection-info]]
   (let [schema (get-or-create-schema schema-or-name connection-info)
-        db-spec (-> schema :options :db-spec)]
-    (execute (schema/build-create-statement schema db-spec) db-spec)
-    (update-global-schema schema)))
+        db-spec (or (conn/get-db-spec connection-info)
+                    (-> schema :options :db-spec))]
+    (execute (schema/build-create-statement schema db-spec) db-spec)))
 
 (defn drop-schema
   "Drop the specified schema or the named one using the given optional
@@ -344,6 +307,6 @@
   drops all elements relying it."
   [schema-or-name & [behavior connection-info]]
   (let [schema (get-or-create-schema schema-or-name connection-info)
-        db-spec (-> schema :options :db-spec)]
-    (execute (schema/build-drop-statement schema behavior db-spec) db-spec)
-    (remove-global-schema schema)))
+        db-spec (or (conn/get-db-spec connection-info)
+                    (-> schema :options :db-spec))]
+    (execute (schema/build-drop-statement schema behavior db-spec) db-spec)))

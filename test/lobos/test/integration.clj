@@ -26,7 +26,8 @@
 (deftest test-action-connectivity
   (let [test-create-action
         #(try
-           (let [lobos (create-schema :lobos)]
+           (let [lobos (schema :lobos)]
+             (create-schema :lobos *db*)
              (= (-> (create lobos (table :foo (integer :bar)))
                     :elements
                     :foo)

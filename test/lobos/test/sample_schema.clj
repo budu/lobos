@@ -31,18 +31,18 @@
          (datetime-tracked))
        ~@elements))
 
-(defschema sample-schema :lobos
-  
-  (tbl :users
+(def sample-schema
+  (schema :lobos
+   (tbl :users
     (varchar :name 100 :unique)
     (check :name (> (length :name) 1)))
 
-  (tbl :posts
+   (tbl :posts
     (varchar :title 200 :unique)
     (text :content)
     (refer-to :users))
 
-  (tbl :comments
+   (tbl :comments
     (text :content)
     (refer-to :users)
-    (refer-to :posts)))
+    (refer-to :posts))))
