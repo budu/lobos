@@ -8,7 +8,8 @@
 
 (ns lobos.metadata
   "Helpers to query the database's meta-data."
-  (:require (lobos [compiler :as compiler]
+  (:require (clojure.contrib.sql [internal :as sqlint])
+            (lobos [compiler :as compiler]
                    [connectivity :as conn]
                    [schema :as schema]))
   (:use (clojure.contrib [def :only [defvar-]]))
@@ -25,13 +26,16 @@
   "Returns the binded DatabaseMetaData object found in *db-meta* or get
   one from the default connection if not available."
   []
-  (or *db-meta*
+  (or (when (conn/connection)
+        (.getMetaData (conn/connection)))
+      *db-meta*
       (conn/with-connection :default-connection
         (.getMetaData (conn/connection)))))
 
 (defn db-meta-spec
   []
-  (or *db-meta-spec*
+  (or (:db-spec sqlint/*db*)
+      *db-meta-spec*
       (conn/get-db-spec :default-connection)))
 
 (defmacro with-db-meta
