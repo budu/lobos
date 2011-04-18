@@ -104,9 +104,6 @@
      (finally (try (drop-schema ~sname :cascade *db*)
                    (catch Exception _#)))))
 
-(defn get-schema []
-  (get-global-schema :lobos *db*))
-
 (defmacro inspect-schema [& keys]
   `(-> :lobos (analyze-schema *db*) ~@keys))
 

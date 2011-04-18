@@ -47,93 +47,6 @@
 
 ;; -----------------------------------------------------------------------------
 
-;; ## Global Schema Map
-
-(defonce global-schemas
-  (atom {})
-  "This atom keeps a map of all schemas in use. See `schema-key` for
-  more details on how keys are generated. *For internal use*.")
-
-(defonce default-schema
-  (atom nil)
-  "This atom keeps the key of the default schema. *For internal use*.")
-
-(defn schema-key
-  "Returns an unique schema key for the given schema. This schema must
-  have its db-spec option properly set. When given a keyword instead of
-  a schema, it look-up this schema by name in the `global-schemas` map
-  using the supplied db-spec argument. *For internal use*."
-  [schema-or-name & [db-spec]]
-  (str (:subname (or db-spec (-> schema-or-name
-                                 :options
-                                 :db-spec)))
-       (if (keyword? schema-or-name)
-         schema-or-name
-         (:sname schema-or-name))))
-
-(defn set-global-schema
-  "Associates the given schema in the `global-schemas` map with its key
-  and returns the given argument. *For internal use*."
-  [schema]
-  (swap! global-schemas assoc (schema-key schema) schema)
-  schema)
-
-(defn get-global-schema
-  "Returns the specified global schema by searching for it using the
-  given name and optional connection-info or default connection.  For
-  internal use. *For debugging purpose*."
-  [sname & [connection-info]]
-  (let [db-spec (conn/get-db-spec connection-info)]
-    (@global-schemas (schema-key sname db-spec))))
-
-(defn update-global-schema
-  "If given a schema, associates it in the global schemas map, else
-  analyze the specified schema from the database specified by the given
-  `db-spec` and associates it in the global schemas map. *For internal
-  use*."
-  ([schema] (set-global-schema schema))
-  ([schema-name db-spec]
-     (set-global-schema
-      (assoc-in
-       (analyzer/analyze-schema schema-name db-spec)
-       [:options :db-spec]
-       db-spec))))
-
-(defn remove-global-schema
-  "Removes the given schema from the global schema map. *For internal
-  use*."
-  [schema]
-  (swap! global-schemas dissoc (schema-key schema))
-  nil)
-
-(defn get-or-create-schema
-  "Returns the given schema, the schema returned by the given function
-  or create an abstract schema definition with the given keyword
-  depending on the argument's type, else nil. Associates the db-spec
-  obtained from the optional `connection-info` in its options map if
-  there's not already one. *For internal use*."
-  [schema-or-name & [connection-info]]
-  (let [db-spec (conn/get-db-spec connection-info)
-        schema (cond (schema/schema? schema-or-name) schema-or-name
-                     (fn? schema-or-name) (schema-or-name)
-                     (keyword? schema-or-name) (schema/schema schema-or-name))]
-    (if (and (not connection-info)
-             (-> schema :options :db-spec))
-      schema
-      (assoc-in schema [:options :db-spec] db-spec))))
-
-(defn set-default-schema
-  "Set the given schema as the default one."
-  [schema]
-  (swap! default-schema (constantly (schema-key (schema)))))
-
-(defn get-default-schema
-  "Returns the default schema."
-  []
-  (@global-schemas @default-schema))
-
-;; -----------------------------------------------------------------------------
-
 ;; ## Helpers
 
 (defn debug
@@ -213,9 +126,7 @@
   given one prepended by the optional `cnx-or-schema` argument.
 
   All actions must return a built statement (or list of statements)
-  using one of the protocol method available. This statement(s) will get
-  executed and if a schema as been given as argument, it will be updated
-  using the `update-global-schema` function.
+  using one of the protocol method available.
 
   The defined actions will have access to two extra local variables. The
   `schema` variable will contain the given schema if `cnx-or-schema` is
@@ -233,7 +144,6 @@
                (optional #(or (schema/schema? %)
                               (connection? %)) params#)
                ~params* params#
-               cnx-or-schema# (or cnx-or-schema# (get-default-schema))
                ~'schema (cond (schema/schema? cnx-or-schema#) cnx-or-schema#
                               (fn? cnx-or-schema#) (cnx-or-schema#))
                cnx# (or (conn/find-connection)
@@ -245,9 +155,7 @@
                                   {:schema (-> ~'schema :sname name)}))]
            (execute
             ~@body
-            ~'db-spec)
-           (when ~'schema (update-global-schema (:schema ~'db-spec)
-                                                ~'db-spec))))
+            ~'db-spec)))
        (.setMeta #'~name
                  (merge (.meta #'~name)
                         {:arglists '(~(vec (conj params 'cnx-or-schema?)))})))))
@@ -295,9 +203,11 @@
     user> (create-schema :tmp)
     user> (create-schema sample-schema)"
   [schema-or-name & [connection-info]]
-  (let [schema (get-or-create-schema schema-or-name connection-info)
-        db-spec (or (conn/get-db-spec connection-info)
-                    (-> schema :options :db-spec))]
+  (let [db-spec (conn/get-db-spec connection-info)
+        schema (if (schema/schema? schema-or-name)
+                 schema-or-name
+                 (schema/schema schema-or-name {:db-spec db-spec}))
+        db-spec (or db-spec (-> schema :options :db-spec))]
     (execute (schema/build-create-statement schema db-spec) db-spec)))
 
 (defn drop-schema
@@ -306,7 +216,9 @@
   default connection. When the `:cascade` behavior is specified, it
   drops all elements relying it."
   [schema-or-name & [behavior connection-info]]
-  (let [schema (get-or-create-schema schema-or-name connection-info)
-        db-spec (or (conn/get-db-spec connection-info)
-                    (-> schema :options :db-spec))]
+  (let [db-spec (conn/get-db-spec connection-info)
+        schema (if (schema/schema? schema-or-name)
+                 schema-or-name
+                 (schema/schema schema-or-name {:db-spec db-spec}))
+        db-spec (or db-spec (-> schema :options :db-spec))]
     (execute (schema/build-drop-statement schema behavior db-spec) db-spec)))
