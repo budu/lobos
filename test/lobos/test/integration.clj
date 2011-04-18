@@ -25,15 +25,11 @@
 
 (deftest test-action-connectivity
   (let [test-create-action
-        #(try
-           (let [lobos (schema :lobos)]
-             (create-schema :lobos *db*)
-             (= (-> (create lobos (table :foo (integer :bar)))
-                    :elements
-                    :foo)
-                (table :foo (integer :bar))))
-           (finally (try (drop-schema :lobos :cascade)
-                         (catch Exception _))))]
+        #(with-schema [lobos :lobos]
+           (= (-> (create lobos (table :foo (integer :bar)))
+                  :elements
+                  :foo)
+              (table :foo (integer :bar))))]
     (is (thrown? Exception (test-create-action))
         "Trying to create a table when no connection is available")
     (is (with-connection h2-spec (test-create-action))
