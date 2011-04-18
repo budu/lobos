@@ -506,7 +506,7 @@ It also can be used in alter modify and rename actions. In that
     '(-> options
          (conj-when (not (integer? precision)) precision)
          (conj-when (not (integer? scale)) scale))
-    "Takes an optional `precision` and `scale` arguments."))
+    " Takes an optional `precision` and `scale` arguments."))
 
 (defmacro def-optional-precision-typed-columns
   "Defines typed columns with optional precision. Used by `float` and
@@ -517,7 +517,7 @@ It also can be used in alter modify and rename actions. In that
     '[table column-name & [precision & options]]
     '(conj-when [] (integer? precision) precision)
     '(conj-when options (not (integer? precision)) precision)
-    "Takes an optional `precision` argument."))
+    " Takes an optional `precision` argument."))
 
 (defmacro def-optional-length-typed-columns
   "Defines optionally length-bounded typed columns. Used by binary and
@@ -528,7 +528,7 @@ It also can be used in alter modify and rename actions. In that
     '[table column-name & [length & options]]
     '(conj-when [] (integer? length) length)
     '(conj-when options (not (integer? length)) length)
-    "Takes an optional `length` argument."))
+    " Takes an optional `length` argument."))
 
 (defmacro def-length-bounded-typed-columns
   "Defines length-bounded typed columns. Used by variable binary and
@@ -539,7 +539,7 @@ It also can be used in alter modify and rename actions. In that
     '[table column-name length & options]
     '(conj-when [] (integer? length) length)
     '(conj-when options (not (integer? length)) length)
-    "The `length` arguemnt is mandatory."))
+    " The `length` arguemnt is mandatory."))
 
 ;; ### Numeric Types
 
