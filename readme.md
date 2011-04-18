@@ -1,18 +1,18 @@
 # Lobos
 
-Lobos is a library to create and manipulate abstract SQL database
+**Lobos** is a library to create and manipulate abstract SQL database
 schemas and applying them to any supported RDBMS. It is based on the
 original ClojureQL but exclude the query language part which is better
 handled by the [new ClojureQL] project. It aims to add higher-level
-features like declarative schema manipulation and built-in migration
-support.
+features like built-in migration support and declarative schema
+manipulation.
 
 This is currently an early release, use it at your own risk. You can
 have a look at the [roadmap] for more information about future releases
 and consult the [history] to see what have been done.
 
-Lobos supports H2, MySQL, PostgreSQL, SQLite and SQL Server. You'll need
-to add the relevant JDBC driver manually. For SQLite you'll need a
+**Lobos** supports H2, MySQL, PostgreSQL, SQLite and SQL Server. You'll
+need to add the relevant JDBC driver manually. For SQLite you'll need a
 custom [SQLite JDBC driver].
 
 ## Usage
@@ -41,46 +41,21 @@ and makes it the default global connection:
 
     (open-global db)
 
-You can send DDL statements (called actions) directly to a connected
+You can send DDL statements (called *actions*) directly to a connected
 database like this:
 
     user> (create db (table :users (integer :id :unique)))
     nil
 
-You can omit the connection altogether and the actions will use the
-default one.
+You can omit the connection altogether. In that case, actions will use
+the connection bound by `with-connection` or the default one.
 
     user> (drop (table :users (integer :id :unique)))
     nil
 
-### Schemas    
+### More Complex Example
 
-You can use a schema which you'll first need to define:
-
-    (defschema sample-schema :public)
-
-You can optionally make that schema the default one:
-
-    (set-default-schema sample-schema)
-
-Now you can call actions on the database to which the schema is attached
-and the actions will return the schema definition instead of nil.
-
-    user> (create sample-schema (table :users (integer :id :unique)))
-    #:lobos.schema.Schema{...}
-
-You could always omit the schema argument, then the default schema will
-be used:
-
-    user> (drop (table :users))
-    #:lobos.schema.Schema{...}
-
-All statements send that way will qualify schema elements with the given
-or default schema.
-
-### More Complex Examples
-
-Lobos supports a comprehensive set of features for creating tables.
+**Lobos** supports a comprehensive set of features for creating tables.
 Here's a more complex example using custom helpers to define a complete
 schema:
 
@@ -109,52 +84,56 @@ schema:
              (datetime-tracked))
            ~@elements))
     
-    (defschema sample-schema :lobos
-      
-      (tbl :users
+    (def sample-schema
+      (schema :lobos
+       (tbl :users
         (varchar :name 100 :unique)
         (check :name (> (length :name) 1)))
     
-      (tbl :posts
+       (tbl :posts
         (varchar :title 200 :unique)
         (text :content)
         (refer-to :users))
     
-      (tbl :comments
+       (tbl :comments
         (text :content)
         (refer-to :users)
-        (refer-to :posts)))
+        (refer-to :posts))))
 
-To create that schema, use the `create-schema` action:
+Then you can use the `create` action to create that schema:
 
     user> (use 'sample-schema)
     nil
-    user> (create-schema sample-schema)
-    #:lobos.schema.Schema{...}
+    user> (create sample-schema)
+    nil
 
-There also the `alter` action which let you manipulate tables:
+### Altering Tables
+
+There's also the `alter` action which let you manipulate tables:
 
     user> (alter :add (table :users (text :about-me)))
-    #:lobos.schema.Schema{...}
+    nil
     user> (alter :add (table :users
                         (text :location)
                         (text :occupation)))
-    #:lobos.schema.Schema{...}
+    nil
     user> (alter :add (table :comments (check :comment-limit (< (length :content) 144))))
-    #:lobos.schema.Schema{...}
+    nil
     user> (alter :modify (table :users (column :location (default "Somewhere"))))
-    #:lobos.schema.Schema{...}
+    nil
     user> (alter :drop (table :users (column :occupation)))
-    #:lobos.schema.Schema{...}
+    nil
     user> (alter :rename (table :users (column :location :to :origin)))
-    #:lobos.schema.Schema{...}
+    nil
+
+### Dropping Schema Elements
 
 The `drop` action has the optional `behavior` parameter that works even
 on database without built-in support for it:
 
     user> (drop sqlserver-spec (table :users) :cascade)
     nil
-                    
+
 ### Debugging
 
 You can always set the debug level to see the compiled statement:
@@ -163,8 +142,9 @@ You can always set the debug level to see the compiled statement:
     :sql
     user> (create (table :users (integer :id :unique)))
     CREATE TABLE "lobos"."users" ("id" INTEGER, CONSTRAINT "unique_id" UNIQUE ("id"))
+    nil
 
-As you can see Lobos use delimited identifiers by default and schema
+As you can see **Lobos** use delimited identifiers by default and schema
 qualified identifiers when an action use a schema.
 
 ### Analyzer
@@ -172,8 +152,7 @@ qualified identifiers when an action use a schema.
 Lobos includes a database analyzer which use the database meta-data or
 information schema to construct an abstract schema definition from an
 actual database schema. This feature is only experimental for the
-moment, is used internally to update the global schema map and is also
-used for integration testing.
+moment and is used internally integration testing.
 
     user> (use 'lobos.analyzer)
     nil
@@ -185,8 +164,9 @@ used for integration testing.
     #:lobos.schema.ForeignKeyConstraint{...}
 
 This feature may eventually be split into its own project and is quite
-limited in its current form. Currently it doesn't support check
-or foreign keys constraints and need a custom [SQLite JDBC driver].
+limited in its current form. Currently it doesn't support check or
+foreign keys constraints and has *very* limited support for parsing SQL
+expressions.
 
 ## Installation
 
