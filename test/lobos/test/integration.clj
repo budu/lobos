@@ -10,7 +10,7 @@
   (:refer-clojure :exclude [alter compile defonce drop
                             bigint boolean char double float time])
   (:use clojure.test
-        (lobos analyzer connectivity core metadata schema test utils)
+        (lobos connectivity core metadata schema test utils)
         (lobos.backends h2 mysql postgresql sqlite sqlserver))
   (:import (lobos.schema ForeignKeyConstraint
                          UniqueConstraint)))
@@ -31,70 +31,76 @@
                   :foo)
               (table :foo (integer :bar))))]
     (is (thrown? Exception (test-create-action))
-        "Trying to create a table when no connection is available")
+        "An exception should have been thrown because there are no connection")
     (is (with-connection h2-spec (test-create-action))
-        "Using with-connection to test if a table has been created")))
+        "No exception should have been thrown what executing an action")))
 
 (def-db-test test-create-and-drop-schema
   (when (with-db-meta (get-db-spec *db*)
           (or (supports-schemas)
               (supports-catalogs)))
     (with-schema [lobos :lobos]
-      (is (= (analyze-schema :lobos *db*) lobos)
-          "A schema named lobos should have been created")
+      (is (= (inspect-schema) lobos)
+          "A schema named 'lobos' should have been created")
       (drop-schema lobos)
-      (is (nil? (analyze-schema :lobos *db*))
-          "A schema named lobos should not be found"))))
+      (is (nil? (inspect-schema))
+          "A schema named 'lobos' should have been dropped"))))
 
 (def-db-test test-create-and-drop-table
   (with-schema [lobos :lobos]
     (create lobos (table :foo (integer :bar)))
-    (is (= (-> (get-schema) :elements :foo)
+    (is (= (inspect-schema :elements :foo)
            (table :foo (integer :bar)))
-        "Checking if the table has been created")
-    (is (nil? (-> (drop lobos (table :foo)) :elements :foo))
-        "Checking if the table has been dropped")))
+        "A table named 'foo' should have been created")
+    (drop lobos (table :foo))
+    (is (nil? (inspect-schema :elements :foo))
+        "A table named 'foo' should have been dropped")))
 
 (def-db-test test-create-and-drop-index
   (with-schema [lobos :lobos]
-    (let [lobos (create lobos (table :foo (integer :bar)))]
-      (let [cname (make-index-name :foo :index [:bar])]
-        (is (= (-> (create lobos (index :foo [:bar]))
-                   :elements :foo :indexes cname)
-               (index :foo [:bar]))
-            "An index should have been created")
-        (is (empty? (-> (drop lobos (index :foo [:bar]))
-                        :elements :foo :indexes))
-            "An index should have been dropped"))
-      (drop lobos (table :foo)))))
+    (create lobos (table :foo (integer :bar)))
+    (let [cname (make-index-name :foo :index [:bar])]
+      (create lobos (index :foo [:bar]))
+      (is (= (inspect-schema :elements :foo :indexes cname)
+             (index :foo [:bar]))
+          "An index named 'foo_index_bar' should have been created")
+      (drop lobos (index :foo [:bar]))
+      (is (empty? (inspect-schema :elements :foo :indexes))
+          "An index named 'foo_index_bar' should have been dropped"))
+    (drop lobos (table :foo))))
 
 (def-db-test test-alter-table
   (with-schema [lobos :lobos]
     (let [actual #(-> % :elements :foo (assoc :indexes {}))]
       (create lobos (table :foo (integer :a)))
-      (are-equal (actual (alter lobos :add (table :foo (integer :b))))
-                 (table :foo (integer :a) (integer :b))
-                 "Checking if the column has been added")
-      (are-equal (actual (alter lobos :drop (table :foo (integer :b))))
-                 (table :foo (integer :a))
-                 "Checking if the column has been dropped")
-      (are-equal (actual (alter lobos :add (table :foo (unique [:a]))))
-                 (table :foo (integer :a :unique))
-                 "Checking if the constraint has been added")
-      (are-equal (actual (alter lobos :drop (table :foo (unique [:a]))))
-                 (table :foo (integer :a))
-                 "Checking if the constraint has been dropped")
-      (are-equal (actual (alter lobos :modify
-                                (table :foo (column :a (default 0)))))
-                 (table :foo (integer :a (default 0)))
-                 "Checking if the default clause has been set")
-      (are-equal (actual (alter lobos :modify
-                                (table :foo (column :a :drop-default))))
-                 (table :foo (integer :a))
-                 "Checking if the default clause has been dropped")
-      (are-equal (actual (alter lobos :rename (table :foo (column :a :to :b))))
-                 (table :foo (integer :b))
-                 "Checking if the column has been renamed")
+      (when-supported (alter lobos :add (table :foo (integer :b)))
+        (is (= (actual (inspect-schema))
+               (table :foo (integer :a) (integer :b)))
+            "A column named 'b' should have been added to table 'foo'"))
+      (when-supported (alter lobos :drop (table :foo (integer :b)))
+        (is (= (actual (inspect-schema))
+               (table :foo (integer :a)))
+            "A column named 'b' should have been dropped from table 'foo'"))
+      (when-supported (alter lobos :add (table :foo (unique [:a])))
+        (is (= (actual (inspect-schema))
+               (table :foo (integer :a :unique)))
+            "A constraint named 'foo_unique_a' should have been added to table 'foo'"))
+      (when-supported (alter lobos :drop (table :foo (unique [:a])))
+        (is (= (actual (inspect-schema))
+               (table :foo (integer :a)))
+            "A constraint named 'foo_unique_a' should have been dropped from table 'foo'"))
+      (when-supported (alter lobos :modify (table :foo (column :a (default 0))))
+        (is (= (actual (inspect-schema))
+               (table :foo (integer :a (default 0))))
+            "A column default clause should have been set"))
+      (when-supported  (alter lobos :modify (table :foo (column :a :drop-default)))
+        (is (= (actual (inspect-schema))
+               (table :foo (integer :a)))
+            "A column default clause should have been dropped"))
+      (when-supported  (alter lobos :rename (table :foo (column :a :to :b)))
+        (is (= (actual (inspect-schema))
+               (table :foo (integer :b)))
+            "A column named 'a' should have been renamed to 'b'"))
       (drop lobos (table :foo)))))
 
 (defn- eq [dtype]
@@ -107,9 +113,9 @@
 
 (def-db-test test-data-types
   (with-schema [lobos :lobos]
-    (let [actual-type #(-> % :elements :foo :columns :bar :data-type :dtype eq)
+    (let [actual-type #(inspect-schema :elements :foo :columns :bar :data-type :dtype eq)
           expected-type #(-> % :data-type :dtype eq)
-          actual-args #(-> % :elements :foo :columns :bar :data-type :args)
+          actual-args #(inspect-schema :elements :foo :columns :bar :data-type :args)
           expected-args #(-> % :data-type :args)]
       
       (doseq [dtype [:smallint :integer :bigint
@@ -120,64 +126,66 @@
                      :boolean
                      :date :time :timestamp]]
         (let [dtype (data-type dtype)]
-          (test-with [lobos (create lobos (table :foo (column :bar dtype)))]
-           (is (= (actual-type lobos) (expected-type (column* :bar dtype [])))
-               (str "Data type not matching for " (-> dtype :dtype name)))
-           (drop lobos (table :foo)))))
+          (when-supported (create lobos (table :foo (column :bar dtype)))
+            (is (= (actual-type) (expected-type (column* :bar dtype [])))
+                (str "Data type should match " (-> dtype :dtype name)))
+            (drop lobos (table :foo)))))
       
       (doseq [dtype [:char :nchar :varchar :nvarchar
                      :binary :varbinary
                      :numeric :decimal]]
         (let [dtype (data-type dtype [3])]
-          (test-with [lobos (create lobos (table :foo (column :bar dtype nil)))]
-           (is (= (actual-type lobos) (expected-type (column* :bar dtype [])))
-               (str "Data type not matching for " (-> dtype :dtype name)))
-           (is (= (actual-args lobos) (expected-args (column* :bar dtype [])))
-               (format "Data type arguments not matching for %s %s"
-                       (-> dtype :dtype name)
-                       (:args dtype)))
-           (drop lobos (table :foo)))))
-    
+          (when-supported (create lobos (table :foo (column :bar dtype nil)))
+            (is (= (actual-type) (expected-type (column* :bar dtype [])))
+                (str "Data type should match " (-> dtype :dtype name)))
+            (is (= (actual-args) (expected-args (column* :bar dtype [])))
+                (format "Data type arguments should match %s for %s"
+                        (:args dtype)
+                        (-> dtype :dtype name)))
+            (drop lobos (table :foo)))))
+      
       (let [dtype (data-type :numeric [8 3])]
-        (test-with [lobos (create lobos (table :foo (column :bar dtype)))]
-         (is (= (actual-type lobos) (expected-type (column* :bar dtype [])))
-             (str "Data type not matching for " (-> dtype :dtype name)))
-         (is (= (actual-args lobos) (expected-args (column* :bar dtype [])))
-             (format "Data type arguments not matching for %s %s"
-                     (-> dtype :dtype name)
-                     (:args dtype)))
-         (drop lobos (table :foo))))
+        (when-supported (create lobos (table :foo (column :bar dtype)))
+          (is (= (actual-type) (expected-type (column* :bar dtype [])))
+              (str "Data type should match " (-> dtype :dtype name)))
+          (is (= (actual-args) (expected-args (column* :bar dtype [])))
+              (format "Data type arguments should match %s for %s"
+                      (:args dtype)
+                      (-> dtype :dtype name)))
+          (drop lobos (table :foo))))
 
       (doseq [dtype [:time :timestamp]]
         (let [dtype (data-type dtype [] {:time-zone true})]
-          (test-with [lobos (create lobos (table :foo (column :bar dtype)))]
-           (is (= (actual-type lobos) (expected-type (column* :bar dtype [])))
-               (str "Data type not matching for " (-> dtype :dtype name)))
-           (is (-> lobos :elements :foo :columns :bar :data-type :options
-                   :time-zone)
-               (str "Timezone not set for " (-> dtype :dtype name)))
-           (drop lobos (table :foo))))))))
+          (when-supported (create lobos (table :foo (column :bar dtype)))
+            (is (= (actual-type) (expected-type (column* :bar dtype [])))
+                (str "Data type should match " (-> dtype :dtype name)))
+            (is (inspect-schema :elements :foo :columns :bar
+                                :data-type :options :time-zone)
+                (str "Timezone should be set for " (-> dtype :dtype name)))
+            (drop lobos (table :foo))))))))
 
 (def-db-test test-unique-constraint
   (with-schema [lobos :lobos]
     (doseq [ctype [:unique :primary-key]]
       (let [cname (make-index-name :foo ctype [:a])]
-        (are-equal (-> lobos (create (table :foo (integer :a ctype)))
-                       :elements :foo :constraints cname)
-                   (UniqueConstraint. cname ctype [:a])
-                   (format "Checking if %s constraint has been created"
-                           (name ctype)))
+        (when-supported (create lobos (table :foo (integer :a ctype)))
+          (is (= (inspect-schema :elements :foo :constraints cname)
+                 (UniqueConstraint. cname ctype [:a]))
+              (format "A %s constraint named '%s' should have been created"
+                      (name ctype)
+                      (name cname))))
         (drop lobos (table :foo))))))
 
 (def-db-test test-foreign-key-constraint
   (with-schema [lobos :lobos]
     (let [cname (make-index-name :baz :fkey [:bar])]
-      (are-equal (-> lobos
-                     (create (table :foo (integer :bar :primary-key)))
-                     (create (table :baz (integer :bar)
-                                    (foreign-key [:bar] :foo)))
-                     :elements :baz :constraints cname)
-                 (ForeignKeyConstraint. cname [:bar] :foo [:bar] nil {})
-                 "Checking if foreign key constraint has been created")
+      (when-supported (do (create lobos (table :foo (integer :bar :primary-key)))
+                          (create lobos (table :baz
+                                          (integer :bar)
+                                          (foreign-key [:bar] :foo))))
+        (is (= (inspect-schema :elements :baz :constraints cname)
+               (ForeignKeyConstraint. cname [:bar] :foo [:bar] nil {}))
+            (format "A foreign key constraint named '%s' should have been created"
+                    (name cname))))
       (drop lobos (table :baz))
       (drop lobos (table :foo)))))

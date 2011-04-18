@@ -10,7 +10,7 @@
   (:refer-clojure :exclude [alter defonce drop])
   (:use clojure.test
         (clojure.contrib [io :only [delete-file file]])
-        (lobos connectivity core utils)
+        (lobos analyzer connectivity core utils)
         (lobos [schema :only [schema]]))
   (:import (java.lang UnsupportedOperationException)))
 
@@ -80,12 +80,12 @@
       e)
     e))
 
-(defmacro ignore-unsupported [& body]
-  `(try (let [r# (do ~@body)] (if (coll? r#) (doall r#) r#))
+(defmacro when-supported [action & body]
+  `(try ~action
+        ~@body
         (catch Exception e#
-          (if (isa? (type (first-non-runtime-cause e#))
-                    UnsupportedOperationException)
-            nil
+          (when-not (isa? (type (first-non-runtime-cause e#))
+                          UnsupportedOperationException)
             (throw e#)))))
 
 (defmacro def-db-test [name & body]
@@ -107,14 +107,8 @@
 (defn get-schema []
   (get-global-schema :lobos *db*))
 
-(defmacro are-equal [actual expected & [msg]]
-  `(let [r# (ignore-unsupported ~actual)]
-     (when r# (is (= r# ~expected) ~msg))
-     r#))
-
-(defmacro test-with [[var form] & body]
-  `(let [~var (ignore-unsupported ~form)]
-     (when ~var ~@body)))
+(defmacro inspect-schema [& keys]
+  `(-> :lobos (analyze-schema *db*) ~@keys))
 
 ;;;; Fixtures
 
