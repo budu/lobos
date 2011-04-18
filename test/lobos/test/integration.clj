@@ -24,16 +24,16 @@
 ;;;; Tests
 
 (deftest test-action-connectivity
-  (let [test-create-action
+  (let [test-action
         #(with-schema [lobos :lobos]
-           (= (-> (create lobos (table :foo (integer :bar)))
-                  :elements
-                  :foo)
+           ;; cannot rely on creating just a schema as some dbms ignore that action
+           (create lobos (table :foo (integer :bar)))
+           (= (inspect-schema :elements :foo)
               (table :foo (integer :bar))))]
-    (is (thrown? Exception (test-create-action))
+    (is (thrown? Exception (test-action))
         "An exception should have been thrown because there are no connection")
-    (is (with-connection h2-spec (test-create-action))
-        "No exception should have been thrown what executing an action")))
+    (is (with-connection h2-spec (test-action))
+        "No exception should have been thrown when executing an action")))
 
 (def-db-test test-create-and-drop-schema
   (when (with-db-meta (get-db-spec *db*)
