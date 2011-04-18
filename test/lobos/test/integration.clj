@@ -10,7 +10,7 @@
   (:refer-clojure :exclude [alter compile defonce drop
                             bigint boolean char double float time])
   (:use clojure.test
-        (lobos connectivity core metadata schema test utils)
+        (lobos analyzer connectivity core metadata schema test utils)
         (lobos.backends h2 mysql postgresql sqlite sqlserver))
   (:import (lobos.schema ForeignKeyConstraint
                          UniqueConstraint)))
@@ -36,14 +36,15 @@
         "Using with-connection to test if a table has been created")))
 
 (def-db-test test-create-and-drop-schema
-  (with-schema [lobos :lobos]
-    (when (with-db-meta (-> lobos :options :db-spec)
-            (or (supports-schemas)
-                (supports-catalogs)))
-      (is (= lobos (schema :lobos {:db-spec (get-db-spec *db*)}))
-          "Checking if the schema has been created")
-      (is (nil? (drop-schema lobos))
-          "Checking if the schema has been dropped"))))
+  (when (with-db-meta (get-db-spec *db*)
+          (or (supports-schemas)
+              (supports-catalogs)))
+    (with-schema [lobos :lobos]
+      (is (= (analyze-schema :lobos *db*) lobos)
+          "A schema named lobos should have been created")
+      (drop-schema lobos)
+      (is (nil? (analyze-schema :lobos *db*))
+          "A schema named lobos should not be found"))))
 
 (def-db-test test-create-and-drop-table
   (with-schema [lobos :lobos]

@@ -167,7 +167,7 @@
 
 (defmethod analyze [::standard Schema]
   [_ sname]
-  (apply schema/schema sname {}
+  (apply schema/schema sname {:db-spec (db-meta-spec)}
          (map #(analyze Table sname %)
               (tables sname))))
 
