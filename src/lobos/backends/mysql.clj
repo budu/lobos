@@ -69,10 +69,12 @@
 
 ;; ## Compiler
 
-(defmethod compile [::standard IdentifierExpression]
+(defmethod compile [:mysql IdentifierExpression]
   [identifier]
   (let [{:keys [db-spec name qualifiers]} identifier]
-    (join* \. (map #(as-str \` % \`) (concat qualifiers name)))))
+    (join* \. (->> (concat qualifiers [name])
+                   (filter identity)
+                   (map #(when % (as-str \` % \`)))))))
 
 (defvar- compiler-data-type-aliases
   {:clob :text

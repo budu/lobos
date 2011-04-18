@@ -124,8 +124,9 @@
 (defmethod compile [::standard IdentifierExpression]
   [identifier]
   (let [{:keys [db-spec name qualifiers]} identifier]
-    (join* \. (map #(when % (as-str \" % \"))
-                   (concat qualifiers [name])))))
+    (join* \. (->> (concat qualifiers [name])
+                   (filter identity)
+                   (map #(when % (as-str \" % \")))))))
 
 (defmethod compile [::standard FunctionExpression]
   [function]

@@ -66,10 +66,12 @@
 
 ;; ## Compiler
 
-(defmethod compile [::standard IdentifierExpression]
+(defmethod compile [:sqlserver IdentifierExpression]
   [identifier]
   (let [{:keys [db-spec name qualifiers]} identifier]
-    (join* \. (map #(as-str \[ % \]) (concat qualifiers name)))))
+    (join* \. (->> (concat qualifiers [name])
+                   (filter identity)
+                   (map #(when % (as-str \[ % \])))))))
 
 (defmethod compile [:sqlserver FunctionExpression]
   [function]
@@ -106,13 +108,13 @@
   [_]
   "IDENTITY")
 
-(defn- drop-schema-cascade [db-spec oname]
+(defn- drop-schema-cascade [db-spec sname]
   (vec (for [element (with-db-meta db-spec
-                       (-> (analyze-schema oname) :elements keys))]
+                       (-> (analyze-schema sname) :elements keys))]
          (compile (schema/build-drop-statement
                    (schema/table element)
                    :cascade
-                   (assoc db-spec :schema oname))))))
+                   (assoc db-spec :schema sname))))))
 
 (defmethod compile [:sqlserver DropStatement]
   [statement]
@@ -120,7 +122,9 @@
         sql-string (join \space
                      "DROP"
                      (as-sql-keyword otype)
-                     (as-identifier db-spec oname (:schema db-spec)))]
+                     (as-identifier db-spec oname
+                                    (when (not= otype :schema)
+                                      (:schema db-spec))))]
     (if (= otype :index)
       (join \space
         "DROP INDEX"
