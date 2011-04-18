@@ -153,7 +153,7 @@
                                 (when ~'schema
                                   {:schema (-> ~'schema :sname name)}))]
            (execute
-            ~@body
+            (do ~@body)
             ~'db-spec)))
        (.setMeta #'~name
                  (merge (.meta #'~name)
