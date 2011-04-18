@@ -605,9 +605,10 @@ It also can be used in alter modify and rename actions. In that
 ;; ## Table Definition
 
 (defn- build-table-elements [db-spec method & elements]
-  (map #(when (second %)
-          (method (second %) db-spec))
-       (apply concat elements)))
+  (->> (apply concat elements)
+       (map #(when (second %)
+               (method (second %) db-spec)))
+       (filter identity)))
 
 ;; `Table` records can be constructed using the `table*` function or
 ;; the `table` macro. *For internal use*.
