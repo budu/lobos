@@ -38,10 +38,10 @@
   "Evaluates body in the context of a new connection or a named global
   connection to a database then closes the connection while binding its
   DatabaseMetaData object to *db-meta*."
-  [db-spec & body]
-  `(if ~db-spec
-     (conn/with-connection ~db-spec
-       (binding [*db-meta-spec* ~db-spec
+  [connection-info & body]
+  `(if ~connection-info
+     (conn/with-connection ~connection-info
+       (binding [*db-meta-spec* (conn/get-db-spec ~connection-info)
                  *db-meta* (.getMetaData (conn/connection))]
          ~@body))
      (do ~@body)))
