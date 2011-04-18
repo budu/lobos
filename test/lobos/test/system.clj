@@ -42,9 +42,9 @@
 
 (defn table [name]
   (compiler/as-identifier
-   (assoc (conn/get-db-spec *db*) :schema :lobos)
+   (conn/get-db-spec *db*)
    name
-   :schema))
+   :lobos))
 
 (defn identifier [name]
   (compiler/as-identifier (conn/get-db-spec *db*) name))

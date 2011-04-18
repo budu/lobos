@@ -129,7 +129,7 @@
                   %))
               (and (keyword? %)
                    (not (contains? sql-symbols (-> % name symbol))))
-              (IdentifierExpression. db-spec % :column [])
+              (IdentifierExpression. db-spec % nil)
               (not (keyword? %))
               (ScalarExpression. db-spec %)
               :else %))

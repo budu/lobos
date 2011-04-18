@@ -49,8 +49,8 @@
   "Constructs an IdentifierExpression AST form and compiles it. Takes an
   optional `level` argument to determine which qualification level to
   output, only support `:schema` for now."
-  [db-spec name & [level qualifiers]]
-  (compile (IdentifierExpression. db-spec name level qualifiers)))
+  [db-spec name & qualifiers]
+  (compile (IdentifierExpression. db-spec name qualifiers)))
 
 (defn unsupported
   "Throws an UnsupportedOperationException using the given message. Can
@@ -121,17 +121,11 @@
           (string? scalar) (str "'" scalar "'")
           :else scalar)))
 
-;; In the standard, identifiers are delimited by double quotes. When the
-;; `level` property is set to `:schema`, qualifies the resulting
-;; identifier using the schema name found in the `db-spec property.
 (defmethod compile [::standard IdentifierExpression]
   [identifier]
-  (let [{:keys [db-spec name level]} identifier
-        schema (:schema db-spec)]
-    (if (and (= level :schema) schema)
-      (str (when schema (str (as-identifier db-spec schema) "."))
-           (as-identifier db-spec name))
-      (as-str \" name \"))))
+  (let [{:keys [db-spec name qualifiers]} identifier]
+    (join* \. (map #(when % (as-str \" % \"))
+                   (concat qualifiers [name])))))
 
 (defmethod compile [::standard FunctionExpression]
   [function]
@@ -219,7 +213,7 @@
       "FOREIGN KEY"
       (as-list (map (partial as-identifier db-spec) columns))
       "REFERENCES"
-      (as-identifier db-spec parent-table :schema)
+      (as-identifier db-spec parent-table (:schema db-spec))
       (as-list (map (partial as-identifier db-spec) parent-columns))
       (when match (str "MATCH " (as-sql-keyword match)))
       (when (contains? triggered-actions :on-delete)
@@ -259,7 +253,7 @@
   [statement]
   (let [{:keys [db-spec tname elements]} statement]
     (format "CREATE TABLE %s %s"
-            (as-identifier db-spec tname :schema)
+            (as-identifier db-spec tname (:schema db-spec))
             (or (as-list (map compile elements))
                 "()"))))
 
@@ -276,7 +270,7 @@
     (format "CREATE %sINDEX %s ON %s %s"
             (str (when ((set options) :unique) "UNIQUE "))
             (as-identifier db-spec iname)
-            (as-identifier db-spec tname :schema)
+            (as-identifier db-spec tname (:schema db-spec))
             (as-list (map index-column columns)))))
 
 (defmethod compile [::standard DropStatement]
@@ -285,7 +279,7 @@
     (join \space
       "DROP"
       (as-sql-keyword otype)
-      (as-identifier db-spec oname :schema)
+      (as-identifier db-spec oname (:schema db-spec))
       (as-sql-keyword behavior))))
 
 ;; ### Alter Statement and Actions
@@ -338,7 +332,7 @@
         element (assoc element :sname (:schema db-spec) :tname tname)]
     (join \space
           "ALTER TABLE"
-          (as-identifier db-spec tname :schema)
+          (as-identifier db-spec tname (:schema db-spec))
           (case action
             :add    (compile (AlterAddAction. db-spec element))
             :drop   (compile (AlterDropAction. db-spec element))

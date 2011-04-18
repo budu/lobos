@@ -98,7 +98,7 @@
     (join \space
       "DROP"
       (as-sql-keyword otype)
-      (as-identifier db-spec oname :schema)
+      (as-identifier db-spec oname (:schema db-spec))
       (when (and behavior (#{:table} otype))
         (as-sql-keyword behavior)))))
 

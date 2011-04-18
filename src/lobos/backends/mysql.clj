@@ -69,14 +69,10 @@
 
 ;; ## Compiler
 
-(defmethod compile [:mysql IdentifierExpression]
+(defmethod compile [::standard IdentifierExpression]
   [identifier]
-  (let [{:keys [db-spec name level]} identifier
-        schema (:schema db-spec)]
-    (if (and (= level :schema) schema)
-      (str (when schema (str (as-identifier db-spec schema) "."))
-           (as-identifier db-spec name))
-      (as-str \` name \`))))
+  (let [{:keys [db-spec name qualifiers]} identifier]
+    (join* \. (map #(as-str \` % \`) (concat qualifiers name)))))
 
 (defvar- compiler-data-type-aliases
   {:clob :text
@@ -124,11 +120,11 @@
         "DROP INDEX"
         (as-identifier db-spec oname)
         "ON"
-        (as-identifier db-spec (:tname options) :schema))
+        (as-identifier db-spec (:tname options) (:schema db-spec)))
       (join \space
         "DROP"
         (as-sql-keyword otype)
-        (as-identifier db-spec oname :schema)
+        (as-identifier db-spec oname (:schema db-spec))
         (when (and behavior (#{:table} otype))
           [(as-sql-keyword behavior)])))))
 

@@ -66,14 +66,10 @@
 
 ;; ## Compiler
 
-(defmethod compile [:sqlserver IdentifierExpression]
+(defmethod compile [::standard IdentifierExpression]
   [identifier]
-  (let [{:keys [db-spec name level]} identifier
-        schema (:schema db-spec)]
-    (if (and (= level :schema) schema)
-      (str (when schema (str (as-identifier db-spec schema) "."))
-           (as-identifier db-spec name))
-      (as-str \[ name \]))))
+  (let [{:keys [db-spec name qualifiers]} identifier]
+    (join* \. (map #(as-str \[ % \]) (concat qualifiers name)))))
 
 (defmethod compile [:sqlserver FunctionExpression]
   [function]
@@ -124,13 +120,13 @@
         sql-string (join \space
                      "DROP"
                      (as-sql-keyword otype)
-                     (as-identifier db-spec oname :schema))]
+                     (as-identifier db-spec oname (:schema db-spec)))]
     (if (= otype :index)
       (join \space
         "DROP INDEX"
         (as-identifier db-spec oname)
         "ON"
-        (as-identifier db-spec (:tname options) :schema))
+        (as-identifier db-spec (:tname options) (:schema db-spec)))
       (apply join \;
              (conj
               (when (and (= otype :schema)
@@ -178,7 +174,7 @@
       (compile (AlterRenameAction. db-spec element))
       (join \space
             "ALTER TABLE"
-            (as-identifier db-spec tname :schema)
+            (as-identifier db-spec tname (:schema db-spec))
             (case action
                   :add    (compile (AlterAddAction. db-spec element))
                   :drop   (compile (AlterDropAction. db-spec element))

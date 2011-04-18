@@ -20,7 +20,7 @@
   [db-spec scalar])
 
 (defrecord IdentifierExpression
-  [db-spec name level qualifiers])
+  [db-spec name qualifiers])
 
 (defrecord FunctionExpression
   [db-spec name args])

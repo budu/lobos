@@ -17,6 +17,9 @@
 (defn join [separator & coll]
   (clojure.string/join separator (filter identity coll)))
 
+(defn join* [separator coll]
+  (apply join separator coll))
+
 (defn as-str ; taken from clojure.contrib.string
   "Like clojure.core/str, but if an argument is a keyword or symbol,
   its name will be used instead of its literal representation."
