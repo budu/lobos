@@ -97,12 +97,13 @@
                     ~@body)))))))
 
 (defmacro with-schema [[var-name sname] & body]
-  `(try
-     (let [~var-name (schema ~sname {:db-spec (get-db-spec *db*)})]
-       (create-schema ~var-name *db*)
-       ~@body)
-     (finally (try (drop-schema ~sname :cascade *db*)
-                   (catch Exception _#)))))
+  `(let [db-spec# (get-db-spec *db*)]
+     (try
+       (let [~var-name (schema ~sname {:db-spec db-spec#})]
+         (create db-spec# ~var-name)
+         ~@body)
+       (finally (try (drop db-spec# (schema ~sname) :cascade)
+                     (catch Exception _#))))))
 
 (defmacro inspect-schema [& keys]
   `(-> :lobos (analyze-schema *db*) ~@keys))

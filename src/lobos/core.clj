@@ -193,32 +193,3 @@
     user> (drop (table :foo) :cascade)"
   [element & [behavior]]
   (schema/build-drop-statement element behavior db-spec))
-
-(defn create-schema
-  "Create a new schema with the given name or create one using the given
-  abstract schema definition. See the `lobos.schema` namespace for more
-  details on schema definition. If given a name but no `connection-info`
-  it will use the default connection. e.g.:
-
-    user> (create-schema :tmp)
-    user> (create-schema sample-schema)"
-  [schema-or-name & [connection-info]]
-  (let [db-spec (conn/get-db-spec connection-info)
-        schema (if (schema/schema? schema-or-name)
-                 schema-or-name
-                 (schema/schema schema-or-name {:db-spec db-spec}))
-        db-spec (or db-spec (-> schema :options :db-spec))]
-    (execute (schema/build-create-statement schema db-spec) db-spec)))
-
-(defn drop-schema
-  "Drop the specified schema or the named one using the given optional
-  behavior. If given a name but no `connection-info` it will use the
-  default connection. When the `:cascade` behavior is specified, it
-  drops all elements relying it."
-  [schema-or-name & [behavior connection-info]]
-  (let [db-spec (conn/get-db-spec connection-info)
-        schema (if (schema/schema? schema-or-name)
-                 schema-or-name
-                 (schema/schema schema-or-name {:db-spec db-spec}))
-        db-spec (or db-spec (-> schema :options :db-spec))]
-    (execute (schema/build-drop-statement schema behavior db-spec) db-spec)))

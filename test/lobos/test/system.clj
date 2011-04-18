@@ -12,7 +12,7 @@
             (lobos [compiler :as compiler]
                    [connectivity :as conn]))
   (:use clojure.test
-        (lobos [core :only [create-schema drop-schema]] test)
+        (lobos [core :only [create drop]] test)
         (lobos.backends h2 mysql postgresql sqlite sqlserver)
         lobos.test.sample-schema))
 
@@ -20,11 +20,11 @@
 
 (defn create-schemas-for-all-db []
   (doseq [db (available-global-cnx)]
-    (create-schema sample-schema db)))
+    (create db sample-schema)))
 
 (defn drop-schemas-for-all-db []
   (doseq [db (available-global-cnx)]
-    (drop-schema sample-schema :cascade db)))
+    (drop db sample-schema :cascade)))
 
 (defn use-sample-schema-fixture [f]
   (try (create-schemas-for-all-db)

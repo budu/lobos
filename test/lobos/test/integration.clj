@@ -42,7 +42,7 @@
     (with-schema [lobos :lobos]
       (is (= (inspect-schema) lobos)
           "A schema named 'lobos' should have been created")
-      (drop-schema lobos)
+      (drop *db* lobos)
       (is (nil? (inspect-schema))
           "A schema named 'lobos' should have been dropped"))))
 
