@@ -6,9 +6,13 @@ h3 {margin:0;padding:0}
 h4 {margin:0;padding:0}
 h5 {margin:0;padding:0}</style><style type="text/css">body {font-family:Verdana, Arial}
 pre {display:inline}
-h2 {margin:0.3em 0}
-p {margin:0.3em 0}
-#wrapper {background-color:#404a3e;border:solid 5px #404a3e;margin:0 10%}
+li {margin-bottom:0.2em}
+p {margin:0.3em 0 0.5em}
+code {background-color:#F8F8FF;border:1px solid #DEDEDE;color:#444444;font-size:1.1em;padding:0 0.2em}
+h1 {font-family:'Palatino Linotype','Book Antiqua',Palatino,FreeSerif,serif}
+h2 {font-family:'Palatino Linotype','Book Antiqua',Palatino,FreeSerif,serif}
+h3 {font-family:'Palatino Linotype','Book Antiqua',Palatino,FreeSerif,serif}
+#wrapper {background-color:#404a3e;border:solid 5px #404a3e;margin:0 15%}
 #header {padding:1em}
 #content {padding:1em}
 #footer {padding:1em}
@@ -18,7 +22,7 @@ a {color:#6a9;text-decoration:none}
 a:visited {color:#497}
 a:hover {color:#798;text-decoration:underline}
 #header {}
-#header h1 {font-family:'Palatino Linotype','Book Antiqua',Palatino,FreeSerif,serif;font-style:italic;font-size:4em;margin-left:155px}
+#header h1 {font-style:italic;font-size:4em;margin-left:155px}
 #header img {float:left;margin-bottom:1em}
 #header ul {display:inline;float:right;list-style:none;padding:0}
 #header ul li {display:inline;margin:0 0.5em}
@@ -26,14 +30,17 @@ a:hover {color:#798;text-decoration:underline}
 #header ul li a {border-radius:0.5em;-moz-border-radius:0.5em;background-color:#243;color:#fa0;padding:0.5em 1.5em}
 #header ul li a.visited {border-radius:0.5em;-moz-border-radius:0.5em;background-color:#243;color:#fa0;padding:0.5em 1.5em}
 #header ul li a:hover {background-color:#687;text-decoration:none}
-#content {background-color:#f6f6f6;background-image:url('img/tracks.png');background-repeat:repeat-y;border-radius:1em;-moz-border-radius:1em;clear:both;color:#404a3e;padding:0.5em 1.5em;padding-left:200px}
-#content div.section {padding-left:0.5em}
-#content div.section h2 {margin-left:-0.5em;font-family:'Palatino Linotype','Book Antiqua',Palatino,FreeSerif,serif;font-size:2em}
+#content {background-color:#f6f6f6;background-image:url('img/tracks.png');background-repeat:repeat-y;border-radius:1em;-moz-border-radius:1em;clear:both;color:#404a3e;padding:1em 1.5em 2em 200px}
+#content div.section {padding-bottom:1em;padding-left:0.5em}
+#content div.section h2 {border-bottom:1px solid #aaa;margin-bottom:0.5em;margin-left:-0.5em;padding-bottom:0.2em;font-size:2em}
+#content div.subsection {margin-bottom:1em;padding-left:0.5em}
+#content div.subsection h3 {font-size:1.4em;margin:0.5em 0;margin-left:-0.5em}
 #content div#downloads {text-align:center}
+#content div#downloads h2 {text-align:left}
 #content div#downloads div.download {border:solid 1px #404a3e;border-radius:0.5em;-moz-border-radius:0.5em;display:inline-block;margin:0.5em;padding:0.5em 1em}
 #content div#downloads div.download a {margin:0 0 0 1em}
 #footer p {font-size:0.7em;padding-bottom:3em;text-align:center}
-div.syntaxhighlighter {border-radius:0.3em;-moz-border-radius:0.3em;padding:0.5em 0.3em}</style><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js" type="text/javascript"></script><script src="js/main.js" type="text/javascript"></script><script src="sh/js/shCore.js" type="text/javascript"></script><script src="sh/js/shBrushXml.js" type="text/javascript"></script><script src="sh/js/shBrushClojure.js" type="text/javascript"></script><link href="sh/css/shCore.css" rel="stylesheet" type="text/css" /><link href="sh/css/shThemeDjango.css" rel="stylesheet" type="text/css" /><script type="text/javascript">
+div.syntaxhighlighter {border-radius:0.3em;-moz-border-radius:0.3em;margin-left:1em !important;padding:0.5em 0.3em}</style><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js" type="text/javascript"></script><script src="js/main.js" type="text/javascript"></script><script src="sh/js/shCore.js" type="text/javascript"></script><script src="sh/js/shBrushXml.js" type="text/javascript"></script><script src="sh/js/shBrushClojure.js" type="text/javascript"></script><link href="sh/css/shCore.css" rel="stylesheet" type="text/css" /><link href="sh/css/shThemeDjango.css" rel="stylesheet" type="text/css" /><script type="text/javascript">
 
 var _gaq = _gaq || [];
 _gaq.push(['_setAccount', 'UA-5802722-4']);
@@ -45,17 +52,34 @@ _gaq.push(['_trackPageview']);
      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
  })();
 
-</script></head><body><div id="wrapper"><div id="header"><img id="logo" src="img/logo.png" /><h1>Lobos</h1><ul><li><a href="index.html">Home</a></li><li><a href="downloads.html">Downloads</a></li><li><a href="documentation.html">Documention</a></li><li><a href="contribute.html">Contribute</a></li></ul></div><div id="content"><div id="home"><div class="section"><h2>Description</h2><p><b>Lobos</b> is a library to help you create and modify
-    database schemas using Clojure code.</p><p>It is currently being actively developed and its API isn't
+</script></head><body><div id="wrapper"><div id="header"><img id="logo" src="img/logo.png" /><h1>Lobos</h1><ul><li><a href="index.html">Home</a></li><li><a href="documentation.html">Documention</a></li><li><a href="downloads.html">Downloads</a></li><li><a href="contribute.html">Contribute</a></li></ul></div><div id="content"><div id="home"><div class="section"><h2>Description</h2><p><b>Lobos</b> is a library to help you create and modify
+    database schemas using Clojure code. It currently has support for
+    H2, MySQL, PostgreSQL, SQLite and SQL Server.</p><p>It is currently being actively developed and its API isn't
     stable yet. In its present form, it only provide an imperative DSL
     to generated database specific data definition statements. That is
     the foundation upon which the migrations and declarative schema
     features will be built.</p></div><div class="section"><h2>Installation</h2><p>You can use <b>Lobos</b> in your projects using either
     Leiningen or Cake by adding the following dependency to you project
-    file:</p><pre class="brush: clojure">[lobos "0.7.0-SNAPSHOT"]</pre><p><b>Lobos</b> is also available through Maven:</p><pre class="brush: xml">&lt;dependency&gt;
+    file:</p><pre class="brush: clojure">[lobos "0.7.0"]</pre><p><b>Lobos</b> is also available through Maven:</p><pre class="brush: xml">&lt;dependency&gt;
   &lt;groupId&gt;lobos&lt;/groupId&gt;
   &lt;artifactId&gt;lobos&lt;/artifactId&gt;
-  &lt;version&gt;0.7.0-SNAPSHOT&lt;/version&gt;
+  &lt;version&gt;0.7.0&lt;/version&gt;
 &lt;/dependency&gt;</pre><p>You can always add the current or previous version manually,
     consult the <a href="downloads.html">downloads page</a> to find
-    the version you want.</p></div></div></div><div id="footer"><p>&copy; 2011 Nicolas Buduroi. All rights reserved.</p></div></div></body></html>
+    the version you want.</p></div><div class="section"><h2>Example</h2><p><b>Lobos</b> is easy to use, you can try it by creating a new
+    Leiningen project, adding the <b>Lobos</b> dependency as above
+    and another dependency for the database system you want to
+    use. Here's an example using the H2 database:</p><pre class="brush: clojure">[com.h2database/h2 "1.3.154"]</pre><p>Now fire up a REPL and enter the following code:</p><pre class="brush: clojure">(use 'lobos.connectivity
+     'lobos.core
+     'lobos.schema)
+
+(def h2
+  {:classname   &quot;org.h2.Driver&quot;
+   :subprotocol &quot;h2&quot;
+   :subname     &quot;./lobos&quot;})
+
+(create h2
+  (table :users
+    (integer :id :primary-key)
+    (varchar :name 100)))</pre><p>For a more complete understanding of how to use <b>Lobos</b> refer to
+    the <a href="documentation.html">documentation page</a>.</p></div></div></div><div id="footer"><p>&copy; 2011 Nicolas Buduroi. All rights reserved.</p></div></div></body></html>
