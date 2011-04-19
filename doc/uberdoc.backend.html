@@ -1,5 +1,359 @@
 <!DOCTYPE html>
-<html><head><meta charset="utf-8" content="text/html" http-equiv="Content-Type" /><meta content="A library to create and manipulate SQL database schemas." name="description" /><script type="text/javascript">/*!
+<html><head><meta charset="utf-8" content="text/html" http-equiv="Content-Type" /><meta content="A library to create and manipulate SQL database schemas." name="description" /><style type="text/css">/**
+ * SyntaxHighlighter
+ * http://alexgorbatchev.com/SyntaxHighlighter
+ *
+ * SyntaxHighlighter is donationware. If you are using it, please donate.
+ * http://alexgorbatchev.com/SyntaxHighlighter/donate.html
+ *
+ * @version
+ * 3.0.83 (July 02 2010)
+ * 
+ * @copyright
+ * Copyright (C) 2004-2010 Alex Gorbatchev.
+ *
+ * @license
+ * Dual licensed under the MIT and GPL licenses.
+ */
+.syntaxhighlighter a,
+.syntaxhighlighter div,
+.syntaxhighlighter code,
+.syntaxhighlighter table,
+.syntaxhighlighter table td,
+.syntaxhighlighter table tr,
+.syntaxhighlighter table tbody,
+.syntaxhighlighter table thead,
+.syntaxhighlighter table caption,
+.syntaxhighlighter textarea {
+  -moz-border-radius: 0 0 0 0 !important;
+  -webkit-border-radius: 0 0 0 0 !important;
+  background: none !important;
+  border: 0 !important;
+  bottom: auto !important;
+  float: none !important;
+  height: auto !important;
+  left: auto !important;
+  line-height: 1.1em !important;
+  margin: 0 !important;
+  outline: 0 !important;
+  overflow: visible !important;
+  padding: 0 !important;
+  position: static !important;
+  right: auto !important;
+  text-align: left !important;
+  top: auto !important;
+  vertical-align: baseline !important;
+  width: auto !important;
+  box-sizing: content-box !important;
+  font-family: "Consolas", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace !important;
+  font-weight: normal !important;
+  font-style: normal !important;
+  min-height: inherit !important;
+  min-height: auto !important;
+}
+
+.syntaxhighlighter {
+/*  width: 100% !important; */
+  margin: 1em 0 1em 0 !important;
+  position: relative !important;
+  overflow: auto !important;
+}
+.syntaxhighlighter.source {
+  overflow: hidden !important;
+}
+.syntaxhighlighter .bold {
+  font-weight: bold !important;
+}
+.syntaxhighlighter .italic {
+  font-style: italic !important;
+}
+.syntaxhighlighter .line {
+  white-space: pre !important;
+}
+.syntaxhighlighter table {
+/*    width: 100% !important;*/
+}
+.syntaxhighlighter table caption {
+  text-align: left !important;
+  padding: .5em 0 0.5em 1em !important;
+}
+.syntaxhighlighter table td.code {
+  width: 100% !important;
+}
+.syntaxhighlighter table td.code .container {
+  position: relative !important;
+}
+.syntaxhighlighter table td.code .container textarea {
+  box-sizing: border-box !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  border: none !important;
+  background: white !important;
+  padding-left: 1em !important;
+  overflow: hidden !important;
+  white-space: pre !important;
+}
+.syntaxhighlighter table td.gutter .line {
+  text-align: right !important;
+  padding: 0 0.5em 0 1em !important;
+}
+.syntaxhighlighter table td.code .line {
+  padding: 0 1em !important;
+}
+.syntaxhighlighter.nogutter td.code .container textarea, .syntaxhighlighter.nogutter td.code .line {
+  padding-left: 0em !important;
+}
+.syntaxhighlighter.show {
+  display: block !important;
+}
+.syntaxhighlighter.collapsed table {
+  display: none !important;
+}
+.syntaxhighlighter.collapsed .toolbar {
+    display: none;
+/*  padding: 0.1em 0.8em 0em 0.8em !important;
+  font-size: 1em !important;
+  position: static !important;
+  width: auto !important;
+  height: auto !important;*/
+}
+.syntaxhighlighter.collapsed .toolbar span {
+  display: inline !important;
+  margin-right: 1em !important;
+}
+.syntaxhighlighter.collapsed .toolbar span a {
+  padding: 0 !important;
+  display: none !important;
+}
+.syntaxhighlighter.collapsed .toolbar span a.expandSource {
+  display: inline !important;
+}
+.syntaxhighlighter .toolbar {
+    display: none;
+/*  position: absolute !important;
+  right: 1px !important;
+  top: 1px !important;
+  width: 11px !important;
+  height: 11px !important;
+  font-size: 10px !important;
+  z-index: 10 !important;*/
+}
+.syntaxhighlighter .toolbar span.title {
+  display: inline !important;
+}
+.syntaxhighlighter .toolbar a {
+  display: block !important;
+  text-align: center !important;
+  text-decoration: none !important;
+  padding-top: 1px !important;
+}
+.syntaxhighlighter .toolbar a.expandSource {
+  display: none !important;
+}
+.syntaxhighlighter.ie {
+  font-size: .9em !important;
+  padding: 1px 0 1px 0 !important;
+}
+.syntaxhighlighter.ie .toolbar {
+  line-height: 8px !important;
+}
+.syntaxhighlighter.ie .toolbar a {
+  padding-top: 0px !important;
+}
+.syntaxhighlighter.printing .line.alt1 .content,
+.syntaxhighlighter.printing .line.alt2 .content,
+.syntaxhighlighter.printing .line.highlighted .number,
+.syntaxhighlighter.printing .line.highlighted.alt1 .content,
+.syntaxhighlighter.printing .line.highlighted.alt2 .content {
+  background: none !important;
+}
+.syntaxhighlighter.printing .line .number {
+  color: #bbbbbb !important;
+}
+.syntaxhighlighter.printing .line .content {
+  color: black !important;
+}
+.syntaxhighlighter.printing .toolbar {
+  display: none !important;
+}
+.syntaxhighlighter.printing a {
+  text-decoration: none !important;
+}
+.syntaxhighlighter.printing .plain, .syntaxhighlighter.printing .plain a {
+  color: black !important;
+}
+.syntaxhighlighter.printing .comments, .syntaxhighlighter.printing .comments a {
+  color: #008200 !important;
+}
+.syntaxhighlighter.printing .string, .syntaxhighlighter.printing .string a {
+  color: blue !important;
+}
+.syntaxhighlighter.printing .keyword {
+  color: #006699 !important;
+  font-weight: bold !important;
+}
+.syntaxhighlighter.printing .preprocessor {
+  color: gray !important;
+}
+.syntaxhighlighter.printing .variable {
+  color: #aa7700 !important;
+}
+.syntaxhighlighter.printing .value {
+  color: #009900 !important;
+}
+.syntaxhighlighter.printing .functions {
+  color: #ff1493 !important;
+}
+.syntaxhighlighter.printing .constants {
+  color: #0066cc !important;
+}
+.syntaxhighlighter.printing .script {
+  font-weight: bold !important;
+}
+.syntaxhighlighter.printing .color1, .syntaxhighlighter.printing .color1 a {
+  color: gray !important;
+}
+.syntaxhighlighter.printing .color2, .syntaxhighlighter.printing .color2 a {
+  color: #ff1493 !important;
+}
+.syntaxhighlighter.printing .color3, .syntaxhighlighter.printing .color3 a {
+  color: red !important;
+}
+.syntaxhighlighter.printing .break, .syntaxhighlighter.printing .break a {
+  color: black !important;
+}
+</style><style type="text/css">.syntaxhighlighter{overflow:hidden !important;}</style><style type="text/css">/**
+ * SyntaxHighlighter
+ * http://alexgorbatchev.com/SyntaxHighlighter
+ *
+ * SyntaxHighlighter is donationware. If you are using it, please donate.
+ * http://alexgorbatchev.com/SyntaxHighlighter/donate.html
+ *
+ * @version
+ * 3.0.83 (July 02 2010)
+ * 
+ * @copyright
+ * Copyright (C) 2004-2010 Alex Gorbatchev.
+ *
+ * @license
+ * Dual licensed under the MIT and GPL licenses.
+ */
+.syntaxhighlighter {
+  background-color: transparent !important;
+}
+.syntaxhighlighter .line.alt1 {
+  background-color: transparent !important;
+}
+.syntaxhighlighter .line.alt2 {
+  background-color: transparent !important;
+}
+.syntaxhighlighter .line.highlighted.alt1, .syntaxhighlighter .line.highlighted.alt2 {
+  background-color: #c3defe !important;
+}
+.syntaxhighlighter .line.highlighted.number {
+  color: white !important;
+}
+.syntaxhighlighter table caption {
+  color: black !important;
+}
+.syntaxhighlighter .gutter {
+  color: #787878 !important;
+}
+.syntaxhighlighter .gutter .line {
+  border-right: 3px solid #d4d0c8 !important;
+}
+.syntaxhighlighter .gutter .line.highlighted {
+  background-color: #d4d0c8 !important;
+  color: white !important;
+}
+.syntaxhighlighter.printing .line .content {
+  border: none !important;
+}
+.syntaxhighlighter.collapsed {
+  overflow: visible !important;
+}
+.syntaxhighlighter.collapsed .toolbar {
+  color: #3f5fbf !important;
+  background: white !important;
+  border: 1px solid #d4d0c8 !important;
+}
+.syntaxhighlighter.collapsed .toolbar a {
+  color: #3f5fbf !important;
+}
+.syntaxhighlighter.collapsed .toolbar a:hover {
+  color: #aa7700 !important;
+}
+.syntaxhighlighter .toolbar {
+  color: #a0a0a0 !important;
+  background: #d4d0c8 !important;
+  border: none !important;
+}
+.syntaxhighlighter .toolbar a {
+  color: #a0a0a0 !important;
+}
+.syntaxhighlighter .toolbar a:hover {
+  color: red !important;
+}
+.syntaxhighlighter .plain, .syntaxhighlighter .plain a {
+  color: black !important;
+}
+.syntaxhighlighter .comments, .syntaxhighlighter .comments a {
+  color: #3f5fbf !important;
+}
+.syntaxhighlighter .string, .syntaxhighlighter .string a {
+  color: #2a00ff !important;
+}
+.syntaxhighlighter .keyword {
+  color: #7f0055 !important;
+}
+.syntaxhighlighter .preprocessor {
+  color: #646464 !important;
+}
+.syntaxhighlighter .variable {
+  color: #aa7700 !important;
+}
+.syntaxhighlighter .value {
+  color: #009900 !important;
+}
+.syntaxhighlighter .functions {
+  color: #ff1493 !important;
+}
+.syntaxhighlighter .constants {
+  color: #0066cc !important;
+}
+.syntaxhighlighter .script {
+  font-weight: bold !important;
+  color: #7f0055 !important;
+  background-color: none !important;
+}
+.syntaxhighlighter .color1, .syntaxhighlighter .color1 a {
+  color: gray !important;
+}
+.syntaxhighlighter .color2, .syntaxhighlighter .color2 a {
+  color: #ff1493 !important;
+}
+.syntaxhighlighter .color3, .syntaxhighlighter .color3 a {
+  color: red !important;
+}
+
+.syntaxhighlighter .keyword {
+  font-weight: bold !important;
+}
+.syntaxhighlighter .xml .keyword {
+  color: #3f7f7f !important;
+  font-weight: normal !important;
+}
+.syntaxhighlighter .xml .color1, .syntaxhighlighter .xml .color1 a {
+  color: #7f007f !important;
+}
+.syntaxhighlighter .xml .string {
+  font-style: italic !important;
+  color: #2a00ff !important;
+}
+</style><style type="text/css">html{margin:0;padding:0;}h1{margin:0;padding:0;}h2{margin:0;padding:0;}h3{margin:0;padding:0;}h4{margin:0;padding:0;}a{color:#261A3B;}a:visited{color:#261A3B;}</style><style type="text/css">.header{margin-top:30px;}h1.project-name{font-size:34px;display:inline;}h2.project-version{font-size:18px;margin-top:0;display:inline;margin-left:10px;}.toc-link{font-size:12px;margin-left:10px;color:#252519;text-decoration:none;}.toc-link:hover{color:#5050A6;}.toc h1{font-size:34px;margin:0;}.docs-header{border-bottom:dotted #aaa 1px;padding-bottom:10px;margin-bottom:25px;}.toc h1{font-size:24px;}.toc{border-bottom:solid #bbb 1px;margin-bottom:40px;}.toc ul{margin-left:20px;padding-left:0px;padding-top:0;margin-top:0;}.toc li{list-style-type:none;padding-left:0;}.dependencies{}.dependencies table{font-size:16px;width:99.99%;border:none;margin-left:20px;}.dependencies td{padding-right:20px;;white-space:nowrap;}.dependencies .dotted{width:99%;}.dependencies .dotted hr{margin-bottom:-6px;noshade:noshade;border-top:none;color:transparent;border-left:none;border-bottom:dotted #bbb 1px;border-right:none;background-color:transparent;height:0;}.dependencies .dep-version{text-align:right;}.plugins ul{margin-left:20px;padding-left:0px;padding-top:0;margin-top:0;}.plugins li{list-style-type:none;padding-left:0;}.header p{margin-left:20px;}</style><style type="text/css">#floating-toc{position:fixed;top:10px;right:20px;height:20px;overflow:hidden;text-align:right;}#floating-toc li{list-style-type:none;margin:0;padding:0;}</style><style type="text/css">body{margin:0;padding:0;font-family:'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;;font-size:16px;color:#252519;}h1{font-size:20px;margin-top:0;}a.anchor{text-decoration:none;color:#252519;}a.anchor:hover{color:#5050A6;}table{border-spacing:0;border-bottom:solid #ddd 1px;;margin-bottom:10px;}code{display:inline;}p{margin-top:8px;}tr{margin:0px;padding:0px;}td.docs{width:410px;max-width:410px;vertical-align:top;margin:0px;padding-left:55px;padding-right:20px;border:none;}td.docs pre{font-size:12px;overflow:hidden;}td.codes{border:none;margin:0px;padding-left:20px;width:55%;border-left:solid #E5E5EE 1px;font-size:10pt;vertical-align:top;overflow:hidden;background-color:#F5F5FF;}td.spacer{padding-bottom:40px;}pre code{display:block;padding:4px;}code{background-color:ghostWhite;border:solid #DEDEDE 1px;padding-left:3px;padding-right:3px;font-size:14px;}.syntaxhighlighter code{font-size:13px;}.footer{text-align:center;}</style><script type="text/javascript">/*!
  * jQuery JavaScript Library v1.4.4
  * http://jquery.com/
  *
@@ -1889,7 +2243,7 @@ return sh;
 // CommonJS
 typeof(exports) != 'undefined' ? exports['SyntaxHighlighter'] = SyntaxHighlighter : null;
 </script><script type="text/javascript">/*!
- * Copyright Â© 2010 Sattvik Software & Technology Resources, Ltd. Co.
+ * Copyright © 2010 Sattvik Software & Technology Resources, Ltd. Co.
  * All rights reserved.
  *
  * sh-clojure may be used under the terms of either the GNU Lesser General Public
@@ -1897,7 +2251,7 @@ typeof(exports) != 'undefined' ? exports['SyntaxHighlighter'] = SyntaxHighlighte
  * sh-clojure, you may choose which license to receive the code under.  See the
  * LICENSE file distributed with sh-clojure for details.
  *
- * Written by Daniel Solano GÃ³mez
+ * Written by Daniel Solano Gómez
  *
  * Version 0.9.1 - 10 Apr 2010
  */
@@ -2054,7 +2408,7 @@ SyntaxHighlighter.brushes.Clojure = function () {
 		{ regex: /\b(true|false|nil)\b/g,
 			css: 'value' },
 		// (un)quoted symbols
-		{ regex: /(`|#?'|~@?)[\w-.\/]+/g,
+		{ regex: /(`|#?'|~@?)[\w-.A-Za-z0-9_&lt;&gt;\-]+/g,
 			css: 'color1' },
 		// keywords
 		{ regex: /:[A-Za-z0-9_\-]+/g,
@@ -2067,7 +2421,8 @@ SyntaxHighlighter.brushes.Clojure = function () {
 			css: 'preprocessor' },
 		// clojure.core
 		{ regex: new ClojureRegExp(this.getKeywords(clojure_core)),
-			css: 'functions' }
+			css: 'functions' },
+                { regex: /[A-Za-z0-9_&lt;&gt;\-]+/g,  css: 'plain'}
 	];
 
 	this.forHtmlScript(SyntaxHighlighter.regexLib.scriptScriptTags);
@@ -2171,362 +2526,8 @@ $(document).ready(function() {
     ul.css('margin-top', '0px')
 
 })
-</script><style type="text/css">/**
- * SyntaxHighlighter
- * http://alexgorbatchev.com/SyntaxHighlighter
- *
- * SyntaxHighlighter is donationware. If you are using it, please donate.
- * http://alexgorbatchev.com/SyntaxHighlighter/donate.html
- *
- * @version
- * 3.0.83 (July 02 2010)
- * 
- * @copyright
- * Copyright (C) 2004-2010 Alex Gorbatchev.
- *
- * @license
- * Dual licensed under the MIT and GPL licenses.
- */
-.syntaxhighlighter a,
-.syntaxhighlighter div,
-.syntaxhighlighter code,
-.syntaxhighlighter table,
-.syntaxhighlighter table td,
-.syntaxhighlighter table tr,
-.syntaxhighlighter table tbody,
-.syntaxhighlighter table thead,
-.syntaxhighlighter table caption,
-.syntaxhighlighter textarea {
-  -moz-border-radius: 0 0 0 0 !important;
-  -webkit-border-radius: 0 0 0 0 !important;
-  background: none !important;
-  border: 0 !important;
-  bottom: auto !important;
-  float: none !important;
-  height: auto !important;
-  left: auto !important;
-  line-height: 1.1em !important;
-  margin: 0 !important;
-  outline: 0 !important;
-  overflow: visible !important;
-  padding: 0 !important;
-  position: static !important;
-  right: auto !important;
-  text-align: left !important;
-  top: auto !important;
-  vertical-align: baseline !important;
-  width: auto !important;
-  box-sizing: content-box !important;
-  font-family: "Consolas", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace !important;
-  font-weight: normal !important;
-  font-style: normal !important;
-  min-height: inherit !important;
-  min-height: auto !important;
-}
-
-.syntaxhighlighter {
-/*  width: 100% !important; */
-  margin: 1em 0 1em 0 !important;
-  position: relative !important;
-  overflow: auto !important;
-}
-.syntaxhighlighter.source {
-  overflow: hidden !important;
-}
-.syntaxhighlighter .bold {
-  font-weight: bold !important;
-}
-.syntaxhighlighter .italic {
-  font-style: italic !important;
-}
-.syntaxhighlighter .line {
-  white-space: pre !important;
-}
-.syntaxhighlighter table {
-/*    width: 100% !important;*/
-}
-.syntaxhighlighter table caption {
-  text-align: left !important;
-  padding: .5em 0 0.5em 1em !important;
-}
-.syntaxhighlighter table td.code {
-  width: 100% !important;
-}
-.syntaxhighlighter table td.code .container {
-  position: relative !important;
-}
-.syntaxhighlighter table td.code .container textarea {
-  box-sizing: border-box !important;
-  position: absolute !important;
-  left: 0 !important;
-  top: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  border: none !important;
-  background: white !important;
-  padding-left: 1em !important;
-  overflow: hidden !important;
-  white-space: pre !important;
-}
-.syntaxhighlighter table td.gutter .line {
-  text-align: right !important;
-  padding: 0 0.5em 0 1em !important;
-}
-.syntaxhighlighter table td.code .line {
-  padding: 0 1em !important;
-}
-.syntaxhighlighter.nogutter td.code .container textarea, .syntaxhighlighter.nogutter td.code .line {
-  padding-left: 0em !important;
-}
-.syntaxhighlighter.show {
-  display: block !important;
-}
-.syntaxhighlighter.collapsed table {
-  display: none !important;
-}
-.syntaxhighlighter.collapsed .toolbar {
-    display: none;
-/*  padding: 0.1em 0.8em 0em 0.8em !important;
-  font-size: 1em !important;
-  position: static !important;
-  width: auto !important;
-  height: auto !important;*/
-}
-.syntaxhighlighter.collapsed .toolbar span {
-  display: inline !important;
-  margin-right: 1em !important;
-}
-.syntaxhighlighter.collapsed .toolbar span a {
-  padding: 0 !important;
-  display: none !important;
-}
-.syntaxhighlighter.collapsed .toolbar span a.expandSource {
-  display: inline !important;
-}
-.syntaxhighlighter .toolbar {
-    display: none;
-/*  position: absolute !important;
-  right: 1px !important;
-  top: 1px !important;
-  width: 11px !important;
-  height: 11px !important;
-  font-size: 10px !important;
-  z-index: 10 !important;*/
-}
-.syntaxhighlighter .toolbar span.title {
-  display: inline !important;
-}
-.syntaxhighlighter .toolbar a {
-  display: block !important;
-  text-align: center !important;
-  text-decoration: none !important;
-  padding-top: 1px !important;
-}
-.syntaxhighlighter .toolbar a.expandSource {
-  display: none !important;
-}
-.syntaxhighlighter.ie {
-  font-size: .9em !important;
-  padding: 1px 0 1px 0 !important;
-}
-.syntaxhighlighter.ie .toolbar {
-  line-height: 8px !important;
-}
-.syntaxhighlighter.ie .toolbar a {
-  padding-top: 0px !important;
-}
-.syntaxhighlighter.printing .line.alt1 .content,
-.syntaxhighlighter.printing .line.alt2 .content,
-.syntaxhighlighter.printing .line.highlighted .number,
-.syntaxhighlighter.printing .line.highlighted.alt1 .content,
-.syntaxhighlighter.printing .line.highlighted.alt2 .content {
-  background: none !important;
-}
-.syntaxhighlighter.printing .line .number {
-  color: #bbbbbb !important;
-}
-.syntaxhighlighter.printing .line .content {
-  color: black !important;
-}
-.syntaxhighlighter.printing .toolbar {
-  display: none !important;
-}
-.syntaxhighlighter.printing a {
-  text-decoration: none !important;
-}
-.syntaxhighlighter.printing .plain, .syntaxhighlighter.printing .plain a {
-  color: black !important;
-}
-.syntaxhighlighter.printing .comments, .syntaxhighlighter.printing .comments a {
-  color: #008200 !important;
-}
-.syntaxhighlighter.printing .string, .syntaxhighlighter.printing .string a {
-  color: blue !important;
-}
-.syntaxhighlighter.printing .keyword {
-  color: #006699 !important;
-  font-weight: bold !important;
-}
-.syntaxhighlighter.printing .preprocessor {
-  color: gray !important;
-}
-.syntaxhighlighter.printing .variable {
-  color: #aa7700 !important;
-}
-.syntaxhighlighter.printing .value {
-  color: #009900 !important;
-}
-.syntaxhighlighter.printing .functions {
-  color: #ff1493 !important;
-}
-.syntaxhighlighter.printing .constants {
-  color: #0066cc !important;
-}
-.syntaxhighlighter.printing .script {
-  font-weight: bold !important;
-}
-.syntaxhighlighter.printing .color1, .syntaxhighlighter.printing .color1 a {
-  color: gray !important;
-}
-.syntaxhighlighter.printing .color2, .syntaxhighlighter.printing .color2 a {
-  color: #ff1493 !important;
-}
-.syntaxhighlighter.printing .color3, .syntaxhighlighter.printing .color3 a {
-  color: red !important;
-}
-.syntaxhighlighter.printing .break, .syntaxhighlighter.printing .break a {
-  color: black !important;
-}
-</style><style type="text/css">.syntaxhighlighter{overflow:hidden !important;}</style><style type="text/css">/**
- * SyntaxHighlighter
- * http://alexgorbatchev.com/SyntaxHighlighter
- *
- * SyntaxHighlighter is donationware. If you are using it, please donate.
- * http://alexgorbatchev.com/SyntaxHighlighter/donate.html
- *
- * @version
- * 3.0.83 (July 02 2010)
- * 
- * @copyright
- * Copyright (C) 2004-2010 Alex Gorbatchev.
- *
- * @license
- * Dual licensed under the MIT and GPL licenses.
- */
-.syntaxhighlighter {
-  background-color: transparent !important;
-}
-.syntaxhighlighter .line.alt1 {
-  background-color: transparent !important;
-}
-.syntaxhighlighter .line.alt2 {
-  background-color: transparent !important;
-}
-.syntaxhighlighter .line.highlighted.alt1, .syntaxhighlighter .line.highlighted.alt2 {
-  background-color: #c3defe !important;
-}
-.syntaxhighlighter .line.highlighted.number {
-  color: white !important;
-}
-.syntaxhighlighter table caption {
-  color: black !important;
-}
-.syntaxhighlighter .gutter {
-  color: #787878 !important;
-}
-.syntaxhighlighter .gutter .line {
-  border-right: 3px solid #d4d0c8 !important;
-}
-.syntaxhighlighter .gutter .line.highlighted {
-  background-color: #d4d0c8 !important;
-  color: white !important;
-}
-.syntaxhighlighter.printing .line .content {
-  border: none !important;
-}
-.syntaxhighlighter.collapsed {
-  overflow: visible !important;
-}
-.syntaxhighlighter.collapsed .toolbar {
-  color: #3f5fbf !important;
-  background: white !important;
-  border: 1px solid #d4d0c8 !important;
-}
-.syntaxhighlighter.collapsed .toolbar a {
-  color: #3f5fbf !important;
-}
-.syntaxhighlighter.collapsed .toolbar a:hover {
-  color: #aa7700 !important;
-}
-.syntaxhighlighter .toolbar {
-  color: #a0a0a0 !important;
-  background: #d4d0c8 !important;
-  border: none !important;
-}
-.syntaxhighlighter .toolbar a {
-  color: #a0a0a0 !important;
-}
-.syntaxhighlighter .toolbar a:hover {
-  color: red !important;
-}
-.syntaxhighlighter .plain, .syntaxhighlighter .plain a {
-  color: black !important;
-}
-.syntaxhighlighter .comments, .syntaxhighlighter .comments a {
-  color: #3f5fbf !important;
-}
-.syntaxhighlighter .string, .syntaxhighlighter .string a {
-  color: #2a00ff !important;
-}
-.syntaxhighlighter .keyword {
-  color: #7f0055 !important;
-}
-.syntaxhighlighter .preprocessor {
-  color: #646464 !important;
-}
-.syntaxhighlighter .variable {
-  color: #aa7700 !important;
-}
-.syntaxhighlighter .value {
-  color: #009900 !important;
-}
-.syntaxhighlighter .functions {
-  color: #ff1493 !important;
-}
-.syntaxhighlighter .constants {
-  color: #0066cc !important;
-}
-.syntaxhighlighter .script {
-  font-weight: bold !important;
-  color: #7f0055 !important;
-  background-color: none !important;
-}
-.syntaxhighlighter .color1, .syntaxhighlighter .color1 a {
-  color: gray !important;
-}
-.syntaxhighlighter .color2, .syntaxhighlighter .color2 a {
-  color: #ff1493 !important;
-}
-.syntaxhighlighter .color3, .syntaxhighlighter .color3 a {
-  color: red !important;
-}
-
-.syntaxhighlighter .keyword {
-  font-weight: bold !important;
-}
-.syntaxhighlighter .xml .keyword {
-  color: #3f7f7f !important;
-  font-weight: normal !important;
-}
-.syntaxhighlighter .xml .color1, .syntaxhighlighter .xml .color1 a {
-  color: #7f007f !important;
-}
-.syntaxhighlighter .xml .string {
-  font-style: italic !important;
-  color: #2a00ff !important;
-}
-</style><style type="text/css">html{margin:0;padding:0;}h1{margin:0;padding:0;}h2{margin:0;padding:0;}h3{margin:0;padding:0;}h4{margin:0;padding:0;}a{color:#261A3B;}a:visited{color:#261A3B;}</style><style type="text/css">.header{margin-top:30px;}h1.project-name{font-size:34px;display:inline;}h2.project-version{font-size:18px;margin-top:0;display:inline;margin-left:10px;}.toc-link{font-size:12px;margin-left:10px;color:#252519;text-decoration:none;}.toc-link:hover{color:#5050A6;}.toc h1{font-size:34px;margin:0;}.docs-header{border-bottom:dotted #aaa 1px;padding-bottom:10px;margin-bottom:25px;}.toc h1{font-size:24px;}.toc{border-bottom:solid #bbb 1px;margin-bottom:40px;}.toc ul{margin-left:20px;padding-left:0px;padding-top:0;margin-top:0;}.toc li{list-style-type:none;padding-left:0;}.dependencies{}.dependencies table{font-size:16px;width:99.99%;border:none;margin-left:20px;}.dependencies td{padding-right:20px;;white-space:nowrap;}.dependencies .dotted{width:99%;}.dependencies .dotted hr{margin-bottom:-6px;noshade:noshade;border-top:none;color:transparent;border-left:none;border-bottom:dotted #bbb 1px;border-right:none;background-color:transparent;height:0;}.dependencies .dep-version{text-align:right;}.plugins ul{margin-left:20px;padding-left:0px;padding-top:0;margin-top:0;}.plugins li{list-style-type:none;padding-left:0;}.header p{margin-left:20px;}</style><style type="text/css">#floating-toc{position:fixed;top:10px;right:20px;height:20px;overflow:hidden;text-align:right;}#floating-toc li{list-style-type:none;margin:0;padding:0;}</style><style type="text/css">body{margin:0;padding:0;font-family:'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;;font-size:16px;color:#252519;}h1{font-size:20px;margin-top:0;}a.anchor{text-decoration:none;color:#252519;}a.anchor:hover{color:#5050A6;}table{border-spacing:0;border-bottom:solid #ddd 1px;;margin-bottom:10px;}code{display:inline;}p{margin-top:8px;}tr{margin:0px;padding:0px;}td.docs{width:410px;max-width:410px;vertical-align:top;margin:0px;padding-left:55px;padding-right:20px;border:none;}td.docs pre{font-size:12px;overflow:hidden;}td.codes{border:none;margin:0px;padding-left:20px;width:55%;border-left:solid #E5E5EE 1px;font-size:10pt;vertical-align:top;overflow:hidden;background-color:#F5F5FF;}td.spacer{padding-bottom:40px;}pre code{display:block;padding:4px;}code{background-color:ghostWhite;border:solid #DEDEDE 1px;padding-left:3px;padding-right:3px;font-size:14px;}.syntaxhighlighter code{font-size:13px;}.footer{text-align:center;}</style><title>lobos -- Marginalia</title></head><body><table><tr><td class="docs"><div class="header"><h1 class="project-name">lobos</h1><h2 class="project-version">0.7.0-SNAPSHOT</h2><br /><p>A library to create and manipulate SQL database schemas.</p>
-</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.2.0</td></tr><tr><td class="dep-name">org.clojure/clojure-contrib</td><td class="dotted"><hr /></td><td class="dep-version">1.2.0</td></tr></table></div><div class="dependencies"><h3>dev dependencies</h3><table><tr><td class="dep-name">clojureql</td><td class="dotted"><hr /></td><td class="dep-version">1.1.0-SNAPSHOT</td></tr><tr><td class="dep-name">swank-clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.2.1</td></tr><tr><td class="dep-name">lein-clojars</td><td class="dotted"><hr /></td><td class="dep-version">0.6.0</td></tr><tr><td class="dep-name">marginalia</td><td class="dotted"><hr /></td><td class="dep-version">0.5.0-alpha</td></tr><tr><td class="dep-name">cljss</td><td class="dotted"><hr /></td><td class="dep-version">0.1.1</td></tr><tr><td class="dep-name">hiccup</td><td class="dotted"><hr /></td><td class="dep-version">0.3.1</td></tr><tr><td class="dep-name">clj-help</td><td class="dotted"><hr /></td><td class="dep-version">0.2.0</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#lobos.compiler">lobos.compiler</a></li><li><a href="#lobos.backends.h2">lobos.backends.h2</a></li><li><a href="#lobos.backends.mysql">lobos.backends.mysql</a></li><li><a href="#lobos.backends.postgresql">lobos.backends.postgresql</a></li><li><a href="#lobos.backends.sqlite">lobos.backends.sqlite</a></li><li><a href="#lobos.backends.sqlserver">lobos.backends.sqlserver</a></li><li><a href="#lobos.ast">lobos.ast</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#lobos.compiler" name="lobos.compiler"><h1 class="project-name">lobos.compiler</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>This namespace include the <code>compile</code> multimethod, a default
+</script><title>lobos -- Marginalia</title></head><body><table><tr><td class="docs"><div class="header"><h1 class="project-name">lobos</h1><h2 class="project-version">0.7.0</h2><br /><p>A library to create and manipulate SQL database schemas.</p>
+</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.2.0</td></tr><tr><td class="dep-name">org.clojure/clojure-contrib</td><td class="dotted"><hr /></td><td class="dep-version">1.2.0</td></tr></table></div><div class="dependencies"><h3>dev dependencies</h3><table><tr><td class="dep-name">swank-clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.2.1</td></tr><tr><td class="dep-name">lein-clojars</td><td class="dotted"><hr /></td><td class="dep-version">0.6.0</td></tr><tr><td class="dep-name">marginalia</td><td class="dotted"><hr /></td><td class="dep-version">0.5.0</td></tr><tr><td class="dep-name">cljss</td><td class="dotted"><hr /></td><td class="dep-version">0.1.1</td></tr><tr><td class="dep-name">hiccup</td><td class="dotted"><hr /></td><td class="dep-version">0.3.1</td></tr><tr><td class="dep-name">clj-help</td><td class="dotted"><hr /></td><td class="dep-version">0.2.0</td></tr><tr><td class="dep-name">com.h2database/h2</td><td class="dotted"><hr /></td><td class="dep-version">1.3.154</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left almost blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#lobos.compiler">lobos.compiler</a></li><li><a href="#lobos.backends.h2">lobos.backends.h2</a></li><li><a href="#lobos.backends.mysql">lobos.backends.mysql</a></li><li><a href="#lobos.backends.postgresql">lobos.backends.postgresql</a></li><li><a href="#lobos.backends.sqlite">lobos.backends.sqlite</a></li><li><a href="#lobos.backends.sqlserver">lobos.backends.sqlserver</a></li><li><a href="#lobos.ast">lobos.ast</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#lobos.compiler" name="lobos.compiler"><h1 class="project-name">lobos.compiler</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>This namespace include the <code>compile</code> multimethod, a default
   implementation based on the SQL standard and some helpers
   functions. The compiler works on an AST defined in the <code>lobos.ast</code>
   namespace. Database specific implementations can be found in the
@@ -2558,8 +2559,8 @@ default standard compiler.</p>
   optional <code>level</code> argument to determine which qualification level to
   output, only support <code>:schema</code> for now.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defn as-identifier
-  [db-spec name & [level qualifiers]]
-  (compile (IdentifierExpression. db-spec name level qualifiers)))</pre></tr><tr><td class="docs"><p>Throws an UnsupportedOperationException using the given message. Can
+  [db-spec name & qualifiers]
+  (compile (IdentifierExpression. db-spec name qualifiers)))</pre></tr><tr><td class="docs"><p>Throws an UnsupportedOperationException using the given message. Can
   be given a test, in which case it throw an exception only if it's
   true.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defn unsupported
@@ -2610,17 +2611,13 @@ function while strings will be properly delimited by single quotes.</p>
   (let [{:keys [scalar]} expression]
     (cond (keyword? scalar) (str (as-sql-keyword scalar))
           (string? scalar) (str "'" scalar "'")
-          :else scalar)))</pre></tr><tr><td class="docs"><p>In the standard, identifiers are delimited by double quotes. When the
-<code>level</code> property is set to <code>:schema</code>, qualifies the resulting
-identifier using the schema name found in the `db-spec property.</p>
+          :else scalar)))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard IdentifierExpression]
   [identifier]
-  (let [{:keys [db-spec name level]} identifier
-        schema (:schema db-spec)]
-    (if (and (= level :schema) schema)
-      (str (when schema (str (as-identifier db-spec schema) "."))
-           (as-identifier db-spec name))
-      (as-str \" name \"))))</pre></tr><tr><td class="docs">
+  (let [{:keys [db-spec name qualifiers]} identifier]
+    (join* \. (->> (concat qualifiers [name])
+                   (filter identity)
+                   (map #(when % (as-str \" % \")))))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard FunctionExpression]
   [function]
   (let [{:keys [db-spec name args]} function]
@@ -2650,11 +2647,10 @@ through the <code>as-list</code> function.</p>
       (when encoding ["CHARACTER SET" (as-str encoding)])
       (when collate ["COLLATE" (as-str collate)])
       (when time-zone ["WITH TIME ZONE"]))))</pre></tr><tr><td class="docs"><h3>Clauses</h3>
-</td><td class="codes" /></tr><tr><td class="docs"><p>GENERATED ALWAYS AS IDENTITY</p>
-
-<p>Standard <code>AutoIncClause</code> are using the <code>ALWAYS</code> variant.</p>
+</td><td class="codes" /></tr><tr><td class="docs"><p>Standard <code>AutoIncClause</code> are using the <code>ALWAYS</code> variant.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard AutoIncClause]
-  [_])</pre></tr><tr><td class="docs"><h3>Definitions</h3>
+  [_]
+  "GENERATED ALWAYS AS IDENTITY")</pre></tr><tr><td class="docs"><h3>Definitions</h3>
 </td><td class="codes" /></tr><tr><td class="docs"><p><code>ColumnDefinition</code> instance will get their names made into SQL
 identifiers using the <code>as-identifier</code> function. It's data-type will
 get compiled with the appropriate method. The options will be added
@@ -2695,7 +2691,7 @@ actions.</p>
       "FOREIGN KEY"
       (as-list (map (partial as-identifier db-spec) columns))
       "REFERENCES"
-      (as-identifier db-spec parent-table :schema)
+      (as-identifier db-spec parent-table (:schema db-spec))
       (as-list (map (partial as-identifier db-spec) parent-columns))
       (when match (str "MATCH " (as-sql-keyword match)))
       (when (contains? triggered-actions :on-delete)
@@ -2729,16 +2725,31 @@ elements.</p>
   [statement]
   (let [{:keys [db-spec tname elements]} statement]
     (format "CREATE TABLE %s %s"
-            (as-identifier db-spec tname :schema)
+            (as-identifier db-spec tname (:schema db-spec))
             (or (as-list (map compile elements))
                 "()"))))</pre></tr><tr><td class="docs">
+</td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard CreateIndexStatement]
+  [statement]
+  (let [{:keys [db-spec iname tname columns options]} statement
+        index-column #(if (keyword? %)
+                        (as-identifier db-spec %)
+                        (let [col (first %)
+                              options (set (rest %))]
+                          (apply join \space
+                            (as-identifier db-spec (first %))
+                            (map as-sql-keyword options))))]
+    (format "CREATE %sINDEX %s ON %s %s"
+            (str (when ((set options) :unique) "UNIQUE "))
+            (as-identifier db-spec iname)
+            (as-identifier db-spec tname (:schema db-spec))
+            (as-list (map index-column columns)))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard DropStatement]
   [statement]
   (let [{:keys [db-spec otype oname behavior]} statement]
     (join \space
       "DROP"
       (as-sql-keyword otype)
-      (as-identifier db-spec oname :schema)
+      (as-identifier db-spec oname (:schema db-spec))
       (as-sql-keyword behavior))))</pre></tr><tr><td class="docs"><h3>Alter Statement and Actions</h3>
 </td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard AlterAddAction]
@@ -2783,7 +2794,7 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
         element (assoc element :sname (:schema db-spec) :tname tname)]
     (join \space
           "ALTER TABLE"
-          (as-identifier db-spec tname :schema)
+          (as-identifier db-spec tname (:schema db-spec))
           (case action
             :add    (compile (AlterAddAction. db-spec element))
             :drop   (compile (AlterDropAction. db-spec element))
@@ -2791,14 +2802,41 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
             :rename (compile (AlterRenameAction. db-spec element))))))</pre></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#lobos.backends.h2" name="lobos.backends.h2"><h1 class="project-name">lobos.backends.h2</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Compiler implementation for H2.</p>
 </td><td class="codes" /><pre class="brush: clojure">(ns lobos.backends.h2
   (:refer-clojure :exclude [compile defonce])
-  (:use (clojure.contrib [def :only [defvar-]])
-        lobos.compiler
-        lobos.utils)
+  (:require (lobos [schema :as schema]))
+  (:use (clojure [string :only [split]])
+        (clojure.contrib [def :only [defvar-]])
+        (lobos analyzer compiler connectivity metadata utils))
   (:import (lobos.ast AlterRenameAction
                       AutoIncClause
                       CreateSchemaStatement
                       DataTypeClause
-                      DropStatement)))</pre></tr><tr><td class="docs"><hr />
+                      DropStatement)
+           (lobos.schema ForeignKeyConstraint
+                         UniqueConstraint)))</pre></tr><tr><td class="docs"><hr />
+</td><td class="codes" /></tr><tr><td class="docs"><h2>Analyzer</h2>
+</td><td class="codes" /></tr><tr><td class="docs">
+</td><td class="codes" /><pre class="brush: clojure">(defmethod analyze [:h2 UniqueConstraint]
+  [_ sname tname cname meta]
+  (let [columns (split (:column_list meta) #",")
+        ctype (-> meta :constraint_type as-keyword)]
+    (UniqueConstraint.
+     (make-index-name tname ctype columns)
+     ctype
+     (map as-keyword columns))))</pre></tr><tr><td class="docs">
+</td><td class="codes" /><pre class="brush: clojure">(defmethod analyze [:h2 :constraints]
+  [_ sname tname]
+  (let [db-spec (db-meta-spec)]
+    (concat
+     (map (fn [meta] (analyze UniqueConstraint sname tname
+                              (-> meta :constraint_name keyword)
+                              meta))
+          (query-schema :constraints
+                        (and (or (= :CONSTRAINT_TYPE "UNIQUE")
+                                 (= :CONSTRAINT_TYPE "PRIMARY KEY"))
+                             (= :TABLE_SCHEMA (as-str sname))
+                             (= :TABLE_NAME (as-str tname)))))
+     (map (fn [[cname meta]] (analyze ForeignKeyConstraint cname meta))
+          (references-meta sname tname)))))</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Compiler</h2>
 </td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:h2 DataTypeClause]
@@ -2808,9 +2846,10 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
       "Use varbinary instead.")
     (unsupported (:time-zone options)
       "Time zones not supported.")
-    (str (as-sql-keyword dtype) (as-list args))))</pre></tr><tr><td class="docs"><p>AUTO_INCREMENT</p>
+    (str (as-sql-keyword dtype) (as-list args))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:h2 AutoIncClause]
-  [_])</pre></tr><tr><td class="docs">
+  [_]
+  "AUTO_INCREMENT")</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard CreateSchemaStatement]
   [statement]
   (let [{:keys [db-spec sname elements]} statement
@@ -2841,7 +2880,7 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
     (join \space
       "DROP"
       (as-sql-keyword otype)
-      (as-identifier db-spec oname :schema)
+      (as-identifier db-spec oname (:schema db-spec))
       (when (and behavior (#{:table} otype))
         (as-sql-keyword behavior)))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:h2 AlterRenameAction]
@@ -2891,7 +2930,7 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
                           index-meta))]
     (UniqueConstraint.
      (if pkey
-       (make-constraint-name tname :primary-key columns)
+       (make-index-name tname :primary-key columns)
        (keyword cname))
      (if pkey
        :primary-key
@@ -2906,12 +2945,10 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
 </td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:mysql IdentifierExpression]
   [identifier]
-  (let [{:keys [db-spec name level]} identifier
-        schema (:schema db-spec)]
-    (if (and (= level :schema) schema)
-      (str (when schema (str (as-identifier db-spec schema) "."))
-           (as-identifier db-spec name))
-      (as-str \` name \`))))</pre></tr><tr><td class="docs">
+  (let [{:keys [db-spec name qualifiers]} identifier]
+    (join* \. (->> (concat qualifiers [name])
+                   (filter identity)
+                   (map #(when % (as-str \` % \`)))))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defvar- compiler-data-type-aliases
   {:clob :text
    :nclob :text})</pre></tr><tr><td class="docs">
@@ -2929,9 +2966,10 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
     (join \space
       (str (as-sql-keyword dtype) (as-list args))
       (when encoding (str "CHARACTER SET " (as-str encoding)))
-      (when collate (str "COLLATE " (as-str collate))))))</pre></tr><tr><td class="docs"><p>AUTO_INCREMENT</p>
+      (when collate (str "COLLATE " (as-str collate))))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:mysql AutoIncClause]
-  [_])</pre></tr><tr><td class="docs">
+  [_]
+  "AUTO_INCREMENT")</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:mysql CreateSchemaStatement]
   [statement]
   (let [{:keys [db-spec sname elements]} statement
@@ -2947,13 +2985,19 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
                (as-identifier db-spec sname)))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:mysql DropStatement]
   [statement]
-  (let [{:keys [db-spec otype oname behavior]} statement]
-    (join \space
-      "DROP"
-      (as-sql-keyword otype)
-      (as-identifier db-spec oname :schema)
-      (when (and behavior (#{:table} otype))
-        [(as-sql-keyword behavior)]))))</pre></tr><tr><td class="docs">
+  (let [{:keys [db-spec otype oname behavior options]} statement]
+    (if (= otype :index)
+      (join \space
+        "DROP INDEX"
+        (as-identifier db-spec oname)
+        "ON"
+        (as-identifier db-spec (:tname options) (:schema db-spec)))
+      (join \space
+        "DROP"
+        (as-sql-keyword otype)
+        (as-identifier db-spec oname (:schema db-spec))
+        (when (and behavior (#{:table} otype))
+          [(as-sql-keyword behavior)])))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:mysql AlterDropAction]
   [action]
   (let [{:keys [db-spec element]} action
@@ -3059,6 +3103,7 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
   (:use (clojure.contrib [def :only [defvar-]])
         lobos.analyzer
         lobos.compiler
+        lobos.connectivity
         lobos.metadata
         lobos.utils)
   (:import (lobos.ast AlterTableStatement
@@ -3068,19 +3113,9 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
                       DataTypeClause
                       DropStatement
                       IdentifierExpression)
-           (lobos.schema Column
-                         DataType
+           (lobos.schema DataType
                          ForeignKeyConstraint
-                         UniqueConstraint
-                         Table)))</pre></tr><tr><td class="docs"><p>Temporary code: need more think more about where to put it or if
-I'll use Contrib or ClojureQL...</p>
-</td><td class="codes" /><pre class="brush: clojure">(use 'lobos.connectivity)
-(defn- query [sql-string]
-  (try
-    (with-open [stmt (.createStatement (connection))]
-      (doall (resultset-seq
-              (.executeQuery stmt sql-string))))
-    (catch Exception _)))</pre></tr><tr><td class="docs"><hr />
+                         UniqueConstraint)))</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Analyzer</h2>
 </td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defvar- analyzer-data-type-aliases
@@ -3105,10 +3140,10 @@ I'll use Contrib or ClojureQL...</p>
   [_ sname tname cname index-meta]
   (let [columns (vec (map #(-> % :column_name keyword)
                           index-meta))]
-  (UniqueConstraint.
-   (make-constraint-name tname :unique columns)
-   :unique
-   columns)))</pre></tr><tr><td class="docs">
+    (UniqueConstraint.
+     (make-index-name tname :unique columns)
+     :unique
+     columns)))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defn- analyze-primary-keys [tname]
   (let [columns (reduce
                  #(conj %1 (-> %2 :column_name keyword))
@@ -3117,12 +3152,12 @@ I'll use Contrib or ClojureQL...</p>
                   (.getPrimaryKeys (db-meta) nil nil (name tname))))]
     (when (not-empty columns)
       [(UniqueConstraint.
-        (make-constraint-name tname :primary-key columns)
+        (make-index-name tname :primary-key columns)
         :primary-key
         columns)])))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defn- analyze-foreign-keys [tname]
-  (let [fks (group-by :id (query (format "pragma foreign_key_list(%s);"
-                                         (name tname))))]
+  (let [fks (group-by :id (raw-query (format "pragma foreign_key_list(%s);"
+                                             (name tname))))]
     (for [fk fks]
       (let [fk (second fk)
             pcolumns (reduce #(conj %1 (-> %2 :to keyword)) [] fk)
@@ -3138,26 +3173,21 @@ I'll use Contrib or ClojureQL...</p>
             on-update (when-not (= on-update :no-action) on-update)
             on-update (when on-delete [:on-update on-update])]
         (ForeignKeyConstraint.
-         (make-constraint-name tname :fkey fcolumns)
+         (make-index-name tname :fkey fcolumns)
          fcolumns
          ptable
          pcolumns
          match
          (into {} [on-delete on-update]))))))</pre></tr><tr><td class="docs">
-</td><td class="codes" /><pre class="brush: clojure">(defn- sqlite-constraints [sname tname]
+</td><td class="codes" /><pre class="brush: clojure">(defn- analyze-unique [sname tname]
   (map (fn [[cname meta]] (analyze UniqueConstraint sname tname cname meta))
        (indexes-meta sname tname #(let [nu (:non_unique %)]
                                     (or (false? nu) (= nu 0))))))</pre></tr><tr><td class="docs">
-</td><td class="codes" /><pre class="brush: clojure">(defmethod analyze [:sqlite Table]
+</td><td class="codes" /><pre class="brush: clojure">(defmethod analyze [:sqlite :constraints]
   [_ sname tname]
-  (schema/table* tname
-                 (into {} (map #(let [c (analyze Column %)]
-                                  [(:cname c) c])
-                               (columns-meta sname tname)))
-                 (into {} (map #(vector (:cname %) %)
-                               (concat (sqlite-constraints sname tname)
-                                       (analyze-primary-keys tname)
-                                       (analyze-foreign-keys tname))))))</pre></tr><tr><td class="docs"><hr />
+  (concat (analyze-unique sname tname)
+          (analyze-primary-keys tname)
+          (analyze-foreign-keys tname)))</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Compiler</h2>
 </td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:sqlite IdentifierExpression]
@@ -3179,15 +3209,20 @@ I'll use Contrib or ClojureQL...</p>
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:sqlite CreateSchemaStatement]
   [statement]
   (let [{:keys [db-spec sname elements]} statement]
-    (not-empty
-     (apply join ";\n\n"
-            (map (comp compile
-                       #(assoc-in % [:db-spec :schema] sname))
-                 elements)))))</pre></tr><tr><td class="docs">
+    (map compile elements)))</pre></tr><tr><td class="docs">
+</td><td class="codes" /><pre class="brush: clojure">(defn- drop-schema [db-spec]
+  (map (comp compile
+             #(schema/build-drop-statement % :cascade db-spec)
+             #(schema/table %)
+             :name)
+       (with-connection db-spec
+         (raw-query
+          (format "select name from sqlite_master where type <> 'index';")))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:sqlite DropStatement]
   [statement]
   (let [{:keys [db-spec otype oname behavior]} statement]
-    (when (#{:table} otype)
+    (if (= otype :schema)
+      (drop-schema db-spec)
       (join \space
         "DROP"
         (as-sql-keyword otype)
@@ -3248,12 +3283,10 @@ I'll use Contrib or ClojureQL...</p>
 </td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:sqlserver IdentifierExpression]
   [identifier]
-  (let [{:keys [db-spec name level]} identifier
-        schema (:schema db-spec)]
-    (if (and (= level :schema) schema)
-      (str (when schema (str (as-identifier db-spec schema) "."))
-           (as-identifier db-spec name))
-      (as-str \[ name \]))))</pre></tr><tr><td class="docs">
+  (let [{:keys [db-spec name qualifiers]} identifier]
+    (join* \. (->> (concat qualifiers [name])
+                   (filter identity)
+                   (map #(when % (as-str \[ % \])))))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:sqlserver FunctionExpression]
   [function]
   (let [{:keys [db-spec name args]} function
@@ -3281,34 +3314,46 @@ I'll use Contrib or ClojureQL...</p>
       "Time zone unsupported for time data type.")
     (join \space
       (str (as-sql-keyword dtype) (as-list args))
-      (when collate (str "COLLATE " (as-str collate))))))</pre></tr><tr><td class="docs"><p>IDENTITY</p>
+      (when collate (str "COLLATE " (as-str collate))))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:sqlserver AutoIncClause]
-  [_])</pre></tr><tr><td class="docs">
+  [_]
+  "IDENTITY")</pre></tr><tr><td class="docs">
+</td><td class="codes" /><pre class="brush: clojure">(defn- drop-schema-cascade [db-spec sname]
+  (vec (for [element (with-db-meta db-spec
+                       (-> (analyze-schema sname) :elements keys))]
+         (compile (schema/build-drop-statement
+                   (schema/table element)
+                   :cascade
+                   (assoc db-spec :schema sname))))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:sqlserver DropStatement]
   [statement]
-  (let [{:keys [db-spec otype oname behavior]} statement
+  (let [{:keys [db-spec otype oname behavior options]} statement
         sql-string (join \space
                      "DROP"
                      (as-sql-keyword otype)
-                     (as-identifier db-spec oname :schema))]
-    (apply join \;
-      (conj (when (and (= otype :schema)
-                       (= behavior :cascade))
-              (vec (for [element (with-db-meta db-spec
-                                   (-> (analyze-schema oname) :elements keys))]
-                     (compile (schema/build-drop-statement
-                               (schema/table element)
-                               :cascade
-                               (assoc db-spec :schema oname))))))
-            sql-string))))</pre></tr><tr><td class="docs">
+                     (as-identifier db-spec oname
+                                    (when (not= otype :schema)
+                                      (:schema db-spec))))]
+    (if (= otype :index)
+      (join \space
+        "DROP INDEX"
+        (as-identifier db-spec oname)
+        "ON"
+        (as-identifier db-spec (:tname options) (:schema db-spec)))
+      (apply join \;
+             (conj
+              (when (and (= otype :schema)
+                         (= behavior :cascade))
+                (drop-schema-cascade db-spec oname))
+              sql-string)))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:sqlserver AlterModifyAction]
   [action]
   (let [{:keys [db-spec element]} action
         default (:default element)
         cname (when default
-                (make-constraint-name (:tname element)
-                                      "default"
-                                      (list (:cname element))))]
+                (make-index-name (:tname element)
+                                 "default"
+                                 (list (:cname element))))]
     (cond (= default :drop)
           (join \space
                 "DROP CONSTRAINT"
@@ -3339,7 +3384,7 @@ I'll use Contrib or ClojureQL...</p>
       (compile (AlterRenameAction. db-spec element))
       (join \space
             "ALTER TABLE"
-            (as-identifier db-spec tname :schema)
+            (as-identifier db-spec tname (:schema db-spec))
             (case action
                   :add    (compile (AlterAddAction. db-spec element))
                   :drop   (compile (AlterDropAction. db-spec element))
@@ -3352,7 +3397,7 @@ I'll use Contrib or ClojureQL...</p>
 </td><td class="codes" /><pre class="brush: clojure">(defrecord ScalarExpression
   [db-spec scalar])</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defrecord IdentifierExpression
-  [db-spec name level qualifiers])</pre></tr><tr><td class="docs">
+  [db-spec name qualifiers])</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defrecord FunctionExpression
   [db-spec name args])</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defrecord OperatorExpression
@@ -3378,8 +3423,10 @@ I'll use Contrib or ClojureQL...</p>
   [db-spec sname elements])</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defrecord CreateTableStatement
   [db-spec tname elements])</pre></tr><tr><td class="docs">
+</td><td class="codes" /><pre class="brush: clojure">(defrecord CreateIndexStatement
+  [db-spec iname tname columns options])</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defrecord DropStatement
-  [db-spec otype oname behavior])</pre></tr><tr><td class="docs">
+  [db-spec otype oname behavior options])</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defrecord AlterTableStatement
   [db-spec tname action element])</pre></tr><tr><td class="docs"><h3>Alter Action Records</h3>
 </td><td class="codes" /></tr><tr><td class="docs">
@@ -3417,6 +3464,7 @@ I'll use Contrib or ClojureQL...</p>
   (import
    '(lobos.ast CreateSchemaStatement
                CreateTableStatement
+               CreateIndexStatement
                DropStatement
                AlterTableStatement)))</pre></tr><tr><td class="docs"><p>Import all action AST records into the calling namespace.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defn import-actions

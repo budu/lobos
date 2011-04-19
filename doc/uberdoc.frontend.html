@@ -1,5 +1,359 @@
 <!DOCTYPE html>
-<html><head><meta charset="utf-8" content="text/html" http-equiv="Content-Type" /><meta content="A library to create and manipulate SQL database schemas." name="description" /><script type="text/javascript">/*!
+<html><head><meta charset="utf-8" content="text/html" http-equiv="Content-Type" /><meta content="A library to create and manipulate SQL database schemas." name="description" /><style type="text/css">/**
+ * SyntaxHighlighter
+ * http://alexgorbatchev.com/SyntaxHighlighter
+ *
+ * SyntaxHighlighter is donationware. If you are using it, please donate.
+ * http://alexgorbatchev.com/SyntaxHighlighter/donate.html
+ *
+ * @version
+ * 3.0.83 (July 02 2010)
+ * 
+ * @copyright
+ * Copyright (C) 2004-2010 Alex Gorbatchev.
+ *
+ * @license
+ * Dual licensed under the MIT and GPL licenses.
+ */
+.syntaxhighlighter a,
+.syntaxhighlighter div,
+.syntaxhighlighter code,
+.syntaxhighlighter table,
+.syntaxhighlighter table td,
+.syntaxhighlighter table tr,
+.syntaxhighlighter table tbody,
+.syntaxhighlighter table thead,
+.syntaxhighlighter table caption,
+.syntaxhighlighter textarea {
+  -moz-border-radius: 0 0 0 0 !important;
+  -webkit-border-radius: 0 0 0 0 !important;
+  background: none !important;
+  border: 0 !important;
+  bottom: auto !important;
+  float: none !important;
+  height: auto !important;
+  left: auto !important;
+  line-height: 1.1em !important;
+  margin: 0 !important;
+  outline: 0 !important;
+  overflow: visible !important;
+  padding: 0 !important;
+  position: static !important;
+  right: auto !important;
+  text-align: left !important;
+  top: auto !important;
+  vertical-align: baseline !important;
+  width: auto !important;
+  box-sizing: content-box !important;
+  font-family: "Consolas", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace !important;
+  font-weight: normal !important;
+  font-style: normal !important;
+  min-height: inherit !important;
+  min-height: auto !important;
+}
+
+.syntaxhighlighter {
+/*  width: 100% !important; */
+  margin: 1em 0 1em 0 !important;
+  position: relative !important;
+  overflow: auto !important;
+}
+.syntaxhighlighter.source {
+  overflow: hidden !important;
+}
+.syntaxhighlighter .bold {
+  font-weight: bold !important;
+}
+.syntaxhighlighter .italic {
+  font-style: italic !important;
+}
+.syntaxhighlighter .line {
+  white-space: pre !important;
+}
+.syntaxhighlighter table {
+/*    width: 100% !important;*/
+}
+.syntaxhighlighter table caption {
+  text-align: left !important;
+  padding: .5em 0 0.5em 1em !important;
+}
+.syntaxhighlighter table td.code {
+  width: 100% !important;
+}
+.syntaxhighlighter table td.code .container {
+  position: relative !important;
+}
+.syntaxhighlighter table td.code .container textarea {
+  box-sizing: border-box !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  border: none !important;
+  background: white !important;
+  padding-left: 1em !important;
+  overflow: hidden !important;
+  white-space: pre !important;
+}
+.syntaxhighlighter table td.gutter .line {
+  text-align: right !important;
+  padding: 0 0.5em 0 1em !important;
+}
+.syntaxhighlighter table td.code .line {
+  padding: 0 1em !important;
+}
+.syntaxhighlighter.nogutter td.code .container textarea, .syntaxhighlighter.nogutter td.code .line {
+  padding-left: 0em !important;
+}
+.syntaxhighlighter.show {
+  display: block !important;
+}
+.syntaxhighlighter.collapsed table {
+  display: none !important;
+}
+.syntaxhighlighter.collapsed .toolbar {
+    display: none;
+/*  padding: 0.1em 0.8em 0em 0.8em !important;
+  font-size: 1em !important;
+  position: static !important;
+  width: auto !important;
+  height: auto !important;*/
+}
+.syntaxhighlighter.collapsed .toolbar span {
+  display: inline !important;
+  margin-right: 1em !important;
+}
+.syntaxhighlighter.collapsed .toolbar span a {
+  padding: 0 !important;
+  display: none !important;
+}
+.syntaxhighlighter.collapsed .toolbar span a.expandSource {
+  display: inline !important;
+}
+.syntaxhighlighter .toolbar {
+    display: none;
+/*  position: absolute !important;
+  right: 1px !important;
+  top: 1px !important;
+  width: 11px !important;
+  height: 11px !important;
+  font-size: 10px !important;
+  z-index: 10 !important;*/
+}
+.syntaxhighlighter .toolbar span.title {
+  display: inline !important;
+}
+.syntaxhighlighter .toolbar a {
+  display: block !important;
+  text-align: center !important;
+  text-decoration: none !important;
+  padding-top: 1px !important;
+}
+.syntaxhighlighter .toolbar a.expandSource {
+  display: none !important;
+}
+.syntaxhighlighter.ie {
+  font-size: .9em !important;
+  padding: 1px 0 1px 0 !important;
+}
+.syntaxhighlighter.ie .toolbar {
+  line-height: 8px !important;
+}
+.syntaxhighlighter.ie .toolbar a {
+  padding-top: 0px !important;
+}
+.syntaxhighlighter.printing .line.alt1 .content,
+.syntaxhighlighter.printing .line.alt2 .content,
+.syntaxhighlighter.printing .line.highlighted .number,
+.syntaxhighlighter.printing .line.highlighted.alt1 .content,
+.syntaxhighlighter.printing .line.highlighted.alt2 .content {
+  background: none !important;
+}
+.syntaxhighlighter.printing .line .number {
+  color: #bbbbbb !important;
+}
+.syntaxhighlighter.printing .line .content {
+  color: black !important;
+}
+.syntaxhighlighter.printing .toolbar {
+  display: none !important;
+}
+.syntaxhighlighter.printing a {
+  text-decoration: none !important;
+}
+.syntaxhighlighter.printing .plain, .syntaxhighlighter.printing .plain a {
+  color: black !important;
+}
+.syntaxhighlighter.printing .comments, .syntaxhighlighter.printing .comments a {
+  color: #008200 !important;
+}
+.syntaxhighlighter.printing .string, .syntaxhighlighter.printing .string a {
+  color: blue !important;
+}
+.syntaxhighlighter.printing .keyword {
+  color: #006699 !important;
+  font-weight: bold !important;
+}
+.syntaxhighlighter.printing .preprocessor {
+  color: gray !important;
+}
+.syntaxhighlighter.printing .variable {
+  color: #aa7700 !important;
+}
+.syntaxhighlighter.printing .value {
+  color: #009900 !important;
+}
+.syntaxhighlighter.printing .functions {
+  color: #ff1493 !important;
+}
+.syntaxhighlighter.printing .constants {
+  color: #0066cc !important;
+}
+.syntaxhighlighter.printing .script {
+  font-weight: bold !important;
+}
+.syntaxhighlighter.printing .color1, .syntaxhighlighter.printing .color1 a {
+  color: gray !important;
+}
+.syntaxhighlighter.printing .color2, .syntaxhighlighter.printing .color2 a {
+  color: #ff1493 !important;
+}
+.syntaxhighlighter.printing .color3, .syntaxhighlighter.printing .color3 a {
+  color: red !important;
+}
+.syntaxhighlighter.printing .break, .syntaxhighlighter.printing .break a {
+  color: black !important;
+}
+</style><style type="text/css">.syntaxhighlighter{overflow:hidden !important;}</style><style type="text/css">/**
+ * SyntaxHighlighter
+ * http://alexgorbatchev.com/SyntaxHighlighter
+ *
+ * SyntaxHighlighter is donationware. If you are using it, please donate.
+ * http://alexgorbatchev.com/SyntaxHighlighter/donate.html
+ *
+ * @version
+ * 3.0.83 (July 02 2010)
+ * 
+ * @copyright
+ * Copyright (C) 2004-2010 Alex Gorbatchev.
+ *
+ * @license
+ * Dual licensed under the MIT and GPL licenses.
+ */
+.syntaxhighlighter {
+  background-color: transparent !important;
+}
+.syntaxhighlighter .line.alt1 {
+  background-color: transparent !important;
+}
+.syntaxhighlighter .line.alt2 {
+  background-color: transparent !important;
+}
+.syntaxhighlighter .line.highlighted.alt1, .syntaxhighlighter .line.highlighted.alt2 {
+  background-color: #c3defe !important;
+}
+.syntaxhighlighter .line.highlighted.number {
+  color: white !important;
+}
+.syntaxhighlighter table caption {
+  color: black !important;
+}
+.syntaxhighlighter .gutter {
+  color: #787878 !important;
+}
+.syntaxhighlighter .gutter .line {
+  border-right: 3px solid #d4d0c8 !important;
+}
+.syntaxhighlighter .gutter .line.highlighted {
+  background-color: #d4d0c8 !important;
+  color: white !important;
+}
+.syntaxhighlighter.printing .line .content {
+  border: none !important;
+}
+.syntaxhighlighter.collapsed {
+  overflow: visible !important;
+}
+.syntaxhighlighter.collapsed .toolbar {
+  color: #3f5fbf !important;
+  background: white !important;
+  border: 1px solid #d4d0c8 !important;
+}
+.syntaxhighlighter.collapsed .toolbar a {
+  color: #3f5fbf !important;
+}
+.syntaxhighlighter.collapsed .toolbar a:hover {
+  color: #aa7700 !important;
+}
+.syntaxhighlighter .toolbar {
+  color: #a0a0a0 !important;
+  background: #d4d0c8 !important;
+  border: none !important;
+}
+.syntaxhighlighter .toolbar a {
+  color: #a0a0a0 !important;
+}
+.syntaxhighlighter .toolbar a:hover {
+  color: red !important;
+}
+.syntaxhighlighter .plain, .syntaxhighlighter .plain a {
+  color: black !important;
+}
+.syntaxhighlighter .comments, .syntaxhighlighter .comments a {
+  color: #3f5fbf !important;
+}
+.syntaxhighlighter .string, .syntaxhighlighter .string a {
+  color: #2a00ff !important;
+}
+.syntaxhighlighter .keyword {
+  color: #7f0055 !important;
+}
+.syntaxhighlighter .preprocessor {
+  color: #646464 !important;
+}
+.syntaxhighlighter .variable {
+  color: #aa7700 !important;
+}
+.syntaxhighlighter .value {
+  color: #009900 !important;
+}
+.syntaxhighlighter .functions {
+  color: #ff1493 !important;
+}
+.syntaxhighlighter .constants {
+  color: #0066cc !important;
+}
+.syntaxhighlighter .script {
+  font-weight: bold !important;
+  color: #7f0055 !important;
+  background-color: none !important;
+}
+.syntaxhighlighter .color1, .syntaxhighlighter .color1 a {
+  color: gray !important;
+}
+.syntaxhighlighter .color2, .syntaxhighlighter .color2 a {
+  color: #ff1493 !important;
+}
+.syntaxhighlighter .color3, .syntaxhighlighter .color3 a {
+  color: red !important;
+}
+
+.syntaxhighlighter .keyword {
+  font-weight: bold !important;
+}
+.syntaxhighlighter .xml .keyword {
+  color: #3f7f7f !important;
+  font-weight: normal !important;
+}
+.syntaxhighlighter .xml .color1, .syntaxhighlighter .xml .color1 a {
+  color: #7f007f !important;
+}
+.syntaxhighlighter .xml .string {
+  font-style: italic !important;
+  color: #2a00ff !important;
+}
+</style><style type="text/css">html{margin:0;padding:0;}h1{margin:0;padding:0;}h2{margin:0;padding:0;}h3{margin:0;padding:0;}h4{margin:0;padding:0;}a{color:#261A3B;}a:visited{color:#261A3B;}</style><style type="text/css">.header{margin-top:30px;}h1.project-name{font-size:34px;display:inline;}h2.project-version{font-size:18px;margin-top:0;display:inline;margin-left:10px;}.toc-link{font-size:12px;margin-left:10px;color:#252519;text-decoration:none;}.toc-link:hover{color:#5050A6;}.toc h1{font-size:34px;margin:0;}.docs-header{border-bottom:dotted #aaa 1px;padding-bottom:10px;margin-bottom:25px;}.toc h1{font-size:24px;}.toc{border-bottom:solid #bbb 1px;margin-bottom:40px;}.toc ul{margin-left:20px;padding-left:0px;padding-top:0;margin-top:0;}.toc li{list-style-type:none;padding-left:0;}.dependencies{}.dependencies table{font-size:16px;width:99.99%;border:none;margin-left:20px;}.dependencies td{padding-right:20px;;white-space:nowrap;}.dependencies .dotted{width:99%;}.dependencies .dotted hr{margin-bottom:-6px;noshade:noshade;border-top:none;color:transparent;border-left:none;border-bottom:dotted #bbb 1px;border-right:none;background-color:transparent;height:0;}.dependencies .dep-version{text-align:right;}.plugins ul{margin-left:20px;padding-left:0px;padding-top:0;margin-top:0;}.plugins li{list-style-type:none;padding-left:0;}.header p{margin-left:20px;}</style><style type="text/css">#floating-toc{position:fixed;top:10px;right:20px;height:20px;overflow:hidden;text-align:right;}#floating-toc li{list-style-type:none;margin:0;padding:0;}</style><style type="text/css">body{margin:0;padding:0;font-family:'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;;font-size:16px;color:#252519;}h1{font-size:20px;margin-top:0;}a.anchor{text-decoration:none;color:#252519;}a.anchor:hover{color:#5050A6;}table{border-spacing:0;border-bottom:solid #ddd 1px;;margin-bottom:10px;}code{display:inline;}p{margin-top:8px;}tr{margin:0px;padding:0px;}td.docs{width:410px;max-width:410px;vertical-align:top;margin:0px;padding-left:55px;padding-right:20px;border:none;}td.docs pre{font-size:12px;overflow:hidden;}td.codes{border:none;margin:0px;padding-left:20px;width:55%;border-left:solid #E5E5EE 1px;font-size:10pt;vertical-align:top;overflow:hidden;background-color:#F5F5FF;}td.spacer{padding-bottom:40px;}pre code{display:block;padding:4px;}code{background-color:ghostWhite;border:solid #DEDEDE 1px;padding-left:3px;padding-right:3px;font-size:14px;}.syntaxhighlighter code{font-size:13px;}.footer{text-align:center;}</style><script type="text/javascript">/*!
  * jQuery JavaScript Library v1.4.4
  * http://jquery.com/
  *
@@ -1889,7 +2243,7 @@ return sh;
 // CommonJS
 typeof(exports) != 'undefined' ? exports['SyntaxHighlighter'] = SyntaxHighlighter : null;
 </script><script type="text/javascript">/*!
- * Copyright Â© 2010 Sattvik Software & Technology Resources, Ltd. Co.
+ * Copyright © 2010 Sattvik Software & Technology Resources, Ltd. Co.
  * All rights reserved.
  *
  * sh-clojure may be used under the terms of either the GNU Lesser General Public
@@ -1897,7 +2251,7 @@ typeof(exports) != 'undefined' ? exports['SyntaxHighlighter'] = SyntaxHighlighte
  * sh-clojure, you may choose which license to receive the code under.  See the
  * LICENSE file distributed with sh-clojure for details.
  *
- * Written by Daniel Solano GÃ³mez
+ * Written by Daniel Solano Gómez
  *
  * Version 0.9.1 - 10 Apr 2010
  */
@@ -2054,7 +2408,7 @@ SyntaxHighlighter.brushes.Clojure = function () {
 		{ regex: /\b(true|false|nil)\b/g,
 			css: 'value' },
 		// (un)quoted symbols
-		{ regex: /(`|#?'|~@?)[\w-.\/]+/g,
+		{ regex: /(`|#?'|~@?)[\w-.A-Za-z0-9_&lt;&gt;\-]+/g,
 			css: 'color1' },
 		// keywords
 		{ regex: /:[A-Za-z0-9_\-]+/g,
@@ -2067,7 +2421,8 @@ SyntaxHighlighter.brushes.Clojure = function () {
 			css: 'preprocessor' },
 		// clojure.core
 		{ regex: new ClojureRegExp(this.getKeywords(clojure_core)),
-			css: 'functions' }
+			css: 'functions' },
+                { regex: /[A-Za-z0-9_&lt;&gt;\-]+/g,  css: 'plain'}
 	];
 
 	this.forHtmlScript(SyntaxHighlighter.regexLib.scriptScriptTags);
@@ -2171,362 +2526,8 @@ $(document).ready(function() {
     ul.css('margin-top', '0px')
 
 })
-</script><style type="text/css">/**
- * SyntaxHighlighter
- * http://alexgorbatchev.com/SyntaxHighlighter
- *
- * SyntaxHighlighter is donationware. If you are using it, please donate.
- * http://alexgorbatchev.com/SyntaxHighlighter/donate.html
- *
- * @version
- * 3.0.83 (July 02 2010)
- * 
- * @copyright
- * Copyright (C) 2004-2010 Alex Gorbatchev.
- *
- * @license
- * Dual licensed under the MIT and GPL licenses.
- */
-.syntaxhighlighter a,
-.syntaxhighlighter div,
-.syntaxhighlighter code,
-.syntaxhighlighter table,
-.syntaxhighlighter table td,
-.syntaxhighlighter table tr,
-.syntaxhighlighter table tbody,
-.syntaxhighlighter table thead,
-.syntaxhighlighter table caption,
-.syntaxhighlighter textarea {
-  -moz-border-radius: 0 0 0 0 !important;
-  -webkit-border-radius: 0 0 0 0 !important;
-  background: none !important;
-  border: 0 !important;
-  bottom: auto !important;
-  float: none !important;
-  height: auto !important;
-  left: auto !important;
-  line-height: 1.1em !important;
-  margin: 0 !important;
-  outline: 0 !important;
-  overflow: visible !important;
-  padding: 0 !important;
-  position: static !important;
-  right: auto !important;
-  text-align: left !important;
-  top: auto !important;
-  vertical-align: baseline !important;
-  width: auto !important;
-  box-sizing: content-box !important;
-  font-family: "Consolas", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace !important;
-  font-weight: normal !important;
-  font-style: normal !important;
-  min-height: inherit !important;
-  min-height: auto !important;
-}
-
-.syntaxhighlighter {
-/*  width: 100% !important; */
-  margin: 1em 0 1em 0 !important;
-  position: relative !important;
-  overflow: auto !important;
-}
-.syntaxhighlighter.source {
-  overflow: hidden !important;
-}
-.syntaxhighlighter .bold {
-  font-weight: bold !important;
-}
-.syntaxhighlighter .italic {
-  font-style: italic !important;
-}
-.syntaxhighlighter .line {
-  white-space: pre !important;
-}
-.syntaxhighlighter table {
-/*    width: 100% !important;*/
-}
-.syntaxhighlighter table caption {
-  text-align: left !important;
-  padding: .5em 0 0.5em 1em !important;
-}
-.syntaxhighlighter table td.code {
-  width: 100% !important;
-}
-.syntaxhighlighter table td.code .container {
-  position: relative !important;
-}
-.syntaxhighlighter table td.code .container textarea {
-  box-sizing: border-box !important;
-  position: absolute !important;
-  left: 0 !important;
-  top: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  border: none !important;
-  background: white !important;
-  padding-left: 1em !important;
-  overflow: hidden !important;
-  white-space: pre !important;
-}
-.syntaxhighlighter table td.gutter .line {
-  text-align: right !important;
-  padding: 0 0.5em 0 1em !important;
-}
-.syntaxhighlighter table td.code .line {
-  padding: 0 1em !important;
-}
-.syntaxhighlighter.nogutter td.code .container textarea, .syntaxhighlighter.nogutter td.code .line {
-  padding-left: 0em !important;
-}
-.syntaxhighlighter.show {
-  display: block !important;
-}
-.syntaxhighlighter.collapsed table {
-  display: none !important;
-}
-.syntaxhighlighter.collapsed .toolbar {
-    display: none;
-/*  padding: 0.1em 0.8em 0em 0.8em !important;
-  font-size: 1em !important;
-  position: static !important;
-  width: auto !important;
-  height: auto !important;*/
-}
-.syntaxhighlighter.collapsed .toolbar span {
-  display: inline !important;
-  margin-right: 1em !important;
-}
-.syntaxhighlighter.collapsed .toolbar span a {
-  padding: 0 !important;
-  display: none !important;
-}
-.syntaxhighlighter.collapsed .toolbar span a.expandSource {
-  display: inline !important;
-}
-.syntaxhighlighter .toolbar {
-    display: none;
-/*  position: absolute !important;
-  right: 1px !important;
-  top: 1px !important;
-  width: 11px !important;
-  height: 11px !important;
-  font-size: 10px !important;
-  z-index: 10 !important;*/
-}
-.syntaxhighlighter .toolbar span.title {
-  display: inline !important;
-}
-.syntaxhighlighter .toolbar a {
-  display: block !important;
-  text-align: center !important;
-  text-decoration: none !important;
-  padding-top: 1px !important;
-}
-.syntaxhighlighter .toolbar a.expandSource {
-  display: none !important;
-}
-.syntaxhighlighter.ie {
-  font-size: .9em !important;
-  padding: 1px 0 1px 0 !important;
-}
-.syntaxhighlighter.ie .toolbar {
-  line-height: 8px !important;
-}
-.syntaxhighlighter.ie .toolbar a {
-  padding-top: 0px !important;
-}
-.syntaxhighlighter.printing .line.alt1 .content,
-.syntaxhighlighter.printing .line.alt2 .content,
-.syntaxhighlighter.printing .line.highlighted .number,
-.syntaxhighlighter.printing .line.highlighted.alt1 .content,
-.syntaxhighlighter.printing .line.highlighted.alt2 .content {
-  background: none !important;
-}
-.syntaxhighlighter.printing .line .number {
-  color: #bbbbbb !important;
-}
-.syntaxhighlighter.printing .line .content {
-  color: black !important;
-}
-.syntaxhighlighter.printing .toolbar {
-  display: none !important;
-}
-.syntaxhighlighter.printing a {
-  text-decoration: none !important;
-}
-.syntaxhighlighter.printing .plain, .syntaxhighlighter.printing .plain a {
-  color: black !important;
-}
-.syntaxhighlighter.printing .comments, .syntaxhighlighter.printing .comments a {
-  color: #008200 !important;
-}
-.syntaxhighlighter.printing .string, .syntaxhighlighter.printing .string a {
-  color: blue !important;
-}
-.syntaxhighlighter.printing .keyword {
-  color: #006699 !important;
-  font-weight: bold !important;
-}
-.syntaxhighlighter.printing .preprocessor {
-  color: gray !important;
-}
-.syntaxhighlighter.printing .variable {
-  color: #aa7700 !important;
-}
-.syntaxhighlighter.printing .value {
-  color: #009900 !important;
-}
-.syntaxhighlighter.printing .functions {
-  color: #ff1493 !important;
-}
-.syntaxhighlighter.printing .constants {
-  color: #0066cc !important;
-}
-.syntaxhighlighter.printing .script {
-  font-weight: bold !important;
-}
-.syntaxhighlighter.printing .color1, .syntaxhighlighter.printing .color1 a {
-  color: gray !important;
-}
-.syntaxhighlighter.printing .color2, .syntaxhighlighter.printing .color2 a {
-  color: #ff1493 !important;
-}
-.syntaxhighlighter.printing .color3, .syntaxhighlighter.printing .color3 a {
-  color: red !important;
-}
-.syntaxhighlighter.printing .break, .syntaxhighlighter.printing .break a {
-  color: black !important;
-}
-</style><style type="text/css">.syntaxhighlighter{overflow:hidden !important;}</style><style type="text/css">/**
- * SyntaxHighlighter
- * http://alexgorbatchev.com/SyntaxHighlighter
- *
- * SyntaxHighlighter is donationware. If you are using it, please donate.
- * http://alexgorbatchev.com/SyntaxHighlighter/donate.html
- *
- * @version
- * 3.0.83 (July 02 2010)
- * 
- * @copyright
- * Copyright (C) 2004-2010 Alex Gorbatchev.
- *
- * @license
- * Dual licensed under the MIT and GPL licenses.
- */
-.syntaxhighlighter {
-  background-color: transparent !important;
-}
-.syntaxhighlighter .line.alt1 {
-  background-color: transparent !important;
-}
-.syntaxhighlighter .line.alt2 {
-  background-color: transparent !important;
-}
-.syntaxhighlighter .line.highlighted.alt1, .syntaxhighlighter .line.highlighted.alt2 {
-  background-color: #c3defe !important;
-}
-.syntaxhighlighter .line.highlighted.number {
-  color: white !important;
-}
-.syntaxhighlighter table caption {
-  color: black !important;
-}
-.syntaxhighlighter .gutter {
-  color: #787878 !important;
-}
-.syntaxhighlighter .gutter .line {
-  border-right: 3px solid #d4d0c8 !important;
-}
-.syntaxhighlighter .gutter .line.highlighted {
-  background-color: #d4d0c8 !important;
-  color: white !important;
-}
-.syntaxhighlighter.printing .line .content {
-  border: none !important;
-}
-.syntaxhighlighter.collapsed {
-  overflow: visible !important;
-}
-.syntaxhighlighter.collapsed .toolbar {
-  color: #3f5fbf !important;
-  background: white !important;
-  border: 1px solid #d4d0c8 !important;
-}
-.syntaxhighlighter.collapsed .toolbar a {
-  color: #3f5fbf !important;
-}
-.syntaxhighlighter.collapsed .toolbar a:hover {
-  color: #aa7700 !important;
-}
-.syntaxhighlighter .toolbar {
-  color: #a0a0a0 !important;
-  background: #d4d0c8 !important;
-  border: none !important;
-}
-.syntaxhighlighter .toolbar a {
-  color: #a0a0a0 !important;
-}
-.syntaxhighlighter .toolbar a:hover {
-  color: red !important;
-}
-.syntaxhighlighter .plain, .syntaxhighlighter .plain a {
-  color: black !important;
-}
-.syntaxhighlighter .comments, .syntaxhighlighter .comments a {
-  color: #3f5fbf !important;
-}
-.syntaxhighlighter .string, .syntaxhighlighter .string a {
-  color: #2a00ff !important;
-}
-.syntaxhighlighter .keyword {
-  color: #7f0055 !important;
-}
-.syntaxhighlighter .preprocessor {
-  color: #646464 !important;
-}
-.syntaxhighlighter .variable {
-  color: #aa7700 !important;
-}
-.syntaxhighlighter .value {
-  color: #009900 !important;
-}
-.syntaxhighlighter .functions {
-  color: #ff1493 !important;
-}
-.syntaxhighlighter .constants {
-  color: #0066cc !important;
-}
-.syntaxhighlighter .script {
-  font-weight: bold !important;
-  color: #7f0055 !important;
-  background-color: none !important;
-}
-.syntaxhighlighter .color1, .syntaxhighlighter .color1 a {
-  color: gray !important;
-}
-.syntaxhighlighter .color2, .syntaxhighlighter .color2 a {
-  color: #ff1493 !important;
-}
-.syntaxhighlighter .color3, .syntaxhighlighter .color3 a {
-  color: red !important;
-}
-
-.syntaxhighlighter .keyword {
-  font-weight: bold !important;
-}
-.syntaxhighlighter .xml .keyword {
-  color: #3f7f7f !important;
-  font-weight: normal !important;
-}
-.syntaxhighlighter .xml .color1, .syntaxhighlighter .xml .color1 a {
-  color: #7f007f !important;
-}
-.syntaxhighlighter .xml .string {
-  font-style: italic !important;
-  color: #2a00ff !important;
-}
-</style><style type="text/css">html{margin:0;padding:0;}h1{margin:0;padding:0;}h2{margin:0;padding:0;}h3{margin:0;padding:0;}h4{margin:0;padding:0;}a{color:#261A3B;}a:visited{color:#261A3B;}</style><style type="text/css">.header{margin-top:30px;}h1.project-name{font-size:34px;display:inline;}h2.project-version{font-size:18px;margin-top:0;display:inline;margin-left:10px;}.toc-link{font-size:12px;margin-left:10px;color:#252519;text-decoration:none;}.toc-link:hover{color:#5050A6;}.toc h1{font-size:34px;margin:0;}.docs-header{border-bottom:dotted #aaa 1px;padding-bottom:10px;margin-bottom:25px;}.toc h1{font-size:24px;}.toc{border-bottom:solid #bbb 1px;margin-bottom:40px;}.toc ul{margin-left:20px;padding-left:0px;padding-top:0;margin-top:0;}.toc li{list-style-type:none;padding-left:0;}.dependencies{}.dependencies table{font-size:16px;width:99.99%;border:none;margin-left:20px;}.dependencies td{padding-right:20px;;white-space:nowrap;}.dependencies .dotted{width:99%;}.dependencies .dotted hr{margin-bottom:-6px;noshade:noshade;border-top:none;color:transparent;border-left:none;border-bottom:dotted #bbb 1px;border-right:none;background-color:transparent;height:0;}.dependencies .dep-version{text-align:right;}.plugins ul{margin-left:20px;padding-left:0px;padding-top:0;margin-top:0;}.plugins li{list-style-type:none;padding-left:0;}.header p{margin-left:20px;}</style><style type="text/css">#floating-toc{position:fixed;top:10px;right:20px;height:20px;overflow:hidden;text-align:right;}#floating-toc li{list-style-type:none;margin:0;padding:0;}</style><style type="text/css">body{margin:0;padding:0;font-family:'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;;font-size:16px;color:#252519;}h1{font-size:20px;margin-top:0;}a.anchor{text-decoration:none;color:#252519;}a.anchor:hover{color:#5050A6;}table{border-spacing:0;border-bottom:solid #ddd 1px;;margin-bottom:10px;}code{display:inline;}p{margin-top:8px;}tr{margin:0px;padding:0px;}td.docs{width:410px;max-width:410px;vertical-align:top;margin:0px;padding-left:55px;padding-right:20px;border:none;}td.docs pre{font-size:12px;overflow:hidden;}td.codes{border:none;margin:0px;padding-left:20px;width:55%;border-left:solid #E5E5EE 1px;font-size:10pt;vertical-align:top;overflow:hidden;background-color:#F5F5FF;}td.spacer{padding-bottom:40px;}pre code{display:block;padding:4px;}code{background-color:ghostWhite;border:solid #DEDEDE 1px;padding-left:3px;padding-right:3px;font-size:14px;}.syntaxhighlighter code{font-size:13px;}.footer{text-align:center;}</style><title>lobos -- Marginalia</title></head><body><table><tr><td class="docs"><div class="header"><h1 class="project-name">lobos</h1><h2 class="project-version">0.7.0-SNAPSHOT</h2><br /><p>A library to create and manipulate SQL database schemas.</p>
-</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.2.0</td></tr><tr><td class="dep-name">org.clojure/clojure-contrib</td><td class="dotted"><hr /></td><td class="dep-version">1.2.0</td></tr></table></div><div class="dependencies"><h3>dev dependencies</h3><table><tr><td class="dep-name">clojureql</td><td class="dotted"><hr /></td><td class="dep-version">1.1.0-SNAPSHOT</td></tr><tr><td class="dep-name">swank-clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.2.1</td></tr><tr><td class="dep-name">lein-clojars</td><td class="dotted"><hr /></td><td class="dep-version">0.6.0</td></tr><tr><td class="dep-name">marginalia</td><td class="dotted"><hr /></td><td class="dep-version">0.5.0-alpha</td></tr><tr><td class="dep-name">cljss</td><td class="dotted"><hr /></td><td class="dep-version">0.1.1</td></tr><tr><td class="dep-name">hiccup</td><td class="dotted"><hr /></td><td class="dep-version">0.3.1</td></tr><tr><td class="dep-name">clj-help</td><td class="dotted"><hr /></td><td class="dep-version">0.2.0</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#lobos.core">lobos.core</a></li><li><a href="#lobos.schema">lobos.schema</a></li><li><a href="#lobos.connectivity">lobos.connectivity</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#lobos.core" name="lobos.core"><h1 class="project-name">lobos.core</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>The <code>core</code> namespace provide the basic interface to interact with a
+</script><title>lobos -- Marginalia</title></head><body><table><tr><td class="docs"><div class="header"><h1 class="project-name">lobos</h1><h2 class="project-version">0.7.0</h2><br /><p>A library to create and manipulate SQL database schemas.</p>
+</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.2.0</td></tr><tr><td class="dep-name">org.clojure/clojure-contrib</td><td class="dotted"><hr /></td><td class="dep-version">1.2.0</td></tr></table></div><div class="dependencies"><h3>dev dependencies</h3><table><tr><td class="dep-name">swank-clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.2.1</td></tr><tr><td class="dep-name">lein-clojars</td><td class="dotted"><hr /></td><td class="dep-version">0.6.0</td></tr><tr><td class="dep-name">marginalia</td><td class="dotted"><hr /></td><td class="dep-version">0.5.0</td></tr><tr><td class="dep-name">cljss</td><td class="dotted"><hr /></td><td class="dep-version">0.1.1</td></tr><tr><td class="dep-name">hiccup</td><td class="dotted"><hr /></td><td class="dep-version">0.3.1</td></tr><tr><td class="dep-name">clj-help</td><td class="dotted"><hr /></td><td class="dep-version">0.2.0</td></tr><tr><td class="dep-name">com.h2database/h2</td><td class="dotted"><hr /></td><td class="dep-version">1.3.154</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left almost blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#lobos.core">lobos.core</a></li><li><a href="#lobos.schema">lobos.schema</a></li><li><a href="#lobos.connectivity">lobos.connectivity</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#lobos.core" name="lobos.core"><h1 class="project-name">lobos.core</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>The <code>core</code> namespace provide the basic interface to interact with a
   database. It contains a set of functions and <em>actions</em> (a special kind
   of functions acting on abstract schemas or their elements) used to
   manipulate database schemas in an implementation agnostic way.</p>
@@ -2561,107 +2562,6 @@ $(document).ready(function() {
 </td><td class="codes" /><pre class="brush: clojure">(defn set-debug-level
   [level]
   (swap! debug-level (constantly level)))</pre></tr><tr><td class="docs"><hr />
-</td><td class="codes" /></tr><tr><td class="docs"><h2>Global Schema Map</h2>
-</td><td class="codes" /></tr><tr><td class="docs"><p>This section contains mainly functions for internal use. You can skip
-most of it if you only mean to use <strong>Lobos</strong> as a library. If that's
-the case, have a look at the <code>defschema</code> macro and the
-<code>set-default-schema</code> and <code>get-default-schema</code> functions.</p>
-</td><td class="codes" /></tr><tr><td class="docs"><p>This atom keeps a map of all schemas in use. See <code>schema-key</code> for
-  more details on how keys are generated. <em>For internal use</em>.</p>
-</td><td class="codes" /><pre class="brush: clojure">(defonce global-schemas
-  (atom {}))</pre></tr><tr><td class="docs"><p>This atom keeps the key of the default schema. <em>For internal use</em>.</p>
-</td><td class="codes" /><pre class="brush: clojure">(defonce default-schema
-  (atom nil))</pre></tr><tr><td class="docs"><p>Returns an unique schema key for the given schema. This schema must
-  have its db-spec option properly set. When given a keyword instead of
-  a schema, it look-up this schema by name in the <code>global-schemas</code> map
-  using the supplied db-spec argument. <em>For internal use</em>.</p>
-</td><td class="codes" /><pre class="brush: clojure">(defn schema-key
-  [schema-or-name & [db-spec]]
-  (str (:subname (or db-spec (-> schema-or-name
-                                 :options
-                                 :db-spec)))
-       (if (keyword? schema-or-name)
-         schema-or-name
-         (:sname schema-or-name))))</pre></tr><tr><td class="docs"><p>Associates the given schema in the <code>global-schemas</code> map with its key
-  and returns the given argument. <em>For internal use</em>.</p>
-</td><td class="codes" /><pre class="brush: clojure">(defn set-global-schema
-  [schema]
-  (swap! global-schemas assoc (schema-key schema) schema)
-  schema)</pre></tr><tr><td class="docs"><p>Returns the specified global schema by searching for it using the
-  given name and optional connection-info or default connection.  For
-  internal use. <em>For debugging purpose</em>.</p>
-</td><td class="codes" /><pre class="brush: clojure">(defn get-global-schema
-  [sname & [connection-info]]
-  (let [db-spec (conn/get-db-spec connection-info)]
-    (@global-schemas (schema-key sname db-spec))))</pre></tr><tr><td class="docs"><p>If given a schema, associates it in the global schemas map, else
-  analyze the specified schema from the database specified by the given
-  <code>db-spec</code> and associates it in the global schemas map. *For internal
-  use*.</p>
-</td><td class="codes" /><pre class="brush: clojure">(defn update-global-schema
-  ([schema] (set-global-schema schema))
-  ([schema-name db-spec]
-     (set-global-schema
-      (assoc-in
-       (analyzer/analyze-schema schema-name db-spec)
-       [:options :db-spec]
-       db-spec))))</pre></tr><tr><td class="docs"><p>Removes the given schema from the global schema map. *For internal
-  use*.</p>
-</td><td class="codes" /><pre class="brush: clojure">(defn remove-global-schema
-  [schema]
-  (swap! global-schemas dissoc (schema-key schema))
-  nil)</pre></tr><tr><td class="docs"><p>Returns the given schema, the schema returned by the given function
-  or create an abstract schema definition with the given keyword
-  depending on the argument's type, else nil. Associates the db-spec
-  obtained from the optional <code>connection-info</code> in its options map if
-  there's not already one. <em>For internal use</em>.</p>
-</td><td class="codes" /><pre class="brush: clojure">(defn get-or-create-schema
-  [schema-or-name & [connection-info]]
-  (let [db-spec (conn/get-db-spec connection-info)
-        schema (cond (schema/schema? schema-or-name) schema-or-name
-                     (fn? schema-or-name) (schema-or-name)
-                     (keyword? schema-or-name) (schema/schema schema-or-name))]
-    (if (and (not connection-info)
-             (-> schema :options :db-spec))
-      schema
-      (assoc-in schema [:options :db-spec] db-spec))))</pre></tr><tr><td class="docs"><p>This macro take two mandatory argument, the name of the variable
-  being defined and the name of the schema it represent. When used
-  without specifying elements, it defines a var containing the specified
-  schema constructed from database meta-data. e.g.:</p>
-
-<pre><code>user&gt; (defschema sample-schema :tmp)
-</code></pre>
-
-<p>  If used with elements, the defined var will keep the abstract schema
-  definition to be later created using the <code>create-schema</code> action. e.g.:</p>
-
-<pre><code>user&gt; (defschema sample-schema :tmp
-         (table :foo (integer :a)))
-</code></pre>
-
-<p>  It can also take an optional <code>connection-info</code> argument from which the
-  db-spec map will be used.</p>
-</td><td class="codes" /><pre class="brush: clojure">(defmacro defschema
-  {:arglists '([connection-info? var-name schema-name & elements])}
-  [& args]
-  (let [[connection-info args] (optional map? args)
-        var-name (first args)
-        schema-name (second args)
-        elements (nnext args)]
-    `(let [db-spec# (conn/get-db-spec ~connection-info)
-           options# {:db-spec db-spec#}
-           elements# (list ~@elements)
-           key# (schema-key
-                 (if elements#
-                   (update-global-schema
-                    (apply schema/schema ~schema-name options# elements#))
-                   (update-global-schema ~schema-name db-spec#)))]
-       (defn ~var-name [] (@global-schemas key#)))))</pre></tr><tr><td class="docs"><p>Set the given schema as the default one.</p>
-</td><td class="codes" /><pre class="brush: clojure">(defn set-default-schema
-  [schema]
-  (swap! default-schema (constantly (schema-key (schema)))))</pre></tr><tr><td class="docs"><p>Returns the default schema.</p>
-</td><td class="codes" /><pre class="brush: clojure">(defn get-default-schema
-  []
-  (@global-schemas @default-schema))</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Helpers</h2>
 </td><td class="codes" /></tr><tr><td class="docs"><p>Prints useful information on the given combination protocol method
   and schema (or elements). For the available methods, see the
@@ -2706,6 +2606,8 @@ the case, have a look at the <code>defschema</code> macro and the
         db-spec (conn/get-db-spec connection-info)
         mode (compiler/compile (compiler/mode db-spec))]
     (conn/with-connection connection-info
+      (require (symbol (str "lobos.backends."
+                            (:subprotocol connection-info))))
       (when mode (execute* mode))
       (doseq [statement statements]
         (let [sql (if (string? statement)
@@ -2727,9 +2629,7 @@ the case, have a look at the <code>defschema</code> macro and the
   given one prepended by the optional <code>cnx-or-schema</code> argument.</p>
 
 <p>  All actions must return a built statement (or list of statements)
-  using one of the protocol method available. This statement(s) will get
-  executed and if a schema as been given as argument, it will be updated
-  using the <code>update-global-schema</code> function.</p>
+  using one of the protocol method available.</p>
 
 <p>  The defined actions will have access to two extra local variables. The
   <code>schema</code> variable will contain the given schema if <code>cnx-or-schema</code> is
@@ -2748,20 +2648,17 @@ the case, have a look at the <code>defschema</code> macro and the
                (optional #(or (schema/schema? %)
                               (connection? %)) params#)
                ~params* params#
-               cnx-or-schema# (or cnx-or-schema# (get-default-schema))
-               ~'schema (cond (schema/schema? cnx-or-schema#) cnx-or-schema#
-                              (fn? cnx-or-schema#) (cnx-or-schema#))
-               cnx# (or (-> ~'schema :options :db-spec)
-                        cnx-or-schema#
+               ~'schema (when (schema/schema? cnx-or-schema#) cnx-or-schema#)
+               cnx# (or (conn/find-connection)
+                        (-> ~'schema :options :db-spec)
+                        (when-not ~'schema cnx-or-schema#)
                         :default-connection)
                ~'db-spec (merge (conn/get-db-spec cnx#)
                                 (when ~'schema
                                   {:schema (-> ~'schema :sname name)}))]
            (execute
-            ~@body
-            ~'db-spec)
-           (when ~'schema (update-global-schema (:schema ~'db-spec)
-                                                ~'db-spec))))
+            (do ~@body)
+            ~'db-spec)))
        (.setMeta #'~name
                  (merge (.meta #'~name)
                         {:arglists '(~(vec (conj params 'cnx-or-schema?)))})))))</pre></tr><tr><td class="docs"><hr />
@@ -2774,7 +2671,7 @@ the case, have a look at the <code>defschema</code> macro and the
 </code></pre>
 </td><td class="codes" /><pre class="brush: clojure">(defaction create
   [element]
-  (schema/build-create-statement element db-spec))</pre></tr><tr><td class="docs"><p>Builds an alter statement with the given schema element and execute
+  (schema/build-create-statement (or element schema) db-spec))</pre></tr><tr><td class="docs"><p>Builds an alter statement with the given schema element and execute
   it. There's four types of alter actions: <code>:add</code>, <code>:drop</code>, <code>:modify</code>
   and <code>:rename</code>. See the <code>lobos.schema</code> namespace for more details on
   schema elements definition. e.g.:</p>
@@ -2793,29 +2690,7 @@ user&gt; (alter :rename (table :foo (column :a :to :b)))
 </code></pre>
 </td><td class="codes" /><pre class="brush: clojure">(defaction drop
   [element & [behavior]]
-  (schema/build-drop-statement element behavior db-spec))</pre></tr><tr><td class="docs"><p>Create a new schema with the given name or create one using the given
-  abstract schema definition. See the <code>lobos.schema</code> namespace for more
-  details on schema definition. If given a name but no <code>connection-info</code>
-  it will use the default connection. e.g.:</p>
-
-<pre><code>user&gt; (create-schema :tmp)
-user&gt; (create-schema sample-schema)
-</code></pre>
-</td><td class="codes" /><pre class="brush: clojure">(defn create-schema
-  [schema-or-name & [connection-info]]
-  (let [schema (get-or-create-schema schema-or-name connection-info)
-        db-spec (-> schema :options :db-spec)]
-    (execute (schema/build-create-statement schema db-spec) db-spec)
-    (update-global-schema schema)))</pre></tr><tr><td class="docs"><p>Drop the specified schema or the named one using the given optional
-  behavior. If given a name but no <code>connection-info</code> it will use the
-  default connection. When the <code>:cascade</code> behavior is specified, it
-  drops all elements relying it.</p>
-</td><td class="codes" /><pre class="brush: clojure">(defn drop-schema
-  [schema-or-name & [behavior connection-info]]
-  (let [schema (get-or-create-schema schema-or-name connection-info)
-        db-spec (-> schema :options :db-spec)]
-    (execute (schema/build-drop-statement schema behavior db-spec) db-spec)
-    (remove-global-schema schema)))</pre></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#lobos.schema" name="lobos.schema"><h1 class="project-name">lobos.schema</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>This namespace include the abstract schema data-structures, an
+  (schema/build-drop-statement element behavior db-spec))</pre></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#lobos.schema" name="lobos.schema"><h1 class="project-name">lobos.schema</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>This namespace include the abstract schema data-structures, an
   handful of helpers to create them and the protocol to build the into
   an abstract syntax tree of implementation agnostic SQL
   statements. Abstract schema data-structures can be divided in two
@@ -2835,7 +2710,7 @@ user&gt; (create-schema sample-schema)
   (:refer-clojure :exclude [defonce replace
                             bigint boolean char double float time])
   (:require (lobos [ast :as ast]))
-  (:use (clojure [walk   :only [postwalk prewalk postwalk-replace]]
+  (:use (clojure [walk   :only [postwalk]]
                  [set    :only [union]]
                  [string :only [replace]])
         (clojure.contrib [def :only [defalias defvar]])
@@ -2908,7 +2783,7 @@ user&gt; (create-schema sample-schema)
                   %))
               (and (keyword? %)
                    (not (contains? sql-symbols (-> % name symbol))))
-              (IdentifierExpression. db-spec % :column [])
+              (IdentifierExpression. db-spec % nil)
               (not (keyword? %))
               (ScalarExpression. db-spec %)
               :else %))
@@ -2923,6 +2798,24 @@ user&gt; (create-schema sample-schema)
                 (rest %))
          %)
       form)))</pre></tr><tr><td class="docs"><hr />
+</td><td class="codes" /></tr><tr><td class="docs"><h2>Index Definitions</h2>
+</td><td class="codes" /></tr><tr><td class="docs">
+</td><td class="codes" /><pre class="brush: clojure">(defrecord Index [iname tname columns options]
+  Creatable Dropable
+  (build-create-statement [this db-spec]
+    (CreateIndexStatement. db-spec iname tname columns options))
+  (build-drop-statement [this behavior db-spec]
+    (DropStatement. db-spec :index iname nil {:tname tname})))</pre></tr><tr><td class="docs">
+</td><td class="codes" /><pre class="brush: clojure">(defn index
+  ([table columns] (index table nil columns))
+  ([table name columns & options]
+     (let [tname (if (keyword? table) table (:name table))
+           cnames (map #(if (keyword? %) % (first %)) columns)
+           name (or name (make-index-name tname :index cnames))]
+       (if (keyword? table)
+         (Index. name tname columns options)
+         (update-in table [:indexes] conj
+                    [name (Index. name tname columns options)])))))</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Constraint Definitions</h2>
 </td><td class="codes" /></tr><tr><td class="docs"><p><code>Constraint</code> records are only used to define unspecified constraint.
 These type of constraints are useful with the alter drop action. They
@@ -2951,7 +2844,7 @@ constraint. <em>For internal use</em>.</p>
   type) constraint definition and add it to the given table.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defn unique-constraint
   [table name type columns]
-  (let [name (or name (make-constraint-name table type columns))]
+  (let [name (or name (make-index-name table type columns))]
     (update-in table [:constraints] conj
                [name (UniqueConstraint. name type (vec columns))])))</pre></tr><tr><td class="docs"><p>Constructs an abstract primary key constraint definition and add it
   to the given table. If the name isn't specified, this constraint will
@@ -3008,7 +2901,7 @@ constraint. <em>For internal use</em>.</p>
         [match args]           (optional #{:full :partial :simple} args)
         triggered-actions      (apply hash-map args)
         constraint-name        (or constraint-name
-                                   (make-constraint-name table "fkey" columns))]
+                                   (make-index-name table "fkey" columns))]
     (update-in table [:constraints] conj
                [constraint-name
                 (ForeignKeyConstraint. constraint-name
@@ -3129,14 +3022,14 @@ definitions and <code>*Expression</code> AST for default values.
  use if supported by the database. Also see the natianal character types.</li>
 <li><code>[:collate type]</code> (for character types) determines how equality is
  handled</li>
-<li>:time-zone (for time types) determines if the type includes a time-zone</li>
+<li><code>:time-zone</code> (for time types) determines if the type includes a time-zone</li>
 </ul>
 
 <p>It also can be used in alter modify and rename actions. In that
   case, if data-type is :to, it acts as a column rename clause and if
   data-type is :drop-default, it acts as a column drop default clause.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defn column
-  {:arglists '([table column-name data-type? options])}
+  {:arglists '([table column-name data-type? & options])}
   [table column-name & options]
   (name-required column-name "column")
   (let [[data-type options] (optional #(instance? DataType %) options)
@@ -3206,7 +3099,7 @@ each types have their own functions.</p>
     '(-> options
          (conj-when (not (integer? precision)) precision)
          (conj-when (not (integer? scale)) scale))
-    "Takes an optional `precision` and `scale` arguments."))</pre></tr><tr><td class="docs"><p>Defines typed columns with optional precision. Used by <code>float</code> and
+    " Takes an optional `precision` and `scale` arguments."))</pre></tr><tr><td class="docs"><p>Defines typed columns with optional precision. Used by <code>float</code> and
   time data-types. <em>For internal use</em>.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defmacro def-optional-precision-typed-columns
   [& names]
@@ -3215,7 +3108,7 @@ each types have their own functions.</p>
     '[table column-name & [precision & options]]
     '(conj-when [] (integer? precision) precision)
     '(conj-when options (not (integer? precision)) precision)
-    "Takes an optional `precision` argument."))</pre></tr><tr><td class="docs"><p>Defines optionally length-bounded typed columns. Used by binary and
+    " Takes an optional `precision` argument."))</pre></tr><tr><td class="docs"><p>Defines optionally length-bounded typed columns. Used by binary and
   character types. <em>For internal use</em>.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defmacro def-optional-length-typed-columns
   [& names]
@@ -3224,7 +3117,7 @@ each types have their own functions.</p>
     '[table column-name & [length & options]]
     '(conj-when [] (integer? length) length)
     '(conj-when options (not (integer? length)) length)
-    "Takes an optional `length` argument."))</pre></tr><tr><td class="docs"><p>Defines length-bounded typed columns. Used by variable binary and
+    " Takes an optional `length` argument."))</pre></tr><tr><td class="docs"><p>Defines length-bounded typed columns. Used by variable binary and
   character types. <em>For internal use</em>.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defmacro def-length-bounded-typed-columns
   [& names]
@@ -3233,36 +3126,36 @@ each types have their own functions.</p>
     '[table column-name length & options]
     '(conj-when [] (integer? length) length)
     '(conj-when options (not (integer? length)) length)
-    "The `length` arguemnt is mandatory."))</pre></tr><tr><td class="docs"><h3>Numeric Types</h3>
+    " The `length` arguemnt is mandatory."))</pre></tr><tr><td class="docs"><h3>Numeric Types</h3>
 </td><td class="codes" /></tr><tr><td class="docs"><p>Constructs an abstract smallint column definition and add it to the given table.</p>
 </td><td class="codes" /><pre class="brush: clojure">(def-simple-typed-columns
   smallint
   integer
-  bigint)</pre></tr><tr><td class="docs"><p>Constructs an abstract numeric column definition and add it to the given table.Takes an optional <code>precision</code> and <code>scale</code> arguments.</p>
+  bigint)</pre></tr><tr><td class="docs"><p>Constructs an abstract numeric column definition and add it to the given table. Takes an optional <code>precision</code> and <code>scale</code> arguments.</p>
 </td><td class="codes" /><pre class="brush: clojure">(def-numeric-like-typed-columns
   numeric
   decimal)</pre></tr><tr><td class="docs"><p>Constructs an abstract real column definition and add it to the given table.</p>
 </td><td class="codes" /><pre class="brush: clojure">(def-simple-typed-columns
   real
   double-precision)</pre></tr><tr><td class="docs"><p>Constructs an abstract double-precision column definition and add it to the given table.</p>
-</td><td class="codes" /><pre class="brush: clojure">(defalias double double-precision)</pre></tr><tr><td class="docs"><p>Constructs an abstract float column definition and add it to the given table.Takes an optional <code>precision</code> argument.</p>
+</td><td class="codes" /><pre class="brush: clojure">(defalias double double-precision)</pre></tr><tr><td class="docs"><p>Constructs an abstract float column definition and add it to the given table. Takes an optional <code>precision</code> argument.</p>
 </td><td class="codes" /><pre class="brush: clojure">(def-optional-precision-typed-columns
   float)</pre></tr><tr><td class="docs"><h3>Character Types</h3>
-</td><td class="codes" /></tr><tr><td class="docs"><p>Constructs an abstract char column definition and add it to the given table.Takes an optional <code>length</code> argument.</p>
+</td><td class="codes" /></tr><tr><td class="docs"><p>Constructs an abstract char column definition and add it to the given table. Takes an optional <code>length</code> argument.</p>
 </td><td class="codes" /><pre class="brush: clojure">(def-optional-length-typed-columns
   char
   nchar
   clob
-  nclob)</pre></tr><tr><td class="docs"><p>Constructs an abstract clob column definition and add it to the given table.Takes an optional <code>length</code> argument.</p>
-</td><td class="codes" /><pre class="brush: clojure">(defalias text clob)</pre></tr><tr><td class="docs"><p>Constructs an abstract nclob column definition and add it to the given table.Takes an optional <code>length</code> argument.</p>
-</td><td class="codes" /><pre class="brush: clojure">(defalias ntext nclob)</pre></tr><tr><td class="docs"><p>Constructs an abstract varchar column definition and add it to the given table.The <code>length</code> arguemnt is mandatory.</p>
+  nclob)</pre></tr><tr><td class="docs"><p>Constructs an abstract clob column definition and add it to the given table. Takes an optional <code>length</code> argument.</p>
+</td><td class="codes" /><pre class="brush: clojure">(defalias text clob)</pre></tr><tr><td class="docs"><p>Constructs an abstract nclob column definition and add it to the given table. Takes an optional <code>length</code> argument.</p>
+</td><td class="codes" /><pre class="brush: clojure">(defalias ntext nclob)</pre></tr><tr><td class="docs"><p>Constructs an abstract varchar column definition and add it to the given table. The <code>length</code> arguemnt is mandatory.</p>
 </td><td class="codes" /><pre class="brush: clojure">(def-length-bounded-typed-columns  
   varchar
   nvarchar)</pre></tr><tr><td class="docs"><h3>Binary Types</h3>
-</td><td class="codes" /></tr><tr><td class="docs"><p>Constructs an abstract binary column definition and add it to the given table.Takes an optional <code>length</code> argument.</p>
+</td><td class="codes" /></tr><tr><td class="docs"><p>Constructs an abstract binary column definition and add it to the given table. Takes an optional <code>length</code> argument.</p>
 </td><td class="codes" /><pre class="brush: clojure">(def-optional-length-typed-columns
   binary
-  blob)</pre></tr><tr><td class="docs"><p>Constructs an abstract varbinary column definition and add it to the given table.The <code>length</code> arguemnt is mandatory.</p>
+  blob)</pre></tr><tr><td class="docs"><p>Constructs an abstract varbinary column definition and add it to the given table. The <code>length</code> arguemnt is mandatory.</p>
 </td><td class="codes" /><pre class="brush: clojure">(def-length-bounded-typed-columns
   varbinary)</pre></tr><tr><td class="docs"><h3>Boolean Type</h3>
 </td><td class="codes" /></tr><tr><td class="docs"><p>Constructs an abstract boolean column definition and add it to the given table.</p>
@@ -3270,18 +3163,25 @@ each types have their own functions.</p>
   boolean)</pre></tr><tr><td class="docs"><h3>Data/time Types</h3>
 </td><td class="codes" /></tr><tr><td class="docs"><p>Constructs an abstract date column definition and add it to the given table.</p>
 </td><td class="codes" /><pre class="brush: clojure">(def-simple-typed-columns
-  date)</pre></tr><tr><td class="docs"><p>Constructs an abstract time column definition and add it to the given table.Takes an optional <code>precision</code> argument.</p>
+  date)</pre></tr><tr><td class="docs"><p>Constructs an abstract time column definition and add it to the given table. Takes an optional <code>precision</code> argument.</p>
 </td><td class="codes" /><pre class="brush: clojure">(def-optional-precision-typed-columns
   time
   timestamp)</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Table Definition</h2>
-</td><td class="codes" /></tr><tr><td class="docs"><p><code>Table</code> records can be constructed using the <code>table*</code> function or
+</td><td class="codes" /></tr><tr><td class="docs">
+</td><td class="codes" /><pre class="brush: clojure">(defn- build-table-elements [db-spec method & elements]
+  (->> (apply concat elements)
+       (map #(when (second %)
+               (method (second %) db-spec)))
+       (filter identity)))</pre></tr><tr><td class="docs"><p><code>Table</code> records can be constructed using the <code>table*</code> function or
 the <code>table</code> macro. <em>For internal use</em>.</p>
-</td><td class="codes" /><pre class="brush: clojure">(defrecord Table [name columns constraints options]
+</td><td class="codes" /><pre class="brush: clojure">(defrecord Table [name columns constraints indexes]
   Alterable Creatable Dropable
   (build-alter-statement [this action db-spec]
-    (let [elements (map #(build-definition (second %) db-spec)
-                        (concat columns constraints))]
+    (let [elements (build-table-elements db-spec
+                                         build-definition
+                                         columns
+                                         constraints)]
       (for [element elements]
         (AlterTableStatement.
          db-spec
@@ -3289,21 +3189,22 @@ the <code>table</code> macro. <em>For internal use</em>.</p>
          action
          element))))
   (build-create-statement [this db-spec]
-    (CreateTableStatement.
-     db-spec
-     name
-     (map #(build-definition (second %) db-spec)
-          (concat columns constraints))))
+    (conj
+     (build-table-elements db-spec build-create-statement indexes)
+     (CreateTableStatement.
+      db-spec
+      name
+      (build-table-elements db-spec build-definition columns constraints))))
   (build-drop-statement [this behavior db-spec]
-    (DropStatement. db-spec :table name behavior)))</pre></tr><tr><td class="docs"><p>Constructs an abstract table definition. The <code>table-name</code> is
+    (DropStatement. db-spec :table name behavior nil)))</pre></tr><tr><td class="docs"><p>Constructs an abstract table definition. The <code>table-name</code> is
   mandatory.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defn table*
-  [table-name & [columns constraints options]]
+  [table-name & [columns constraints indexes]]
   (name-required table-name "table")
   (Table. table-name
           (or columns {})
           (or constraints {})
-          (or options {})))</pre></tr><tr><td class="docs"><p>Constructs an abstract table definition containing the given
+          (or indexes {})))</pre></tr><tr><td class="docs"><p>Constructs an abstract table definition containing the given
   elements. Takes an arbitrary number of table elements.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defmacro table
   [name & elements]
@@ -3317,9 +3218,11 @@ the <code>table</code> macro. <em>For internal use</em>.</p>
     (CreateSchemaStatement.
      db-spec
      sname
-     (map #(build-create-statement (second %) db-spec) elements)))
+     (flatten
+      (map #(build-create-statement (second %) db-spec)
+           elements))))
   (build-drop-statement [this behavior db-spec]
-    (DropStatement. db-spec :schema sname behavior)))</pre></tr><tr><td class="docs"><p>Returns true if the given object is a Schema.</p>
+    (DropStatement. db-spec :schema sname behavior nil)))</pre></tr><tr><td class="docs"><p>Returns true if the given object is a Schema.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defn schema?
   [o]
   (isa? (type o) Schema))</pre></tr><tr><td class="docs"><p>Constructs an abstract schema definition.</p>
@@ -3337,7 +3240,8 @@ the <code>table</code> macro. <em>For internal use</em>.</p>
 </td><td class="codes" /></tr><tr><td class="docs"><p>The definition hierarchy makes it easy to test if an object represent
 an abstract schema element definition. See the <code>definition?</code>
 predicate.</p>
-</td><td class="codes" /><pre class="brush: clojure">(derive Constraint           ::definition)
+</td><td class="codes" /><pre class="brush: clojure">(derive Index                ::definition)
+(derive Constraint           ::definition)
 (derive UniqueConstraint     ::definition)
 (derive ForeignKeyConstraint ::definition)
 (derive CheckConstraint      ::definition)
@@ -3355,14 +3259,16 @@ predicate.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defonce global-connections
   (atom {}))</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Helpers</h2>
-</td><td class="codes" /></tr><tr><td class="docs"><p>Returns the current database connection (or throws if there is none)</p>
+</td><td class="codes" /></tr><tr><td class="docs"><p>Returns the current database connection (or nil if there is none)</p>
+</td><td class="codes" /><pre class="brush: clojure">(defalias find-connection sqlint/find-connection*)</pre></tr><tr><td class="docs"><p>Returns the current database connection (or throws if there is none)</p>
 </td><td class="codes" /><pre class="brush: clojure">(defalias connection sqlint/connection*)</pre></tr><tr><td class="docs"><p>Returns the associated db-spec or itself. <em>For internal use</em>.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defn get-db-spec
   [& [connection-info]]
   (let [connection-info (or connection-info :default-connection)]
-    (if (keyword? connection-info)
-      (-> @global-connections connection-info :db-spec)
-      connection-info)))</pre></tr><tr><td class="docs"><p>Replaces <code>get-connection</code> from <code>contrib.sql.internal</code>
+    (or (:db-spec sqlint/*db*)
+        (if (keyword? connection-info)
+          (-> @global-connections connection-info :db-spec)
+          connection-info))))</pre></tr><tr><td class="docs"><p>Replaces <code>get-connection</code> from <code>contrib.sql.internal</code>
   namespace. Dissociates the <code>:schema</code> key to prevent conflit.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defn- get-cnx
   [db-spec]
@@ -3470,5 +3376,5 @@ predicate.</p>
   (try
     (with-named-connection :default-connection
       connection)
-    (catch Exception e nil)))</pre></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a><div id="floating-toc"><ul><li class="floating-toc-li" id="floating-toc_lobos.core">lobos.core</li><li class="floating-toc-li" id="floating-toc_lobos.schema">lobos.schema</li><li class="floating-toc-li" id="floating-toc_lobos.connectivity">lobos.connectivity</li></ul></div></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
+    (catch Exception _ nil)))</pre></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a><div id="floating-toc"><ul><li class="floating-toc-li" id="floating-toc_lobos.core">lobos.core</li><li class="floating-toc-li" id="floating-toc_lobos.schema">lobos.schema</li><li class="floating-toc-li" id="floating-toc_lobos.connectivity">lobos.connectivity</li></ul></div></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
        SyntaxHighlighter.all()</script></body></html>
