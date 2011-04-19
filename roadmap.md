@@ -14,10 +14,4 @@ You can have a look at the [wiki] for more details.
 
  * Support for migration
 
-## 0.7
-
- * Improve compiler support for value expression
- * Probably rewrite the analyzer once again, maybe split it to another
-   project
-
 [wiki]: https://github.com/budu/lobos/wiki

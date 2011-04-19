@@ -15,6 +15,8 @@ and consult the [history] to see what have been done.
 need to add the relevant JDBC driver manually. For SQLite you'll need a
 custom [SQLite JDBC driver].
 
+You may also be interested in joining the [Lobos Google Group].
+
 ## Usage
 
 Here's a quick overview of how it works in its current state. For more
@@ -174,14 +176,14 @@ Lobos is available through Clojars.
 
 For the latest release, in Cake/Leiningen:
 
-    [lobos "0.7.0-SNAPSHOT"]
+    [lobos "0.7.0]
 
 in Maven:
 
     <dependency>
       <groupId>lobos</groupId>
       <artifactId>lobos</artifactId>
-      <version>0.7.0-SNAPSHOT</version>
+      <version>0.7.0</version>
     </dependency>
 
 ## License
@@ -196,3 +198,4 @@ the file epl-v10.html in the project root directory.
 [history]: https://github.com/budu/lobos/blob/master/history.md
 [SQLite JDBC driver]: https://github.com/budu/sqlitejdbc
 [commented code]: http://budu.github.com/lobos/doc/uberdoc.frontend.html
+[Lobos Google Group]: http://groups.google.com/group/lobos-library

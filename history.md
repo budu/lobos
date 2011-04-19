@@ -1,5 +1,13 @@
 # Lobos History
 
+## 0.7
+
+ * Add support for creating indexes
+ * Improved compiler support for value expression
+ * Improved the analyzer to be able to use database specific information
+   schema
+ * Removed the global schema map
+
 ## 0.6
 
  * Support for altering tables
