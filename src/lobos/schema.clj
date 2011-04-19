@@ -421,12 +421,12 @@
      use if supported by the database. Also see the natianal character types.
    * `[:collate type]` (for character types) determines how equality is
      handled
-   * :time-zone (for time types) determines if the type includes a time-zone
+   * `:time-zone` (for time types) determines if the type includes a time-zone
 
 It also can be used in alter modify and rename actions. In that
   case, if data-type is :to, it acts as a column rename clause and if
   data-type is :drop-default, it acts as a column drop default clause."
-  {:arglists '([table column-name data-type? options])}
+  {:arglists '([table column-name data-type? & options])}
   [table column-name & options]
   (name-required column-name "column")
   (let [[data-type options] (optional #(instance? DataType %) options)
