@@ -101,7 +101,8 @@
    ;; SyntaxHighlighter
    [:div.syntaxhighlighter :border-radius :0.3em
                            :margin-left "1em !important"
-                           :padding "0.5em 0.3em"]))
+                           :padding "0.7em 0.3em"
+                           :width "85% !important"]))
 
 (defn page-layout [title body]
   (html
