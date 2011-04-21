@@ -91,17 +91,24 @@
       (when resultset
         (doall (resultset-seq resultset))))))
 
-(defmacro query
-  [db-spec sname table & [conditions]]
-  `(do
-     (require (symbol (str "lobos.backends."
-                           (:subprotocol ~db-spec))))
+(defn query-from-where [db-spec stmt sname tname where-expr]
+  (do
+    (require (symbol (str "lobos.backends."
+                          (:subprotocol db-spec))))
      (raw-query
-        (str "select * from "
-             (compiler/as-identifier ~db-spec ~table ~sname)
-             (when-not ~(nil? conditions)
-               (str
-                " where "
-                (compiler/compile
-                 (schema/build-definition (schema/expression ~conditions)
-                                          ~db-spec))))))))
+      (str stmt
+           " from "
+           (compiler/as-identifier db-spec tname sname)
+           (when where-expr
+             (str
+              " where "
+              (compiler/compile
+               (schema/build-definition where-expr db-spec))))))))
+
+(defmacro query [db-spec sname tname & [conditions]]
+  `(query-from-where ~db-spec "select *" ~sname ~tname
+                     (schema/expression ~conditions)))
+
+(defmacro delete [db-spec sname tname & [conditions]]
+  `(query-from-where ~db-spec "delete" ~sname ~tname
+                     (schema/expression ~conditions)))
