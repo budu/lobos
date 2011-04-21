@@ -111,14 +111,6 @@
 ;; The following helpers are used internally to defince **Lobos**
 ;; *actions*. You can skip this section.
 
-(defn connection?
-  "Checks if the given argument is a named connection or a db-spec. *For
-  internal use*."
-  [cnx]
-  (or ((set (keys @conn/global-connections)) cnx)
-      (and (map? cnx)
-           ((comp not schema/definition?) cnx))))
-
 (defmacro defaction
   "Defines an action applicable to an optional abstract schema or
   database connection. *Actions* are simply a special kind of
@@ -143,7 +135,8 @@
        (defn ~name* [self# & params#]
          (let [[cnx-or-schema# params#]
                (optional #(or (schema/schema? %)
-                              (connection? %)) params#)
+                              (and (-> % schema/definition? not)
+                                   (conn/connection? %))) params#)
                ~params* params#
                ~'schema (when (schema/schema? cnx-or-schema#) cnx-or-schema#)
                cnx# (or (conn/find-connection)

@@ -45,6 +45,13 @@
   (let [db-spec (dissoc db-spec :schema)]
     (sqlint/get-connection db-spec)))
 
+(defn connection?
+  "Checks if the given argument is a named connection or a db-spec. As a
+  db-spec is just a map, any map return true. *For internal use*."
+  [cnx]
+  (or ((set (keys @global-connections)) cnx)
+      (map? cnx)))
+
 ;; -----------------------------------------------------------------------------
 
 ;; ## Global Connections
