@@ -172,9 +172,10 @@
               (tables sname))))
 
 (defn analyze-schema
-  [sname & [connection-info]]
-  (let [sname (keyword sname)]
-    (with-db-meta connection-info
+  [& [sname connection-info]]
+  (with-db-meta connection-info
+    (let [sname (or (keyword sname)
+                    (default-schema))]
       (if-let [schemas (schemas)]
         (when ((set schemas) sname)
           (analyze Schema sname))

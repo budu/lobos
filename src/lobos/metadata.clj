@@ -118,6 +118,14 @@
              (doall (resultset-seq (.getSchemas (db-meta)))))
         (supports-catalogs) (catalogs)))
 
+(defn default-schema []
+  (when (supports-schemas)
+    (->> (doall (resultset-seq (.getSchemas (db-meta))))
+         (filter :is_default)
+         first
+         :table_schem
+         keyword)))
+
 (defn tables
   "Returns a list of table names as keywords for the specified schema."
   [& [sname]]
