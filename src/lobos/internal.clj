@@ -7,6 +7,7 @@
 ; You must not remove this notice, or any other, from this software.
 
 (ns lobos.internal
+  (:refer-clojure :exclude [defonce])
   (:require (lobos [compiler :as compiler]
                    [connectivity :as conn]
                    [schema :as schema]))
@@ -63,36 +64,3 @@
                        (when schema
                          {:schema (-> schema :sname name)}))]
     [db-spec schema args]))
-
-(defmacro defaction
-  "Defines an action applicable to an optional abstract schema or
-  database connection. *Actions* are simply a special kind of
-  functions. They will have an augmented argument list, which is the
-  given one prepended by the optional `cnx-or-schema` argument.
-
-  All actions must return a built statement (or list of statements)
-  using one of the protocol method available.
-
-  The defined actions will have access to two extra local variables. The
-  `schema` variable will contain the given schema if `cnx-or-schema` is
-  one else it be nil. The `db-spec` argument will contain the db-spec
-  map found with the given connection or in the given schema. *For
-  internal use*."
-  {:arglists '([name doc-string? attr-map? [params*] & body])}
-  [name & args]
-  (let [params (seq (first (filter vector? args)))
-        name* (symbol (str name \*))
-        [name args] (name-with-attributes name args)
-        [params* & body] args]
-    `(do
-       (defn ~name* [self# & params#]
-         (let [[~'db-spec ~'schema ~params*]
-               (optional-cnx-or-schema params#)]
-           (execute
-            (do ~@body)
-            ~'db-spec)))
-       (defmacro ~name [~'& args#]
-         `(~~name* (quote ~~'&form) ~@args#))
-       (.setMeta #'~name
-                 (merge (.meta #'~name)
-                        {:arglists '(~(vec (conj params 'cnx-or-schema?)))})))))
