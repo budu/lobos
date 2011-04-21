@@ -5,6 +5,7 @@ classes
 lib
 wiki
 www
+lobos/migrations
 
 playground.clj
 pom.xml
