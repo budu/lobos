@@ -69,8 +69,10 @@
         columns)])))
 
 (defn- analyze-foreign-keys [tname]
-  (let [fks (group-by :id (raw-query (format "pragma foreign_key_list(%s);"
-                                             (name tname))))]
+  (let [fks (group-by :id  (try
+                             (raw-query (format "pragma foreign_key_list(%s);"
+                                                (name tname)))
+                             (catch Exception _)))]
     (for [fk fks]
       (let [fk (second fk)
             pcolumns (reduce #(conj %1 (-> %2 :to keyword)) [] fk)

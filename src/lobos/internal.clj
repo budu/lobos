@@ -77,33 +77,31 @@
 (defn optional-cnx-and-sname [args]
   (let [[db-spec schema args] (optional-cnx-or-schema args)
         [sname args] (conn/with-connection db-spec
-                       (optional #((set (metadata/schemas)) %) args))]
+                       (optional #(or (nil? %)
+                                      (set (metadata/schemas)) %) args))]
     [db-spec sname args]))
 
 ;; -----------------------------------------------------------------------------
 
-;; ## Query Helpers
+;; ## DML Helpers
 
 (defn raw-query [sql-string]
   (with-open [stmt (.createStatement (conn/connection))]
-    (let [resultset (try (.executeQuery stmt sql-string)
-                         (catch Exception _))]
+    (let [resultset (.executeQuery stmt sql-string)]
       (when resultset
         (doall (resultset-seq resultset))))))
 
 (defmacro query
-  {:arglists '([connection-info? sname? table & [conditions]])}
-  [& args]
-  `(let [[db-spec# schema# [table# & [conditions#]]]
-         (optional-cnx-and-sname ~(vec args))]
+  [db-spec sname table & [conditions]]
+  `(do
      (require (symbol (str "lobos.backends."
-                           (:subprotocol db-spec#))))
-     (raw-query 
+                           (:subprotocol ~db-spec))))
+     (raw-query
         (str "select * from "
-             (compiler/as-identifier db-spec# table# schema#)
-             (when conditions#
+             (compiler/as-identifier ~db-spec ~table ~sname)
+             (when-not ~(nil? conditions)
                (str
                 " where "
                 (compiler/compile
-                 (schema/build-definition (schema/expression conditions#)
-                                          db-spec#))))))))
+                 (schema/build-definition (schema/expression ~conditions)
+                                          ~db-spec))))))))

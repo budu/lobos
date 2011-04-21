@@ -41,7 +41,8 @@
      (map (fn [meta] (analyze UniqueConstraint sname tname
                               (-> meta :constraint_name keyword)
                               meta))
-          (query :INFORMATION_SCHEMA
+          (query db-spec
+                 :INFORMATION_SCHEMA
                  :CONSTRAINTS
                  (and (or (= :CONSTRAINT_TYPE "UNIQUE")
                           (= :CONSTRAINT_TYPE "PRIMARY KEY"))
