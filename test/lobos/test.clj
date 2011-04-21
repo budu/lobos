@@ -106,7 +106,7 @@
                      (catch Exception _#))))))
 
 (defmacro inspect-schema [& keys]
-  `(-> :lobos (analyze-schema *db*) ~@keys))
+  `(-> (analyze-schema *db* :lobos) ~@keys))
 
 ;;;; Fixtures
 

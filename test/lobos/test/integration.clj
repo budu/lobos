@@ -10,7 +10,7 @@
   (:refer-clojure :exclude [alter compile defonce drop
                             bigint boolean char double float time])
   (:use clojure.test
-        (lobos connectivity core metadata schema test utils)
+        (lobos analyzer connectivity core metadata schema test utils)
         (lobos.backends h2 mysql postgresql sqlite sqlserver))
   (:import (lobos.schema ForeignKeyConstraint
                          UniqueConstraint)))
@@ -28,7 +28,7 @@
         #(with-schema [lobos :lobos]
            ;; cannot rely on creating just a schema as some dbms ignore that action
            (create lobos (table :foo (integer :bar)))
-           (= (inspect-schema :elements :foo)
+           (= (-> :lobos analyze-schema :elements :foo)
               (table :foo (integer :bar))))]
     (is (thrown? Exception (test-action))
         "An exception should have been thrown because there are no connection")

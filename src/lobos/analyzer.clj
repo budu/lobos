@@ -9,7 +9,8 @@
 (ns lobos.analyzer
   "Analyze a database's meta-data to contruct an abstract schema."
   (:refer-clojure :exclude [defonce replace])
-  (:require (lobos [schema :as schema]))
+  (:require (lobos [connectivity :as conn]
+                   [schema :as schema]))
   (:use (clojure.contrib [def :only [defvar-]])
         (clojure [string :only [replace]])
         lobos.metadata
@@ -172,11 +173,13 @@
               (tables sname))))
 
 (defn analyze-schema
-  [& [sname connection-info]]
-  (with-db-meta connection-info
-    (let [sname (or (keyword sname)
-                    (default-schema))]
-      (if-let [schemas (schemas)]
-        (when ((set schemas) sname)
-          (analyze Schema sname))
-        (analyze Schema sname)))))
+  [& args]
+  {:arglists '([connection-info? sname?])}
+  (let [[cnx [sname]] (optional conn/connection? args)]
+    (with-db-meta cnx
+      (let [sname (or (keyword sname)
+                      (default-schema))]
+        (if-let [schemas (schemas)]
+          (when ((set schemas) sname)
+            (analyze Schema sname))
+          (analyze Schema sname))))))
