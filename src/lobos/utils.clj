@@ -91,3 +91,6 @@
      (list 'clojure.core/defonce
            (with-meta name (assoc (meta name) :doc doc))
            expr)))
+
+(defn exclude [items from]
+  (filter #(not ((set items) %)) from))
