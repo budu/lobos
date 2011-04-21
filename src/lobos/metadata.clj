@@ -92,6 +92,14 @@
   (when (.supportsSchemasInDataManipulation (db-meta))
     (.getSchemaTerm (db-meta))))
 
+(defmacro meta-call [method sname & args]
+  `(doall
+    (resultset-seq
+     (~method (db-meta)
+              (when (and ~sname (not (supports-schemas))) (name ~sname))
+              (when (and ~sname (supports-schemas)) (name ~sname))
+              ~@args))))
+
 ;; -----------------------------------------------------------------------------
 
 ;; ## Database Objects
@@ -112,14 +120,9 @@
 
 (defn tables
   "Returns a list of table names as keywords for the specified schema."
-  [sname]
+  [& [sname]]
   (map #(-> % :table_name keyword)
-       (resultset-seq
-        (.getTables (db-meta)
-                    (when-not (supports-schemas) (name sname))
-                    (when (supports-schemas) (name sname))
-                    nil
-                    (into-array ["TABLE"])))))
+       (meta-call .getTables sname nil (into-array ["TABLE"]))))
 
 (defn primary-keys
   "Returns primary key names as a set of keywords for the specified
@@ -127,11 +130,7 @@
   [sname tname]
   (set
    (map #(-> % :pk_name keyword)
-        (resultset-seq
-         (.getPrimaryKeys (db-meta)
-                          (when-not (supports-schemas) (name sname))
-                          (when (supports-schemas) (name sname))
-                          (name tname))))))
+        (meta-call .getPrimaryKeys sname (name tname)))))
 
 (defn indexes-meta
   "Returns metadata maps for indexes of the specified table. Results are
@@ -143,13 +142,7 @@
     (group-by :index_name
       (filter #(and (> (:type %) DatabaseMetaData/tableIndexStatistic)
                     ((or f identity) %))
-              (resultset-seq
-               (.getIndexInfo (db-meta)
-                              (when-not (supports-schemas) (name sname))
-                              (when (supports-schemas) (name sname))
-                              (name tname)
-                              false
-                              false))))
+              (meta-call .getIndexInfo sname (name tname) false false)))
     (catch java.sql.SQLException _ nil)))
 
 (defn references-meta
@@ -158,18 +151,9 @@
   foreign key name."
   [sname tname]
   (group-by :fk_name
-    (resultset-seq
-     (.getImportedKeys (db-meta)
-                       (when-not (supports-schemas) (name sname))
-                       (when (supports-schemas) (name sname))
-                       (name tname)))))
+    (meta-call .getImportedKeys sname (name tname))))
 
 (defn columns-meta
   "Returns metadata maps for each columns of the specified table."
   [sname tname]
-  (resultset-seq
-   (.getColumns (db-meta)
-                (when-not (supports-schemas) (name sname))
-                (when (supports-schemas) (name sname))
-                (name tname)
-                nil)))
+  (meta-call .getColumns sname (name tname) nil))
