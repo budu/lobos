@@ -136,10 +136,11 @@
   {:arglists '([name doc-string? attr-map? [params*] & body])}
   [name & args]
   (let [params (seq (first (filter vector? args)))
+        name* (symbol (str name \*))
         [name args] (name-with-attributes name args)
         [params* & body] args]
     `(do
-       (defn ~name [& params#]
+       (defn ~name* [self# & params#]
          (let [[cnx-or-schema# params#]
                (optional #(or (schema/schema? %)
                               (connection? %)) params#)
@@ -155,6 +156,8 @@
            (execute
             (do ~@body)
             ~'db-spec)))
+       (defmacro ~name [~'& args#]
+         `(~~name* (quote ~~'&form) ~@args#))
        (.setMeta #'~name
                  (merge (.meta #'~name)
                         {:arglists '(~(vec (conj params 'cnx-or-schema?)))})))))
