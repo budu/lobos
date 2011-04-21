@@ -10,6 +10,7 @@
   (:refer-clojure :exclude [defonce])
   (:require (lobos [compiler :as compiler]
                    [connectivity :as conn]
+                   [metadata :as metadata]
                    [schema :as schema]))
   (:use (clojure.contrib [def :only [name-with-attributes]])
         lobos.utils))
@@ -18,6 +19,10 @@
   (atom nil)
   "This atom keeps the currently set debug level, see
   `set-debug-level`. *For internal use*.")
+
+;; -----------------------------------------------------------------------------
+
+;; ## Statement Execution Helpers
 
 (defn- execute*
   "Execute the given SQL string or sequence of strings. Prints them if
@@ -49,6 +54,10 @@
                            (compiler/compile statement))]
           (when sql (execute* sql)))))) nil)
 
+;; -----------------------------------------------------------------------------
+
+;; ## Optional Arguments Helpers
+
 (defn optional-cnx-or-schema [args]
   (let [[cnx-or-schema args]
         (optional #(or (schema/schema? %)
@@ -64,3 +73,37 @@
                        (when schema
                          {:schema (-> schema :sname name)}))]
     [db-spec schema args]))
+
+(defn optional-cnx-and-sname [args]
+  (let [[db-spec schema args] (optional-cnx-or-schema args)
+        [sname args] (conn/with-connection db-spec
+                       (optional #((set (metadata/schemas)) %) args))]
+    [db-spec sname args]))
+
+;; -----------------------------------------------------------------------------
+
+;; ## Query Helpers
+
+(defn raw-query [sql-string]
+  (with-open [stmt (.createStatement (conn/connection))]
+    (let [resultset (try (.executeQuery stmt sql-string)
+                         (catch Exception _))]
+      (when resultset
+        (doall (resultset-seq resultset))))))
+
+(defmacro query
+  {:arglists '([connection-info? sname? table & [conditions]])}
+  [& args]
+  `(let [[db-spec# schema# [table# & [conditions#]]]
+         (optional-cnx-and-sname ~(vec args))]
+     (require (symbol (str "lobos.backends."
+                           (:subprotocol db-spec#))))
+     (raw-query 
+        (str "select * from "
+             (compiler/as-identifier db-spec# table# schema#)
+             (when conditions#
+               (str
+                " where "
+                (compiler/compile
+                 (schema/build-definition (schema/expression conditions#)
+                                          db-spec#))))))))

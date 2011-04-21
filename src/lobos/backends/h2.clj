@@ -12,7 +12,7 @@
   (:require (lobos [schema :as schema]))
   (:use (clojure [string :only [split]])
         (clojure.contrib [def :only [defvar-]])
-        (lobos analyzer compiler connectivity metadata utils))
+        (lobos analyzer compiler connectivity internal metadata utils))
   (:import (lobos.ast AlterRenameAction
                       AutoIncClause
                       CreateSchemaStatement
@@ -41,11 +41,12 @@
      (map (fn [meta] (analyze UniqueConstraint sname tname
                               (-> meta :constraint_name keyword)
                               meta))
-          (query-schema :constraints
-                        (and (or (= :CONSTRAINT_TYPE "UNIQUE")
-                                 (= :CONSTRAINT_TYPE "PRIMARY KEY"))
-                             (= :TABLE_SCHEMA (as-str sname))
-                             (= :TABLE_NAME (as-str tname)))))
+          (query :INFORMATION_SCHEMA
+                 :CONSTRAINTS
+                 (and (or (= :CONSTRAINT_TYPE "UNIQUE")
+                          (= :CONSTRAINT_TYPE "PRIMARY KEY"))
+                      (= :TABLE_SCHEMA (as-str sname))
+                      (= :TABLE_NAME (as-str tname)))))
      (map (fn [[cname meta]] (analyze ForeignKeyConstraint cname meta))
           (references-meta sname tname)))))
 

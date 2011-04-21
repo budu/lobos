@@ -52,30 +52,6 @@
 
 ;; -----------------------------------------------------------------------------
 
-;; ## Helpers
-
-(defn raw-query [sql-string]
-  (with-open [stmt (.createStatement (conn/connection))]
-    (let [resultset (try (.executeQuery stmt sql-string)
-                         (catch Exception _))]
-      (when resultset
-        (doall (resultset-seq resultset))))))
-
-(defmacro query-schema [table & [conditions]]
-  `(let [db-spec# (db-meta-spec)]
-     (require (symbol (str "lobos.backends."
-                           (:subprotocol db-spec#))))
-     (raw-query 
-      (str "select * from information_schema." (name ~table)
-           (when '~conditions
-             (str
-              " where "
-              (compiler/compile
-               (schema/build-definition (schema/expression ~conditions)
-                                        db-spec#))))))))
-
-;; -----------------------------------------------------------------------------
-
 ;; ## Predicates
 
 (defn supports-catalogs

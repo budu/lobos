@@ -11,11 +11,7 @@
   (:refer-clojure :exclude [compile defonce])
   (:require (lobos [schema :as schema]))
   (:use (clojure.contrib [def :only [defvar-]])
-        lobos.analyzer
-        lobos.compiler
-        lobos.connectivity
-        lobos.metadata
-        lobos.utils)
+        (lobos analyzer compiler connectivity internal metadata utils))
   (:import (lobos.ast AlterTableStatement
                       AutoIncClause
                       CreateSchemaStatement
