@@ -107,8 +107,10 @@
 
 (defmacro query [db-spec sname tname & [conditions]]
   `(query-from-where ~db-spec "select *" ~sname ~tname
-                     (schema/expression ~conditions)))
+                     (when-not ~(nil? conditions)
+                       (schema/expression ~conditions))))
 
 (defmacro delete [db-spec sname tname & [conditions]]
   `(query-from-where ~db-spec "delete" ~sname ~tname
-                     (schema/expression ~conditions)))
+                     (when-not ~(nil? conditions)
+                       (schema/expression ~conditions))))
