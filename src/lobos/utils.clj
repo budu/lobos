@@ -94,3 +94,12 @@
 
 (defn exclude [items from]
   (filter #(not ((set items) %)) from))
+
+(defmacro when->> ; inspired by pallet.thread-expr
+  [condition & body]
+  (let [arg (last body)
+        body (butlast body)]
+    `(let [arg# ~arg]
+       (if ~condition
+         (->> arg# ~@body)
+         arg#))))
