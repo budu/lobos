@@ -78,7 +78,7 @@
   (let [[db-spec schema args] (optional-cnx-or-schema args)
         [sname args] (conn/with-connection db-spec
                        (optional #(or (nil? %)
-                                      (set (metadata/schemas)) %) args))]
+                                      ((set (metadata/schemas)) %)) args))]
     [db-spec sname args]))
 
 ;; -----------------------------------------------------------------------------
