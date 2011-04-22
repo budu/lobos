@@ -126,7 +126,7 @@
          (filter #(re-seq re (str %)))
          (map slurp)
          (map read-string)
-         (map #(with-meta % {:version version})))))
+         (map #(assoc % :version version)))))
 
 ;; ### Migrations Table Helpers
 
@@ -152,7 +152,6 @@
   [db-spec sname & versions]
   (when-not (empty? versions)
     (conn/with-connection db-spec
-      (println versions)
       (delete db-spec sname *migrations-table*
               (in :version (vec versions))))))
 
@@ -170,21 +169,21 @@
                                         sname))))
 
 (defn do-migrations* [db-spec sname with versions]
-  (let [versions (if (empty? versions)
-                   (pending-versions db-spec sname)
-                   versions)
-        migrations (->> versions
+  (let [migrations (->> versions
                         (map version->migrations)
-                        flatten)]
+                        flatten
+                        (sort-by :version)
+                        (when->> (= with :undo) reverse))]
     (binding [*record* nil]
       ;; TODO: transaction
       (doseq [migration migrations
               action (with migration)]
+        (println (as-str with "ing") (:version migration))
         (eval action)
         ((if (= with :do)
            insert-versions
            delete-versions)
-         db-spec sname (-> migration meta :version))))))
+         db-spec sname (:version migration))))))
 
 ;; -----------------------------------------------------------------------------
 
@@ -221,10 +220,21 @@
 ;; connection-info?
 
 (defcommand run [& versions]
-  (do-migrations* db-spec sname :do versions))
+  (let [versions (if (empty? versions)
+                   (pending-versions db-spec sname)
+                   versions)]
+    (do-migrations* db-spec sname :do versions)))
 
-(defcommand rollback [& versions]
-  (do-migrations* db-spec sname :undo versions))
+(defcommand rollback [& args]
+  (let [versions (cond
+                  (empty? args)
+                  [(last (query-migrations-table db-spec sname))]
+                  (and (= 1 (count args))
+                       (integer? (first args)))
+                  (take (first args)
+                        (reverse (query-migrations-table db-spec sname)))
+                  :else args)]
+    (do-migrations* db-spec sname :undo versions)))
 
 (defn print-stach []
   (when (.exists (stach-file))
