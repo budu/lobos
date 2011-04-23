@@ -162,7 +162,7 @@
                         {:arglists
                          '(~(vec (conj params
                                        'sname?
-                                       'connection-info?)))})))))
+                                       'cnx-or-schema?)))})))))
 
 (defcommand print-done []
   (doseq [version (mig/query-migrations-table db-spec sname)]
