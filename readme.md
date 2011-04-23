@@ -149,6 +149,48 @@ You can always set the debug level to see the compiled statement:
 As you can see **Lobos** use delimited identifiers by default and schema
 qualified identifiers when an action use a schema.
 
+### Migrations
+
+**Lobos** records each actions and include a set of commands to create
+migration files, run and rollbacks them. When you execute an action, the
+call used will be recorded inside a stash file found in
+`lobos/migrations/stash.clj`.
+
+    user> (create (table :users (integer :id)))
+    nil
+    ---
+    $ cat lobos/migrations/stash.clj
+
+    (create (table :users (integer :id)))
+
+Recorded actions can be dumped into one or more migration files using the
+`dump` command:
+
+    user> (dump)
+    nil
+    ---
+    $ cat lobos/migrations/20110421174029265_default_create_table_users.clj
+
+    {:do [(create (table :users (integer :id)))]}
+
+Without arguments, `dump` will create one migration file for every action
+found in the stash file. When given a string as argument, it will dump
+all actions inside a file named with the version followed by the given
+message.
+
+Then you can use the `run` and `rollback` commands:
+
+    user> (rollback)
+    undoing 20110421174029265
+    user> (run)
+    doing 20110421174029265
+
+Note that for now you'll have to write the `:undo` part of the migration
+file for the previous example to work.
+
+There's also three print commands to look where you are into the
+migration process: `print-stash`, `print-pending` and `print-done`.
+
 ### Analyzer
 
 Lobos includes a database analyzer which use the database meta-data or
@@ -176,14 +218,14 @@ Lobos is available through Clojars.
 
 For the latest release, in Cake/Leiningen:
 
-    [lobos "0.7.0]
+    [lobos "0.8.0-SNAPSHOT"]
 
 in Maven:
 
     <dependency>
       <groupId>lobos</groupId>
       <artifactId>lobos</artifactId>
-      <version>0.7.0</version>
+      <version>0.8.0-SNAPSHOT</version>
     </dependency>
 
 ## License
