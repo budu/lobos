@@ -94,12 +94,12 @@
        (filter #(not= % (stach-file)))
        (sort)))
 
-(defn- msg->mfile [& msg]
+(defn msg->mfile [& msg]
   (file (str *default-directory*
              (apply join \_ (current-timestamp) msg)
              ".clj")))
 
-(defn- action->mfile [action]
+(defn action->mfile [action]
   (let [[action & args] action
         [spec-or-schema args]  (optional symbol? args)
         [subaction args] (optional keyword? args)
@@ -191,69 +191,3 @@
            delete-versions)
          db-spec sname (:version migration))))))
 
-;; -----------------------------------------------------------------------------
-
-;; ## Migration Commands
-
-(defmacro defcommand
-  [name & args]
-  (let [params (seq (first (filter vector? args)))
-        [name args] (name-with-attributes name args)
-        [params* & body] args]
-    `(do
-       (defn ~name [& params#]
-         (let [[~'db-spec ~'sname ~params*]
-               (optional-cnx-and-sname params#)]
-           (create-migrations-table ~'db-spec ~'sname)
-           (do ~@body)))
-       (.setMeta #'~name
-                 (merge (.meta #'~name)
-                        {:arglists
-                         '(~(vec (conj params
-                                       'sname?
-                                       'connection-info?)))})))))
-
-(defcommand print-done []
-  (doseq [version (query-migrations-table db-spec sname)]
-    (println version)))
-
-(defcommand print-pending []
-  (doseq [version (pending-versions db-spec sname)]
-    (println version)))
-
-;; TODO: make run and rollback use the db-spec and schema found in the
-;; migration's actions. What happen if multiple actions use different
-;; connection-info?
-
-(defcommand run [& versions]
-  (let [versions (if (empty? versions)
-                   (pending-versions db-spec sname)
-                   versions)]
-    (do-migrations* db-spec sname :do versions)))
-
-(defcommand rollback [& args]
-  (let [versions (cond
-                  (empty? args)
-                  [(last (query-migrations-table db-spec sname))]
-                  (and (= 1 (count args))
-                       (integer? (first args)))
-                  (take (first args)
-                        (reverse (query-migrations-table db-spec sname)))
-                  :else args)]
-    (do-migrations* db-spec sname :undo versions)))
-
-(defn print-stach []
-  (when (.exists (stach-file))
-    (print (slurp (stach-file)))))
-
-(defn- dump* [db-spec sname mfile actions]
-  (append-to-mfile mfile actions)
-  (insert-versions db-spec sname (mfile->version mfile)))
-
-(defcommand dump [& msg]
-  (let [actions (read-stach-file)]
-    (if (empty? msg)
-      (doseq [action actions]
-        (dump* db-spec sname (action->mfile action) [action]))
-      (dump* db-spec sname (apply msg->mfile msg) actions))
-    (clear-stach-file)))

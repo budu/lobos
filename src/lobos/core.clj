@@ -141,3 +141,66 @@
     user> (drop (table :foo) :cascade)"
   [element & [behavior]]
   (schema/build-drop-statement element behavior db-spec))
+
+;; -----------------------------------------------------------------------------
+
+;; ## Migration Commands
+
+(defmacro defcommand
+  [name & args]
+  (let [params (seq (first (filter vector? args)))
+        [name args] (name-with-attributes name args)
+        [params* & body] args]
+    `(do
+       (defn ~name [& params#]
+         (let [[~'db-spec ~'sname ~params*]
+               (optional-cnx-and-sname params#)]
+           (mig/create-migrations-table ~'db-spec ~'sname)
+           (do ~@body)))
+       (.setMeta #'~name
+                 (merge (.meta #'~name)
+                        {:arglists
+                         '(~(vec (conj params
+                                       'sname?
+                                       'connection-info?)))})))))
+
+(defcommand print-done []
+  (doseq [version (mig/query-migrations-table db-spec sname)]
+    (println version)))
+
+(defcommand print-pending []
+  (doseq [version (mig/pending-versions db-spec sname)]
+    (println version)))
+
+(defn print-stach []
+  (when (.exists (mig/stach-file))
+    (print (slurp (mig/stach-file)))))
+
+(defcommand run [& versions]
+  (let [versions (if (empty? versions)
+                   (mig/pending-versions db-spec sname)
+                   versions)]
+    (mig/do-migrations* db-spec sname :do versions)))
+
+(defcommand rollback [& args]
+  (let [versions (cond
+                  (empty? args)
+                  [(last (mig/query-migrations-table db-spec sname))]
+                  (and (= 1 (count args))
+                       (integer? (first args)))
+                  (take (first args)
+                        (reverse (mig/query-migrations-table db-spec sname)))
+                  :else args)]
+    (mig/do-migrations* db-spec sname :undo versions)))
+
+(defn- dump* [db-spec sname mfile actions]
+  (mig/append-to-mfile mfile actions)
+  (mig/insert-versions db-spec sname (mig/mfile->version mfile)))
+
+(defcommand dump [& msg]
+  (let [actions (mig/read-stach-file)]
+    (if (empty? msg)
+      (doseq [action actions]
+        (dump* db-spec sname (mig/action->mfile action) [action]))
+      (dump* db-spec sname (apply mig/msg->mfile msg) actions))
+    (mig/clear-stach-file)))
