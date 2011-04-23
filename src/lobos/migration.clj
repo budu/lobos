@@ -29,14 +29,14 @@
 
 ;; ## Globals
 
-(def *record* :stach)
+(def *record* :stash)
 
 (def *default-directory*
      (replace "lobos/migrations/"
               "/"
               java.io.File/separator))
 
-(def *stach-file* "stach.clj")
+(def *stash-file* "stash.clj")
 
 (def *migrations-table* :lobos_migrations)
 
@@ -68,22 +68,22 @@
     (.write wtr "\n")
     (pprint content wtr)))
 
-;; ### Stach File Helpers
+;; ### Stash File Helpers
 
-(defn stach-file []
+(defn stash-file []
   (file *default-directory*
-        *stach-file*))
+        *stash-file*))
 
-(defn append-to-stach-file [action]
-  (append (stach-file) action))
+(defn append-to-stash-file [action]
+  (append (stash-file) action))
 
-(defn clear-stach-file []
-  (when (.exists (stach-file))
-    (spit (stach-file) "")))
+(defn clear-stash-file []
+  (when (.exists (stash-file))
+    (spit (stash-file) "")))
 
-(defn read-stach-file []
-  (when (.exists (stach-file))
-    (read-string (str \[ (slurp (stach-file)) \]))))
+(defn read-stash-file []
+  (when (.exists (stash-file))
+    (read-string (str \[ (slurp (stash-file)) \]))))
 
 ;; ### Migration Files Helpers
 
@@ -91,7 +91,7 @@
   (->> *default-directory*
        file
        .listFiles
-       (filter #(not= % (stach-file)))
+       (filter #(not= % (stash-file)))
        (sort)))
 
 (defn msg->mfile [& msg]
@@ -127,12 +127,6 @@
          (map slurp)
          (map read-string)
          (map #(assoc % :version version)))))
-
-(defn record [action]
-  (cond
-   (= *record* :stach) (append-to-stach-file action)
-   (= *record* :migration) (append-to-mfile (action->mfile action)
-                                            [action])))
 
 ;; ### Migrations Table Helpers
 
@@ -191,3 +185,13 @@
            delete-versions)
          db-spec sname (:version migration))))))
 
+(defn dump* [db-spec sname mfile actions]
+  (append-to-mfile mfile actions)
+  (insert-versions db-spec sname (mfile->version mfile)))
+
+(defn record [db-spec sname action]
+  (cond
+   (= *record* :stash) (append-to-stash-file action)
+   (= *record* :migration) (dump* db-spec sname
+                                  (action->mfile action)
+                                  [action])))

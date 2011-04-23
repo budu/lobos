@@ -105,7 +105,7 @@
            (execute
             (do ~@body)
             ~'db-spec)
-           (mig/record self#)))
+           (mig/record ~'db-spec (:name ~'schema) self#)))
        (defmacro ~name [~'& args#]
          `(~~name* (quote ~~'&form) ~@args#))
        (.setMeta #'~name
@@ -172,9 +172,9 @@
   (doseq [version (mig/pending-versions db-spec sname)]
     (println version)))
 
-(defn print-stach []
-  (when (.exists (mig/stach-file))
-    (print (slurp (mig/stach-file)))))
+(defn print-stash []
+  (when (.exists (mig/stash-file))
+    (print (slurp (mig/stash-file)))))
 
 (defcommand run [& versions]
   (let [versions (if (empty? versions)
@@ -193,14 +193,10 @@
                   :else args)]
     (mig/do-migrations* db-spec sname :undo versions)))
 
-(defn- dump* [db-spec sname mfile actions]
-  (mig/append-to-mfile mfile actions)
-  (mig/insert-versions db-spec sname (mig/mfile->version mfile)))
-
 (defcommand dump [& msg]
-  (let [actions (mig/read-stach-file)]
+  (let [actions (mig/read-stash-file)]
     (if (empty? msg)
       (doseq [action actions]
-        (dump* db-spec sname (mig/action->mfile action) [action]))
-      (dump* db-spec sname (apply mig/msg->mfile msg) actions))
-    (mig/clear-stach-file)))
+        (mig/dump* db-spec sname (mig/action->mfile action) [action]))
+      (mig/dump* db-spec sname (apply mig/msg->mfile msg) actions))
+    (mig/clear-stash-file)))
