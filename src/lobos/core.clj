@@ -96,7 +96,8 @@
                (optional-cnx-or-schema params#)]
            (execute
             (do ~@body)
-            ~'db-spec)))
+            ~'db-spec)
+           (mig/record self#)))
        (defmacro ~name [~'& args#]
          `(~~name* (quote ~~'&form) ~@args#))
        (.setMeta #'~name
