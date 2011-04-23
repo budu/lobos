@@ -179,7 +179,8 @@
   (let [[db-spec sname _] (optional-cnx-and-sname args)]
     (with-db-meta db-spec
       (let [sname (or (keyword sname)
-                      (default-schema))]
+                      (default-schema)
+                      (first _))]
         (if-let [schemas (schemas)]
           (when ((set schemas) sname)
             (analyze Schema sname))
