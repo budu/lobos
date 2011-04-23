@@ -74,7 +74,7 @@
   (file *default-directory*
         *stach-file*))
 
-(defn append-stach-file [action]
+(defn append-to-stach-file [action]
   (append (stach-file) action))
 
 (defn clear-stach-file []
@@ -127,6 +127,12 @@
          (map slurp)
          (map read-string)
          (map #(assoc % :version version)))))
+
+(defn record [action]
+  (cond
+   (= *record* :stach) (append-to-stach-file action)
+   (= *record* :migration) (append-to-mfile (action->mfile action)
+                                            [action])))
 
 ;; ### Migrations Table Helpers
 
@@ -240,12 +246,14 @@
   (when (.exists (stach-file))
     (print (slurp (stach-file)))))
 
-(defn dump [& msg]
+(defn- dump* [db-spec sname mfile actions]
+  (append-to-mfile mfile actions)
+  (insert-versions db-spec sname (mfile->version mfile)))
+
+(defcommand dump [& msg]
   (let [actions (read-stach-file)]
     (if (empty? msg)
       (doseq [action actions]
-        (let [mfile (action->mfile action)]
-          (append-to-mfile mfile [action])))
-      (let [mfile (apply msg->mfile msg)]
-        (append-to-mfile mfile actions)))
+        (dump* db-spec sname (action->mfile action) [action]))
+      (dump* db-spec sname (apply msg->mfile msg) actions))
     (clear-stach-file)))
