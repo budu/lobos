@@ -31,9 +31,14 @@
        (f)
        (finally (drop-schemas-for-all-db))))
 
+(defn quiet-sql-exception [f]
+  (binding [*err* identity]
+    (f)))
+
 (use-fixtures :once
   remove-tmp-files-fixture
-  open-global-connections-fixture)
+  open-global-connections-fixture
+  quiet-sql-exception)
 
 (use-fixtures :each
   use-sample-schema-fixture)
