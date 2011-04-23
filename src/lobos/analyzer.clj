@@ -13,6 +13,7 @@
                    [schema :as schema]))
   (:use (clojure.contrib [def :only [defvar-]])
         (clojure [string :only [replace]])
+        lobos.internal
         lobos.metadata
         lobos.utils)
   (:import (java.sql DatabaseMetaData)
@@ -175,8 +176,8 @@
 (defn analyze-schema
   [& args]
   {:arglists '([connection-info? sname?])}
-  (let [[cnx [sname]] (optional conn/connection? args)]
-    (with-db-meta cnx
+  (let [[db-spec sname _] (optional-cnx-and-sname args)]
+    (with-db-meta db-spec
       (let [sname (or (keyword sname)
                       (default-schema))]
         (if-let [schemas (schemas)]
