@@ -30,6 +30,14 @@
 
 ;; -----------------------------------------------------------------------------
 
+;; ## Helpers
+
+(defmacro without-migration [& body]
+  `(binding [mig/*record* nil]
+     ~@body))
+
+;; -----------------------------------------------------------------------------
+
 ;; ## Debugging Interface
 
 (defn set-debug-level
