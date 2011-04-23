@@ -43,7 +43,7 @@
       (is (= (inspect-schema) lobos)
           "A schema named 'lobos' should have been created")
       (drop *db* lobos)
-      (is (nil? (inspect-schema))
+      (is (not= (inspect-schema :sname) :lobos)
           "A schema named 'lobos' should have been dropped"))))
 
 (def-db-test test-create-and-drop-table
