@@ -192,6 +192,6 @@
 (defn record [db-spec sname action]
   (cond
    (= *record* :stash) (append-to-stash-file action)
-   (= *record* :migration) (dump* db-spec sname
-                                  (action->mfile action)
-                                  [action])))
+   (= *record* :auto) (dump* db-spec sname
+                             (action->mfile action)
+                             [action])))
