@@ -8,7 +8,7 @@
 
 (ns lobos.migration
   "Migrations support."
-  (:refer-clojure :exclude [defonce replace])
+  (:refer-clojure :exclude [complement defonce replace])
   (:require (clojure.contrib [sql :as sql])
             (lobos [analyzer :as analyzer]
                    [compiler :as compiler]
@@ -42,6 +42,21 @@
 
 ;; -----------------------------------------------------------------------------
 
+;; ## Action Complement
+
+(defn complement [action]
+  (cond 
+    (= (first action) 'create)
+    (apply list 'drop (rest action))
+    (= (first action) 'alter)
+    (let [[head & [[subaction & args]]]
+          (split-with #(not (keyword? %)) action)]
+      (case subaction
+        :add (concat head [:drop] args)
+        nil))))
+
+;; -----------------------------------------------------------------------------
+
 ;; ## Helpers
 
 (defn- ljust [s n p]
@@ -55,10 +70,6 @@
       str
       (replace #"\D" "")
       (ljust 17 \0)))
-
-;; -----------------------------------------------------------------------------
-
-;; ## Helpers
 
 ;; ### File Helpers
 
@@ -111,8 +122,10 @@
      element
      (as-str name))))
 
-(defn append-to-mfile [mfile actions]
-  (append mfile `{:do ~actions}))
+(defn append-to-mfile [mfile do & [undo]]
+  (append mfile `{:do ~do
+                  ~@(when undo [:undo])
+                  ~@(when undo [(vec undo)])}))
 
 (defn mfile->version [mfile]
   (->> mfile
@@ -186,7 +199,10 @@
          db-spec sname (:version migration))))))
 
 (defn dump* [db-spec sname mfile actions]
-  (append-to-mfile mfile actions)
+  (append-to-mfile mfile actions (->> actions
+                                      (map complement)
+                                      (filter identity)
+                                      seq))
   (insert-versions db-spec sname (mfile->version mfile)))
 
 (defn record [db-spec sname action]
