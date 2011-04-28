@@ -117,7 +117,9 @@
 
 (defn msg->mfile [& msg]
   (file (str *default-directory*
-             (apply join \_ (current-timestamp) msg)
+             (replace
+              (apply join \_ (current-timestamp) msg)
+              #"\s" "_")
              ".clj")))
 
 (defn action->mfile [action]
