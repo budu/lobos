@@ -200,9 +200,10 @@
     (binding [*record* nil]
       ;; TODO: transaction
       (doseq [migration migrations
-              action (with migration)]
+              action (or (with migration) [:nop])]
         (println (as-str with "ing") (:version migration))
-        (eval action)
+        (when (not= action :nop)
+          (eval action))
         ((if (= with :do)
            insert-versions
            delete-versions)
