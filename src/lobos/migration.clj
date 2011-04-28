@@ -14,7 +14,8 @@
                    [compiler :as compiler]
                    [connectivity :as conn]
                    [schema :as schema]))
-  (:use (clojure [string :only [replace]])
+  (:use (clojure [string :only [replace]]
+                 [walk   :only [postwalk]])
         (clojure.java [io :only [file
                                  make-parents
                                  writer]])
@@ -44,6 +45,14 @@
 
 ;; ## Action Complement
 
+(defn reverse-rename [form]
+  (postwalk
+   #(if (and (seq? %) (= 'column (first %)))
+      (let [[elem from _ to] %]
+        `(~elem ~to :to ~from))
+      %)
+   form))
+
 (defn complement [action]
   (cond 
     (= (first action) 'create)
@@ -53,6 +62,7 @@
           (split-with #(not (keyword? %)) action)]
       (case subaction
         :add (concat head [:drop] args)
+        :rename (concat head [:rename] (reverse-rename args))
         nil))))
 
 ;; -----------------------------------------------------------------------------
