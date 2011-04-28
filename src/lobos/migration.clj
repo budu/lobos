@@ -125,12 +125,16 @@
         [spec-or-schema args]  (optional symbol? args)
         [subaction args] (optional keyword? args)
         [element name] (first args)]
-    (msg->mfile
-     (or spec-or-schema "default")
-     action
-     (when subaction (as-str subaction))
-     element
-     (as-str name))))
+    (if (= action 'exec)
+      (msg->mfile
+       (or spec-or-schema "default")
+       action)
+      (msg->mfile
+       (or spec-or-schema "default")
+       action
+       (when subaction (as-str subaction))
+       element
+       (as-str name)))))
 
 (defn append-to-mfile [mfile do & [undo]]
   (append mfile `{:do ~do

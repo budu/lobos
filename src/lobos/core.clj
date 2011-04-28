@@ -76,7 +76,9 @@
 
 ;; -----------------------------------------------------------------------------
 
-;; ## Actions
+;; ## Lobos Action
+
+;; ### Action Macro
 
 (defmacro defaction
   "Defines an action applicable to an optional abstract schema or
@@ -112,6 +114,8 @@
                  (merge (.meta #'~name)
                         {:arglists '(~(vec (conj params 'cnx-or-schema?)))})))))
 
+;; ### Actions
+
 (defaction create
   "Builds a create statement with the given schema element and execute
   it. See the `lobos.schema` namespace for more details on schema
@@ -142,9 +146,16 @@
   [element & [behavior]]
   (schema/build-drop-statement element behavior db-spec))
 
+(defaction exec
+  "Execute the given statements as an action."
+  [& statements]
+  statements)
+
 ;; -----------------------------------------------------------------------------
 
-;; ## Migration Commands
+;; ## Lobos Migration
+
+;; ### Migration Command Macro
 
 (defmacro defcommand
   [name & args]
@@ -163,6 +174,8 @@
                          '(~(vec (conj params
                                        'sname?
                                        'cnx-or-schema?)))})))))
+
+;; ### Migration Commands
 
 (defcommand print-done []
   (doseq [version (mig/query-migrations-table db-spec sname)]
