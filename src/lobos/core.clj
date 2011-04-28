@@ -199,10 +199,13 @@
   (let [versions (cond
                   (empty? args)
                   [(last (mig/query-migrations-table db-spec sname))]
-                  (and (= 1 (count args))
-                       (integer? (first args)))
-                  (take (first args)
-                        (reverse (mig/query-migrations-table db-spec sname)))
+                  (= 1 (count args))
+                  (let [arg (first args)
+                        migs (reverse
+                              (mig/query-migrations-table db-spec sname))]
+                    (cond
+                     (integer? arg) (take arg migs)
+                     (= arg :all) migs))
                   :else args)]
     (mig/do-migrations* db-spec sname :undo versions)))
 
