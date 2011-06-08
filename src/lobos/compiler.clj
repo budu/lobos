@@ -54,11 +54,11 @@
 
 (defn unsupported
   "Throws an UnsupportedOperationException using the given message. Can
-  be given a test, in which case it throw an exception only if it's
+  be given a condition, in which case it throw an exception only if it's
   true."
   ([msg] (unsupported true msg))
-  ([test msg]
-     (when test
+  ([cond msg]
+     (when cond
        (throw (UnsupportedOperationException. (str msg))))))
 
 (defn mode
