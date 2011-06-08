@@ -12,7 +12,9 @@
   (:use (clojure [string :only [lower-case
                                 replace
                                 upper-case]]
-                 [walk :only [postwalk]])))
+                 [walk :only [postwalk]])
+        (clojure.java [io :only [file]]))
+  (:import java.io.File))
 
 (defn join [separator & coll]
   (clojure.string/join separator (filter identity coll)))
@@ -92,6 +94,9 @@
            (with-meta name (assoc (meta name) :doc doc))
            expr)))
 
+(defn only [items from]
+  (filter #((set items) %) from))
+
 (defn exclude [items from]
   (filter #(not ((set items) %)) from))
 
@@ -103,3 +108,9 @@
        (if ~condition
          (->> arg# ~@body)
          arg#))))
+
+(defn make-parents ;; fixed from java.io
+  [f & more]
+  (let [parents (.getParentFile ^File (apply file f more))]
+    (when parents
+      (.mkdirs parents))))

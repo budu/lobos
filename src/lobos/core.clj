@@ -107,7 +107,7 @@
            (execute
             (do ~@body)
             ~'db-spec)
-           (mig/record ~'db-spec (:name ~'schema) self#)))
+           (mig/record self#)))
        (defmacro ~name [~'& args#]
          `(~~name* (quote ~~'&form) ~@args#))
        (.setMeta #'~name
@@ -178,41 +178,44 @@
 ;; ### Migration Commands
 
 (defcommand print-done []
-  (doseq [version (mig/query-migrations-table db-spec sname)]
-    (println version)))
+  (doseq [name (mig/query-migrations-table db-spec sname)]
+    (mig/print-migration name)))
 
 (defcommand print-pending []
-  (doseq [version (mig/pending-versions db-spec sname)]
-    (println version)))
+  (doseq [name (mig/pending-migrations db-spec sname)]
+    (mig/print-migration name)))
 
 (defn print-stash []
-  (when (.exists (mig/stash-file))
-    (print (slurp (mig/stash-file)))))
+  (when (.exists mig/*stash-file*)
+    (print (slurp mig/*stash-file*))))
 
-(defcommand run [& versions]
-  (let [versions (if (empty? versions)
-                   (mig/pending-versions db-spec sname)
-                   versions)]
-    (mig/do-migrations* db-spec sname :do versions)))
+(defcommand run [& names]
+  (let [names (if (empty? names)
+                (mig/pending-migrations db-spec sname)
+                names)]
+    (mig/do-migrations* db-spec sname :up names)))
 
 (defcommand rollback [& args]
-  (let [versions (cond
-                  (empty? args)
-                  [(last (mig/query-migrations-table db-spec sname))]
-                  (= 1 (count args))
-                  (let [arg (first args)
-                        migs (reverse
-                              (mig/query-migrations-table db-spec sname))]
-                    (cond
-                     (integer? arg) (take arg migs)
-                     (= arg :all) migs))
-                  :else args)]
-    (mig/do-migrations* db-spec sname :undo versions)))
+  (let [names (cond
+               (empty? args)
+               [(last (mig/query-migrations-table db-spec sname))]
+               (= 1 (count args))
+               (let [arg (first args)
+                     migs (reverse
+                           (mig/query-migrations-table db-spec sname))]
+                 (cond
+                  (integer? arg) (take arg migs)
+                  (= arg :all) migs
+                  :else args))
+               :else args)]
+    (mig/do-migrations* db-spec sname :down names)))
 
-(defcommand dump [& msg]
-  (let [actions (mig/read-stash-file)]
-    (if (empty? msg)
-      (doseq [action actions]
-        (mig/dump* db-spec sname (mig/action->mfile action) [action]))
-      (mig/dump* db-spec sname (apply mig/msg->mfile msg) actions))
-    (mig/clear-stash-file)))
+(defcommand dump [name & [msg]]
+  (when-not name
+    (throw (IllegalArgumentException.
+            "Migration must be named.")))
+  (when ((set (mig/list-migrations-names)) (str name))
+    (throw (IllegalArgumentException.
+            "Migration name is already taken.")))
+  (mig/dump* db-spec sname name msg (mig/read-stash-file))
+  (mig/clear-stash-file))
