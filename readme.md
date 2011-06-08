@@ -1,11 +1,10 @@
 # Lobos
 
 **Lobos** is a library to create and manipulate abstract SQL database
-schemas and applying them to any supported RDBMS. It is based on the
-original ClojureQL but exclude the query language part which is better
-handled by the [new ClojureQL] project. It aims to add higher-level
-features like built-in migration support and declarative schema
-manipulation.
+schemas and applying them to any supported RDBMS that support a flexible
+migrations mechanism. It is based on the original ClojureQL but exclude
+the query language part which is better handled by the [new ClojureQL]
+project.
 
 This is currently an early release, use it at your own risk. You can
 have a look at the [roadmap] for more information about future releases
@@ -152,41 +151,35 @@ qualified identifiers when an action use a schema.
 ### Migrations
 
 **Lobos** records each actions and include a set of commands to create
-migration files, run and rollbacks them. When you execute an action, the
+migrations, run and rollbacks them. When you execute an action, the
 call used will be recorded inside a stash file found in
-`lobos/migrations/stash.clj`.
+`.lobos_stash.clj`.
 
     user> (create (table :users (integer :id)))
     nil
-    ---
-    $ cat lobos/migrations/stash.clj
+    user> (print-stash)
 
     (create (table :users (integer :id)))
 
-Recorded actions can be dumped into one or more migration files using the
+Recorded actions can be dumped into one or more migrations using the
 `dump` command:
 
-    user> (dump)
+    user> (dump 'create-users)
     nil
-    ---
-    $ cat lobos/migrations/20110421174029265_default_create_table_users.clj
 
-    {:do [(create (table :users (integer :id)))]}
-
-Without arguments, `dump` will create one migration file for every action
-found in the stash file. When given a string as argument, it will dump
-all actions inside a file named with the version followed by the given
-message.
+This command will create a migration definition into the migration file
+(located in `src/lobos/migrations.clj` by default) for all action found
+in the stash file. 
 
 Then you can use the `run` and `rollback` commands:
 
     user> (rollback)
-    undoing 20110421174029265
+    create-users
     user> (run)
-    doing 20110421174029265
+    create-users
 
-Note that for now you'll have to write the `:undo` part of the migration
-file for the previous example to work.
+The `dump` command will automatically generate the undo method for some
+actions.
 
 There's also three print commands to look where you are into the
 migration process: `print-stash`, `print-pending` and `print-done`.
