@@ -197,9 +197,12 @@
                     (->> name-or-migration
                          symbol
                          (ns-resolve *migrations-namespace*)))]
-    (-> migration meta :name println)
-    (when-let [doc (-> migration meta :doc)]
-      (println "   " doc))))
+    (if migration
+      (do
+        (-> migration meta :name println)
+        (when-let [doc (-> migration meta :doc)]
+          (println "   " doc)))
+      (println name-or-migration))))
 
 (defn pending-migrations [db-spec sname]
   (exclude (query-migrations-table db-spec
