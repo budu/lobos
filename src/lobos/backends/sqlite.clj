@@ -21,6 +21,7 @@
                       IdentifierExpression)
            (lobos.schema DataType
                          ForeignKeyConstraint
+                         Schema
                          UniqueConstraint)))
 
 ;; -----------------------------------------------------------------------------
@@ -105,6 +106,16 @@
   (concat (analyze-unique sname tname)
           (analyze-primary-keys tname)
           (analyze-foreign-keys tname)))
+
+(defmethod analyze [:sqlite Schema]
+  [_ sname]
+  (let [db-spec (db-meta-spec)
+        sname (or sname
+                  (->> db-spec
+                       :subname
+                       (re-find #"^\./(.*)\.\w+$")
+                       second))]
+    (analyze [:lobos.analyzer/standard Schema] sname)))
 
 ;; -----------------------------------------------------------------------------
 

@@ -189,3 +189,11 @@
                     (name cname))))
       (drop lobos (table :baz))
       (drop lobos (table :foo)))))
+
+(def-db-test test-default-schema
+  (when-not (= *db* :mysql)
+    (create *db* (table :foo (integer :bar)))
+    (is (= (-> *db* analyze-schema :elements :foo)
+           (table :foo (integer :bar)))
+        "A table named 'foo' should have been created in the default schema")
+    (drop *db* (table :foo))))

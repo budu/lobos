@@ -17,7 +17,8 @@
   (:import (lobos.ast AlterRenameAction
                       ColumnDefinition
                       DataTypeClause)
-           (lobos.schema DataType)))
+           (lobos.schema DataType
+                         Schema)))
 
 ;; -----------------------------------------------------------------------------
 
@@ -46,6 +47,10 @@
      dtype
      (analyze-data-type-args dtype column-meta)
      options)))
+
+(defmethod analyze [:postgresql Schema]
+  [_ sname]
+  (analyze [:lobos.analyzer/standard Schema] (or sname :public)))
 
 ;; -----------------------------------------------------------------------------
 

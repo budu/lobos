@@ -27,7 +27,8 @@
                       FunctionExpression
                       IdentifierExpression)
            (lobos.schema DataType
-                         Expression)))
+                         Expression
+                         Schema)))
 
 ;; -----------------------------------------------------------------------------
 
@@ -61,6 +62,10 @@
      dtype
      (analyze-data-type-args dtype column-meta)
      options)))
+
+(defmethod analyze [:microsoft-sql-server Schema]
+  [_ sname]
+  (analyze [:lobos.analyzer/standard Schema] (or sname :dbo)))
 
 ;; -----------------------------------------------------------------------------
 

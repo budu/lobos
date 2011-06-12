@@ -41,9 +41,11 @@
 (defmulti analyze
   "Analyzes the specified part of a schema and returns its abstract
   equivalent."
-  (fn [klass & args]
-    [(as-keyword (.getDatabaseProductName (db-meta)))
-     klass])
+  (fn [dispatch-val & args]
+    (if (vector? dispatch-val)
+      dispatch-val
+      [(as-keyword (.getDatabaseProductName (db-meta)))
+       dispatch-val]))
   :hierarchy db-hierarchy)
 
 ;; -----------------------------------------------------------------------------
@@ -182,6 +184,7 @@
                       (default-schema)
                       (first _))]
         (if-let [schemas (schemas)]
-          (when ((set schemas) sname)
+          (when (or (nil? sname)
+                    ((set schemas) sname))
             (analyze Schema sname))
           (analyze Schema sname))))))

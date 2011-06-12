@@ -19,6 +19,7 @@
                utils))
   (:import (lobos.schema Column
                          DataType
+                         Schema
                          UniqueConstraint)))
 
 (ast/import-all)
@@ -64,6 +65,18 @@
     (first
      (resultset-seq
       (.getColumns (db-meta) (name sname) nil (name tname) (name cname))))))
+
+(defmethod analyze [:mysql Schema]
+  [_ sname]
+  (let [db-spec (db-meta-spec)
+        sname (or sname
+                  (->> db-spec
+                       :subname
+                       (re-find #"//.*/(.+)$")
+                       second))]
+    (when-not sname
+      (throw (java.sql.SQLException. "No database selected")))
+    (analyze [:lobos.analyzer/standard Schema] sname)))
 
 ;; -----------------------------------------------------------------------------
 
