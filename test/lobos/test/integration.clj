@@ -46,6 +46,18 @@
       (is (not= (inspect-schema :sname) :lobos)
           "A schema named 'lobos' should have been dropped"))))
 
+(def-db-test test-create-and-drop-schema-with-tables
+  (when (with-db-meta (get-db-spec *db*)
+          (or (supports-schemas)
+              (supports-catalogs)))
+    (with-schema [lobos :lobos]
+      (is (= (inspect-schema) lobos)
+          "A schema named 'lobos' should have been created")
+      (create lobos (table :foo (integer :bar)))
+      (drop *db* lobos :cascade)
+      (is (not= (inspect-schema :sname) :lobos)
+          "A schema named 'lobos' should have been dropped"))))
+
 (def-db-test test-create-and-drop-table
   (with-schema [lobos :lobos]
     (create lobos (table :foo (integer :bar)))

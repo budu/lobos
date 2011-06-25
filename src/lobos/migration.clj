@@ -52,7 +52,9 @@
    form))
 
 (defn complement [action]
-  (cond 
+  (cond
+    (and (= (first action) 'create) (= (first (nth action 2 nil)) 'schema))
+    (lazy-seq (assoc (vec (apply list 'drop (rest action))) 3 :cascade))
     (= (first action) 'create)
     (apply list 'drop (rest action))
     (= (first action) 'alter)
