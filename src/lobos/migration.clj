@@ -53,17 +53,19 @@
 
 (defn complement [action]
   (cond
-    (and (= (first action) 'create) (= (first (nth action 2 nil)) 'schema))
-    (lazy-seq (assoc (vec (apply list 'drop (rest action))) 3 :cascade))
     (= (first action) 'create)
-    (apply list 'drop (rest action))
+    (if (= 'schema (-> action reverse first first))
+      (concat ['drop] (rest action) [:cascade])
+      (apply list 'drop (rest action)))
     (= (first action) 'alter)
-    (let [[head & [[subaction & args]]]
-          (split-with #(not (keyword? %)) action)]
-      (case subaction
-        :add (concat head [:drop] args)
-        :rename (concat head [:rename] (reverse-rename args))
-        nil))))
+    (let [[element subaction cnx-or-schema] (reverse (rest action))]
+      (filter
+       identity
+       (case subaction
+             :add (list 'alter cnx-or-schema :drop element)
+             :rename (list 'alter cnx-or-schema :rename
+                           (reverse-rename element))
+             nil)))))
 
 ;; -----------------------------------------------------------------------------
 
