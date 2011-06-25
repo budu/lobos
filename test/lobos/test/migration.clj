@@ -11,12 +11,12 @@
   (:use clojure.test
         lobos.migration))
 
-(deftest test-complement-for-drop-table-statement
+(deftest test-complement-for-create-action-on-table
   (is (= '(drop db (table :users (integer :id)))
          (complement '(create db (table :users (integer :id)))))
-      "should generate correct drop table statement"))
+      "Should generate drop table action without cascade clause"))
 
-(deftest test-complement-for-drop-schema-statement
+(deftest test-complement-for-create-action-on-schema
   (is (= '(drop db (schema :users) :cascade)
          (complement '(create db (schema :users))))
-      "should generate correct drop schema statement with a cascade clause"))
+      "Should generate drop schema action with a cascade clause"))
