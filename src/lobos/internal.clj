@@ -24,6 +24,15 @@
 
 ;; ## Statement Execution Helpers
 
+(defn autorequire-backend
+  "Automatically require the backend for the given connection-info."
+  [connection-info]
+  (->> connection-info
+       :subprotocol
+       (str "lobos.backends.")
+       symbol
+       require))
+
 (defn- execute*
   "Execute the given SQL string or sequence of strings. Prints them if
   the `debug-level` is set to `:sql`."
@@ -45,8 +54,7 @@
         db-spec (conn/get-db-spec connection-info)
         mode (compiler/compile (compiler/mode db-spec))]
     (conn/with-connection connection-info
-      (require (symbol (str "lobos.backends."
-                            (:subprotocol connection-info))))
+      (autorequire-backend connection-info)
       (when mode (execute* mode))
       (doseq [statement statements]
         (let [sql (if (string? statement)

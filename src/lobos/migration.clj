@@ -172,6 +172,7 @@
 
 (defn create-migrations-table
   [db-spec sname]
+  (autorequire-backend db-spec)
   (when-not (-> (analyzer/analyze-schema db-spec sname)
                 :elements
                 *migrations-table*)
