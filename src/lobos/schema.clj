@@ -652,7 +652,7 @@ It also can be used in alter modify and rename actions. In that
   "Constructs an abstract table definition containing the given
   elements. Takes an arbitrary number of table elements."
   [name & elements]
-  `(-> (table* ~name {} {} {}) ~@elements))
+  `(-> (table* ~name {} {} {}) ~@(reverse elements)))
 
 ;; -----------------------------------------------------------------------------
 
