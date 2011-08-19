@@ -51,7 +51,7 @@ database like this:
 You can omit the connection altogether. In that case, actions will use
 the connection bound by `with-connection` or the default one.
 
-    user> (drop (table :users (integer :id :unique)))
+    user> (drop (table :users))
     nil
 
 ### More Complex Example
