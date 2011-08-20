@@ -108,7 +108,7 @@
 ;;;; Column definition tests
 
 (def column-definition-stub
-     (Column. :foo nil nil false false []))
+  (Column. :foo nil nil false false []))
 
 (deftest test-column
   (testing "Column definition"
@@ -133,7 +133,15 @@
     (is (= (table :foo (column :foo nil "BAR"))
            (table* :foo {:foo (assoc column-definition-stub
                                 :others ["BAR"])} {} {}))
-        "Setting custom options")))
+        "Setting custom options")
+    (is (= (table :foo (column :foo :to :bar))
+           (table* :foo {:foo (assoc column-definition-stub
+                                :others :bar)}))
+        "Should set :others value to the new column name")
+    (is (= (table :foo (column :foo :drop-default))
+           (table* :foo {:foo (assoc column-definition-stub
+                                :default :drop)}))
+        "Should set :default value to :drop")))
 
 (deftest test-typed-column
   (testing "Typed column definition"

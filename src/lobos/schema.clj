@@ -423,7 +423,7 @@
      handled
    * `:time-zone` (for time types) determines if the type includes a time-zone
 
-It also can be used in alter modify and rename actions. In that
+  It also can be used in alter modify and rename actions. In that
   case, if data-type is :to, it acts as a column rename clause and if
   data-type is :drop-default, it acts as a column drop default clause."
   {:arglists '([table column-name data-type? & options])}
@@ -446,8 +446,8 @@ It also can be used in alter modify and rename actions. In that
      (update-in table [:columns] conj
                 [column-name
                  (case (first options)
-                   :to (Column. column-name nil nil nil nil (second options))
-                   :drop-default (Column. column-name nil :drop nil nil nil)
+                   :to (Column. column-name nil nil false false (second options))
+                   :drop-default (Column. column-name nil :drop false false [])
                    (column* column-name data-type options))]))))
 
 ;; -----------------------------------------------------------------------------
