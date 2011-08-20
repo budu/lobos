@@ -56,23 +56,6 @@
 
 ;; ## Global Connections
 
-(defn open-global
-  "Opens a global connection to the database specified by `db-spec`. If
-  no `connection-name` is given, opens a default global connection."
-  ([db-spec] (open-global :default-connection db-spec))
-  ([connection-name db-spec]
-     (if-let [cnx (connection-name @global-connections)]
-       (throw
-        (Exception.
-         (format "A global connection by that name already exists (%s)"
-                 connection-name)))
-       (let [cnx (get-cnx db-spec)]
-         (when-let [ac (-> db-spec :auto-commit)]
-           (.setAutoCommit cnx ac))
-         (swap! global-connections assoc
-                (or connection-name :default-connection)
-                {:connection cnx :db-spec db-spec})))))
-
 (defn close-global
   "Supplied with a keyword identifying a global connection, that connection
   is closed and the reference dropped."
@@ -87,6 +70,38 @@
       (throw
        (Exception. (format "No global connection by that name is open: %s"
                            connection-name))))))
+
+(defn- open-global* [connection-name db-spec]
+  (let [cnx (get-cnx db-spec)]
+    (when-let [ac (-> db-spec :auto-commit)]
+      (.setAutoCommit cnx ac))
+    (swap! global-connections assoc
+           (or connection-name :default-connection)
+           {:connection cnx :db-spec db-spec})))
+
+(defn open-global
+  "Opens a global connection to the database specified by `db-spec`. If
+  no `connection-name` is given, opens a default global connection.
+
+  If a global connection by that name already exists and the db-spec is
+  safe (see below), then an exeption will be thrown. When the db-spec is
+  not safe it will be closed if the old db-spec is different and the
+  original connection is left untouched.
+
+  A safe db-spec is a a map containing a :safe key set to a non-false
+  value."
+  ([db-spec] (open-global :default-connection db-spec))
+  ([connection-name db-spec]
+     (if-let [cnx (connection-name @global-connections)]
+       (if (:safe (:db-spec cnx))
+         (throw
+          (Exception.
+           (format "A global connection by that name already exists (%s)"
+                   connection-name)))
+         (when-not (= (:db-spec cnx) db-spec)
+           (close-global connection-name)
+           (open-global* connection-name db-spec)))
+       (open-global* connection-name db-spec))))
 
 ;; -----------------------------------------------------------------------------
 
