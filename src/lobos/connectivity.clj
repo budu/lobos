@@ -40,7 +40,7 @@
 
 (defn- get-cnx
   "Replaces `get-connection` from `contrib.sql.internal`
-  namespace. Dissociates the `:schema` key to prevent conflit."
+  namespace. Dissociates the `:schema` key to prevent conflict."
   [db-spec]
   (let [db-spec (dissoc db-spec :schema)]
     (sqlint/get-connection db-spec)))
