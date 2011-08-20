@@ -9,4 +9,4 @@
                      [cljss "0.1.1"]
                      [hiccup "0.3.1"]
                      [com.h2database/h2 "1.3.158"]]
-  :jar-exclusions [#"www.clj"])
+  :jar-exclusions [#"www.clj" #"config.clj" #"migrations.clj"])
