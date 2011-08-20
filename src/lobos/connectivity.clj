@@ -85,22 +85,22 @@
 
   If a global connection by that name already exists and the db-spec is
   safe (see below), then an exeption will be thrown. When the db-spec is
-  not safe it will be closed if the old db-spec is different and the
+  unsafe it will be closed if the old db-spec is different and the
   original connection is left untouched.
 
-  A safe db-spec is a a map containing a :safe key set to a non-false
-  value."
+  A safe db-spec is a map that does not contain an :unsafe key set to a
+  truthful value."
   ([db-spec] (open-global :default-connection db-spec))
   ([connection-name db-spec]
      (if-let [cnx (connection-name @global-connections)]
-       (if (:safe (:db-spec cnx))
+       (if (:unsafe (:db-spec cnx))
+         (when-not (= (:db-spec cnx) db-spec)
+           (close-global connection-name)
+           (open-global* connection-name db-spec))
          (throw
           (Exception.
            (format "A global connection by that name already exists (%s)"
-                   connection-name)))
-         (when-not (= (:db-spec cnx) db-spec)
-           (close-global connection-name)
-           (open-global* connection-name db-spec)))
+                   connection-name))))
        (open-global* connection-name db-spec))))
 
 ;; -----------------------------------------------------------------------------

@@ -34,10 +34,10 @@
   (close-global :foo)
   (is (= @global-connections {})
       "Closing a named global connection")
+  (open-global :foo {:unsafe true})
   (open-global :foo {})
-  (open-global :foo {:safe true})
   (is (= @global-connections
-         {:foo {:connection *cnx* :db-spec {:safe true}}})
+         {:foo {:connection *cnx* :db-spec {}}})
       "Re-opening a named global connection")
   (is (thrown? Exception
                (open-global :foo nil))
