@@ -177,6 +177,10 @@
 
 ;; ### Migration Commands
 
+(defn print-stash []
+  (when (.exists mig/*stash-file*)
+    (print (slurp mig/*stash-file*))))
+
 (defcommand print-done []
   (doseq [name (mig/query-migrations-table db-spec sname)]
     (println name)))
@@ -184,10 +188,6 @@
 (defcommand print-pending []
   (doseq [name (mig/pending-migrations db-spec sname)]
     (println name)))
-
-(defn print-stash []
-  (when (.exists mig/*stash-file*)
-    (print (slurp mig/*stash-file*))))
 
 (defcommand migrate [& names]
   (let [names (if (empty? names)
