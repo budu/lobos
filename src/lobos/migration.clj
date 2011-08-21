@@ -145,22 +145,26 @@
             (.replace "." "/")
             (str ".clj"))))
 
+(defn create-mfile []
+  (append
+   (migrations-file)
+   `(~'ns ~*migrations-namespace*
+      (:refer-clojure :exclude [~'alter ~'defonce ~'drop
+                                ~'bigint ~'boolean ~'char
+                                ~'double ~'float ~'time])
+      (:use (~'lobos [~'migration :only [~'defmigration]]
+                     ~'core ~'schema)
+            ~*config-namespace*))))
+
 (defn append-to-mfile [name msg up & [down]]
-  (let [mfile (migrations-file)]
-    (when-not (.exists (migrations-file))
-      (append mfile `(~'ns ~*migrations-namespace*
-                       (:refer-clojure :exclude [~'alter ~'defonce ~'drop
-                                                 ~'bigint ~'boolean ~'char
-                                                 ~'double ~'float ~'time])
-                       (:use (~'lobos [~'migration :only [~'defmigration]]
-                                      ~'core ~'schema)
-                              ~*config-namespace*))))
-    (append
-     mfile
-     `(~'defmigration ~name ~@(when msg [msg])
-        (~'up [] ~@up)
-        ~@(when down
-            [`(~'down [] ~@down)])))))
+  (when-not (.exists (migrations-file))
+    (create-mfile))
+  (append
+   (migrations-file)
+   `(~'defmigration ~name ~@(when msg [msg])
+      (~'up [] ~@up)
+      ~@(when down
+          [`(~'down [] ~@down)]))))
 
 (defn list-migrations []
   (when (.exists (migrations-file))
