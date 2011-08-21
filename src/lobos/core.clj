@@ -189,7 +189,7 @@
   (when (.exists mig/*stash-file*)
     (print (slurp mig/*stash-file*))))
 
-(defcommand run [& names]
+(defcommand migrate [& names]
   (let [names (if (empty? names)
                 (mig/pending-migrations db-spec sname)
                 names)]
