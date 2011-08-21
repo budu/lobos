@@ -237,7 +237,7 @@
               (down migration)
               (delete-migrations db-spec sname name))))))))
 
-(defn dump* [db-spec sname name msg actions]
+(defn generate-migration* [db-spec sname name msg actions]
   (append-to-mfile name msg
                    actions
                    (->> actions

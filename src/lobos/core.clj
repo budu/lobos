@@ -210,7 +210,7 @@
                :else args)]
     (mig/do-migrations* db-spec sname :down names)))
 
-(defcommand dump [name & [msg]]
+(defcommand generate-migration [name & [msg]]
   (let [name (symbol (if (string? name)
                        name
                        (clojure.core/name name)))]
@@ -220,5 +220,5 @@
     (when ((set (mig/list-migrations-names)) (str name))
       (throw (IllegalArgumentException.
               "Migration name is already taken.")))
-    (mig/dump* db-spec sname name msg (mig/read-stash-file))
+    (mig/generate-migration* db-spec sname name msg (mig/read-stash-file))
     (mig/clear-stash-file)))
