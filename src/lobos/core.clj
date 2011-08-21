@@ -211,11 +211,14 @@
     (mig/do-migrations* db-spec sname :down names)))
 
 (defcommand dump [name & [msg]]
-  (when-not name
-    (throw (IllegalArgumentException.
-            "Migration must be named.")))
-  (when ((set (mig/list-migrations-names)) (str name))
-    (throw (IllegalArgumentException.
-            "Migration name is already taken.")))
-  (mig/dump* db-spec sname name msg (mig/read-stash-file))
-  (mig/clear-stash-file))
+  (let [name (symbol (if (string? name)
+                       name
+                       (clojure.core/name name)))]
+    (when-not name
+      (throw (IllegalArgumentException.
+              "Migration must be named.")))
+    (when ((set (mig/list-migrations-names)) (str name))
+      (throw (IllegalArgumentException.
+              "Migration name is already taken.")))
+    (mig/dump* db-spec sname name msg (mig/read-stash-file))
+    (mig/clear-stash-file)))
