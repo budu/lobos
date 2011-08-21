@@ -206,19 +206,6 @@
 (defn list-migrations-names []
   (map #(-> % meta :name str) (list-migrations)))
 
-(defn print-migration [name-or-migration]
-  (let [migration (if (var? name-or-migration)
-                    name-or-migration
-                    (->> name-or-migration
-                         symbol
-                         (ns-resolve *migrations-namespace*)))]
-    (if migration
-      (do
-        (-> migration meta :name println)
-        (when-let [doc (-> migration meta :doc)]
-          (println "   " doc)))
-      (println name-or-migration))))
-
 (defn pending-migrations [db-spec sname]
   (exclude (query-migrations-table db-spec
                                    sname)
@@ -235,7 +222,7 @@
     (binding [*record* nil]
       (doseq [migration migrations]
         (let [name (-> migration meta :name)]
-          (print-migration name)
+          (println name)
           (if (= with :up)
             (do
               (up migration)

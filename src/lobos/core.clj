@@ -179,11 +179,11 @@
 
 (defcommand print-done []
   (doseq [name (mig/query-migrations-table db-spec sname)]
-    (mig/print-migration name)))
+    (println name)))
 
 (defcommand print-pending []
   (doseq [name (mig/pending-migrations db-spec sname)]
-    (mig/print-migration name)))
+    (println name)))
 
 (defn print-stash []
   (when (.exists mig/*stash-file*)
