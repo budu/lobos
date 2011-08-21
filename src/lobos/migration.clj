@@ -189,7 +189,7 @@
        (compiler/as-identifier db-spec *migrations-table* sname)
        (map str names)))))
 
-(defn delete-migration
+(defn delete-migrations
   [db-spec sname & names]
   (when-not (empty? names)
     (conn/with-connection db-spec
@@ -229,7 +229,7 @@
               (insert-migrations db-spec sname name))
             (do
               (down migration)
-              (delete-migration db-spec sname name))))))))
+              (delete-migrations db-spec sname name))))))))
 
 (defn dump* [db-spec sname name msg actions]
   (append-to-mfile name msg
