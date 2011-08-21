@@ -217,7 +217,7 @@
                                    sname)
            (list-migrations-names)))
 
-(defn do-migrations* [db-spec sname with names]
+(defn do-migrations [db-spec sname with names]
   (let [migrations (->> names
                         (map str)
                         (only (list-migrations-names))

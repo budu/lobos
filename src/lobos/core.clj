@@ -193,7 +193,7 @@
   (let [names (if (empty? names)
                 (mig/pending-migrations db-spec sname)
                 names)]
-    (mig/do-migrations* db-spec sname :up names)))
+    (mig/do-migrations db-spec sname :up names)))
 
 (defcommand rollback [& args]
   (let [names (cond
@@ -208,7 +208,7 @@
                   (= arg :all) migs
                   :else args))
                :else args)]
-    (mig/do-migrations* db-spec sname :down names)))
+    (mig/do-migrations db-spec sname :down names)))
 
 (defcommand generate-migration [name & [msg]]
   (let [name (symbol (if (string? name)
