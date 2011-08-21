@@ -89,28 +89,28 @@
 (defprotocol Migration
   "The migration protocol is meant to be reified into a single migration
   unit. See the defmigration macro, *For internal use*."
-  (up [cnx-or-schema])
-  (down [cnx-or-schema]))
-
-(defn prepare-body
-  "*For internal use*."
-  [body]
-  `(do ~@(rest body)))
+  (up [_])
+  (down [_]))
 
 (defmacro defmigration
-  ""
+  "Defines a migration to be used by the migration commands. The code
+   contained inside the up section is used to modify a database using
+   Lobos' actions, while the down section revert those changes.
+
+    (defmigration create-users
+      (up (create (table :users (integer :id :primary-key))))
+      (down (drop (table :users (integer :id :primary-key)))))"
   {:arglists '([name doc-string? attr-map? & bodies])}
   [name & args]
-  (let [[name args] (name-with-attributes name args)
+  (let [prepare-body #(conj (rest %) 'do)
+        [name args] (name-with-attributes name args)
         [migrate-up migrate-down] args]
     `(do
        (def ~name
          (with-meta
            (reify Migration
-                  (up [cnx-or-schema]
-                      ~(prepare-body migrate-up))
-                  (down [cnx-or-schema]
-                        ~(prepare-body migrate-down)))
+                  (up [_] ~(prepare-body migrate-up))
+                  (down [_] ~(prepare-body migrate-down)))
            (.meta #'~name)))
        (swap! migrations conj ~name))))
 
