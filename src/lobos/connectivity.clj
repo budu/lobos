@@ -57,9 +57,11 @@
 ;; ## Global Connections
 
 (defn close-global
-  "Supplied with a keyword identifying a global connection, that connection
-  is closed and the reference dropped."
-  [& [connection-name]]
+  "Supplied with a keyword identifying a global connection, that
+  connection is closed and the reference dropped. If a truthful silent
+  argument is supplied, don't throw an execption if there's no such
+  connection."
+  [& [connection-name silent]]
   (let [connection-name (or connection-name :default-connection)
         cnx (connection-name @global-connections)]
     (if cnx
@@ -67,9 +69,10 @@
         (.close (:connection cnx))
         (swap! global-connections dissoc connection-name)
         true)
-      (throw
-       (Exception. (format "No global connection by that name is open: %s"
-                           connection-name))))))
+      (when-not silent
+        (throw
+         (Exception. (format "No global connection by that name is open: %s"
+                             connection-name)))))))
 
 (defn- open-global* [connection-name db-spec]
   (let [cnx (get-cnx db-spec)]
