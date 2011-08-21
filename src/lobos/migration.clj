@@ -185,9 +185,10 @@
   [db-spec sname & names]
   (when-not (empty? names)
     (sql/with-connection db-spec
-      (sql/insert-rows
+      (apply
+       sql/insert-rows
        (compiler/as-identifier db-spec *migrations-table* sname)
-       (map str names)))))
+       (map (comp vector str) names)))))
 
 (defn delete-migrations
   [db-spec sname & names]
