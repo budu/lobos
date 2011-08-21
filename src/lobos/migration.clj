@@ -182,6 +182,7 @@
                 *migrations-table*)
     (let [action (schema/table *migrations-table*
                                (schema/varchar :name 255))
+          db-spec (assoc db-spec :schema sname)
           create-stmt (schema/build-create-statement action db-spec)]
       (execute create-stmt db-spec))))
 
