@@ -59,9 +59,15 @@
 (defmethod complement
   'create
   [action]
-  (if (= 'schema (-> action reverse first first))
-    (concat ['drop] (rest action) [:cascade])
-    (apply list 'drop (rest action))))
+  (let [not-cons-or-seq? #(not (or (seq? %)
+                                   (isa? (type %) clojure.lang.Cons)))
+        args (->> (rest action)
+                  (map #(if (seq? %)
+                          (filter not-cons-or-seq? %)
+                          %)))]
+    (if (= 'schema (-> action reverse first first))
+      (concat ['drop] args [:cascade])
+      (apply list 'drop args))))
 
 (defmethod complement
   'alter
