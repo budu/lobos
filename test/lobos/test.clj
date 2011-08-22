@@ -19,27 +19,31 @@
 (def h2-spec
   {:classname   "org.h2.Driver"
    :subprotocol "h2"
-   :subname     "./lobos"})
+   :subname     "./lobos"
+   :unsafe      true})
 
 (def mysql-spec
   {:classname   "com.mysql.jdbc.Driver"
    :subprotocol "mysql"
    :user        "lobos"
    :password    "lobos"
-   :subname     "//localhost:3306/"})
+   :subname     "//localhost:3306/"
+   :unsafe      true})
 
 (def postgresql-spec
   {:classname   "org.postgresql.Driver"
    :subprotocol "postgresql"
    :user        "lobos"
    :password    "lobos"
-   :subname     "//localhost:5432/lobos"})
+   :subname     "//localhost:5432/lobos"
+   :unsafe      true})
 
 (def sqlite-spec
   {:classname   "org.sqlite.JDBC"
    :subprotocol "sqlite"
    :subname     "./lobos.sqlite3"
-   :create      true})
+   :create      true
+   :unsafe      true})
 
 (def sqlserver-spec
   {:classname    "com.microsoft.sqlserver.jdbc.SQLServerDriver"
@@ -47,7 +51,8 @@
    :user         "lobos"
    :password     "lobos"
    :subname      "//localhost:1433"
-   :databaseName "lobos"})
+   :databaseName "lobos"
+   :unsafe       true})
 
 (def db-specs [h2-spec
                mysql-spec
