@@ -220,5 +220,6 @@
     (when ((set (mig/list-migrations-names)) (str name))
       (throw (IllegalArgumentException.
               "Migration name is already taken.")))
-    (mig/generate-migration* db-spec sname name msg (mig/read-stash-file))
+    (mig/generate-migration* db-spec sname name msg
+                             (mig/read-stash-file))
     (mig/clear-stash-file)))
