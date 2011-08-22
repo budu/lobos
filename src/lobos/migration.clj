@@ -130,6 +130,12 @@
     (.write wtr "\n")
     (pprint content wtr)))
 
+(defn ns-file [ns]
+  (file *src-directory*
+        (-> (str ns)
+            (.replace "." "/")
+            (str ".clj"))))
+
 ;; ### Stash File Helpers
 
 (defn append-to-stash-file [action]
@@ -146,10 +152,7 @@
 ;; ### Migrations File Helpers
 
 (defn migrations-file []
-  (file *src-directory*
-        (-> (str *migrations-namespace*)
-            (.replace "." "/")
-            (str ".clj"))))
+  (ns-file *migrations-namespace*))
 
 (defn create-mfile []
   (append
