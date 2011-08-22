@@ -7,7 +7,7 @@
 ;; You must not remove this notice, or any other, from this software.
 
 (ns lobos.test.migration
-  (:refer-clojure :exclude [complement])
+  (:refer-clojure :exclude [complement create alter drop])
   (:require (lobos [connectivity :as conn]
                    [schema :as schema]))
   (:use (clojure.java [io :only [delete-file]])
@@ -18,9 +18,16 @@
 
 ;;;; Fixtures
 
+(defn with-config-file-global-connection-fixture [f]
+  (spit (ns-file *config-namespace*)
+        (str "(ns lobos.config (:use lobos.connectivity))"
+             "(open-global " h2-spec ")"))
+  (f)
+  (conn/close-global nil true))
+
 (use-fixtures :once
   remove-tmp-files-fixture
-  #(do (%) (conn/close-global nil true)))
+  with-config-file-global-connection-fixture)
 
 ;;;; Tests
 
@@ -41,7 +48,7 @@
 
 (deftest test-complement-create
   (is (= (complement '(create (table :users (integer :id))))
-         '(drop (table :users (integer :id))))
+         '(drop (table :users)))
       "Should return a drop table action without cascade clause")
   (is (= (complement '(create db (schema :users)))
          '(drop db (schema :users) :cascade))
@@ -95,17 +102,17 @@
 (deftest test-append-to-mfile
   (delete-file (migrations-file) true)
   (create-mfile)
-  (append-to-mfile 'foo "this is a test" '(println "up"))
+  (append-to-mfile 'foo "this is a test" '[(println "up")])
   (is (.endsWith
        (slurp (migrations-file))
-       "(defmigration foo \"this is a test\" (up [] println \"up\"))\n")
+       "(defmigration foo \"this is a test\" (up [] (println \"up\")))\n")
       (str "Should create a migrations file ending with "
            "a migration with a docstring and an up clause"))
-  (append-to-mfile 'bar nil '(println "up") '(println "down"))
+  (append-to-mfile 'bar nil '(println "up") '[(println "down")])
   (is (.endsWith
        (slurp (migrations-file))
        (str "(defmigration bar (up [] println \"up\") "
-            "(down [] println \"down\"))\n"))
+            "(down [] (println \"down\")))\n"))
       (str "Should append a migration without a docstring and "
            " an up and down clauses")))
 
@@ -114,17 +121,17 @@
   (is (nil? (list-migrations))
       "Should return nil")
   (doseq [name '(foo bar baz)]
-    (append-to-mfile name nil '(println "up")))
+    (append-to-mfile name nil '[(println "up")]))
   (is (= (count (list-migrations)) 3)
       "Should return a collection of three elements")
   (is (every? #(satisfies? Migration %) (list-migrations))
       "All items returned should satisfy the Migration protocol"))
 
 (defmacro with-migrations-table [& body]
-  `(conn/with-connection h2-spec
-     (binding [*db* h2-spec]
+  `(binding [*db* h2-spec]
+     (conn/with-connection *db*
        (with-schema [~'lobos :lobos]
-         (create-migrations-table h2-spec :lobos)
+         (create-migrations-table *db* :lobos)
          ~@body))))
 
 (deftest test-create-migrations-table
@@ -136,38 +143,94 @@
 
 (deftest test-insert-and-delete-migrations
   (with-migrations-table
-    (insert-migrations h2-spec :lobos 'foo)
-    (is (= (query h2-spec :lobos :lobos_migrations)
+    (insert-migrations *db* :lobos 'foo)
+    (is (= (query *db* :lobos :lobos_migrations)
            (list {:name "foo"}))
         "Should insert a migration entry named 'foo'")
-    (insert-migrations h2-spec :lobos 'bar 'baz)
-    (is (= (query h2-spec :lobos :lobos_migrations)
+    (insert-migrations *db* :lobos 'bar 'baz)
+    (is (= (query *db* :lobos :lobos_migrations)
            (list {:name "foo"}
                  {:name "bar"}
                  {:name "baz"}))
         "Should insert two migration entries named 'bar' and 'baz'")
-    (delete-migrations h2-spec :lobos 'foo)
-    (is (= (query h2-spec :lobos :lobos_migrations)
+    (delete-migrations *db* :lobos 'foo)
+    (is (= (query *db* :lobos :lobos_migrations)
            (list {:name "bar"} {:name "baz"}))
         "Should delete a migration entry named 'foo'")
-    (delete-migrations h2-spec :lobos 'bar 'baz)
-    (is (empty? (query h2-spec :lobos :lobos_migrations))
+    (delete-migrations *db* :lobos 'bar 'baz)
+    (is (empty? (query *db* :lobos :lobos_migrations))
         "Should delete all migration entries")))
 
-(deftest test-query-migrations-table
-  (with-migrations-table
-    (is (empty? (query-migrations-table h2-spec :lobos))
-        "Should return an empty list")
-    (insert-migrations h2-spec :lobos 'foo 'bar)
-    (is (= (query-migrations-table h2-spec :lobos)
-           (list "foo" "bar"))
-        "Should return a list containing 'foo' and 'bar'")))
+(deftest test-record
+  (delete-file *stash-file* true)
+  (record 'foo)
+  (is (= (slurp *stash-file*) "\nfoo\n")
+      "Should record the given action to the stash file")
+  (clear-stash-file)
+  (binding [*record* nil] (record 'foo))
+  (is (= (slurp *stash-file*) "")
+      "Should not record the given action to the stash file"))
 
 (deftest test-list-migrations-names
   (delete-file (migrations-file) true)
   (is (empty? (list-migrations-names))
       "Should return an empty list")
   (doseq [name '(foo bar baz)]
-    (append-to-mfile name nil '(println "up")))
+    (append-to-mfile name nil '[(println "up")]))
   (is (= (list-migrations-names) (list "foo" "bar" "baz"))
       "Should return a list containing 'foo' 'bar' and 'baz'"))
+
+(deftest test-query-migrations-table
+  (with-migrations-table
+    (is (empty? (query-migrations-table *db* :lobos))
+        "Should return an empty list")
+    (insert-migrations *db* :lobos 'foo 'bar)
+    (is (= (query-migrations-table *db* :lobos)
+           (list "foo" "bar"))
+        "Should return a list containing 'foo' and 'bar'")))
+
+(deftest test-pending-migrations
+  (with-migrations-table
+    (delete-file (migrations-file) true)
+    (is (empty? (pending-migrations *db* :lobos))
+        "Should return an empty list")
+    (doseq [name '(foo bar baz)]
+      (append-to-mfile name nil '[(println "up")]))
+    (is (= (pending-migrations *db* :lobos) (list "foo" "bar" "baz"))
+        "Should return a list containing 'foo' 'bar' and 'baz'")
+    (insert-migrations *db* :lobos 'foo 'bar)
+    (is (= (pending-migrations *db* :lobos) (list "baz"))
+        "Should return a list containing 'baz'")))
+
+(deftest test-do-migrations
+  (with-migrations-table
+    (delete-file (migrations-file) true)
+    (doseq [n [:foo :bar :baz]]
+      (generate-migration* *db* :lobos (symbol (name n)) nil
+                           `[(~'create (~'table ~n (~'integer ~n)))]))
+    (delete-migrations *db* :lobos 'foo 'bar 'baz)
+    (is (= (pending-migrations *db* :lobos) (list "foo" "bar" "baz"))
+        "Should return a list containing 'foo' 'bar' and 'baz'")
+    (do-migrations *db* :lobos :up '[foo] true)
+    (is (= (pending-migrations *db* :lobos) (list "bar" "baz"))
+        "Should return a list containing 'bar' and 'baz'")
+    (do-migrations *db* :lobos :up '[bar baz] true)
+    (is (empty? (pending-migrations *db* :lobos))
+        "Should return an empty list")
+    (do-migrations *db* :lobos :down '[bar] true)
+    (is (= (pending-migrations *db* :lobos) (list "bar"))
+        "Should return a list containing 'bar'")
+    (do-migrations *db* :lobos :down '[foo baz] true)
+    (is (= (pending-migrations *db* :lobos) (list "foo" "bar" "baz"))
+        "Should return a list containing 'foo' 'bar' and 'baz'")))
+    
+(deftest test-generate-migration*
+  (with-migrations-table
+    (delete-file (migrations-file) true)
+    (generate-migration* *db* :lobos 'foo nil [])
+    (is (empty? (query-migrations-table *db* :lobos))
+        "Should return an empty list")
+    (generate-migration* *db* :lobos 'bar nil '[(println "up")])
+    (is (= (query-migrations-table *db* :lobos)
+           (list "bar"))
+        "Should return a list containing 'bar'")))
