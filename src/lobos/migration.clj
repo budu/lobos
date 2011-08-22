@@ -211,22 +211,26 @@
       (delete db-spec sname *migrations-table*
               (in :name (vec (map str names)))))))
 
+;; ### Commands Helpers
+
+(defn record [action]
+  (when *record*
+    (append-to-stash-file action)))
+
+(defn list-migrations-names []
+  (map #(-> % meta :name str) (list-migrations)))
+
 (defn query-migrations-table
   [db-spec sname]
   (conn/with-connection db-spec
     (map :name (query db-spec sname *migrations-table*))))
-
-;; ### Commands Helpers
-
-(defn list-migrations-names []
-  (map #(-> % meta :name str) (list-migrations)))
 
 (defn pending-migrations [db-spec sname]
   (exclude (query-migrations-table db-spec
                                    sname)
            (list-migrations-names)))
 
-(defn do-migrations [db-spec sname with names]
+(defn do-migrations [db-spec sname with names & [silent]]
   (let [migrations (->> names
                         (map str)
                         (only (list-migrations-names))
@@ -237,7 +241,8 @@
     (binding [*record* nil]
       (doseq [migration migrations]
         (let [name (-> migration meta :name)]
-          (println name)
+          (when-not silent
+            (println name))
           (if (= with :up)
             (do
               (up migration)
@@ -253,8 +258,5 @@
                         (map complement)
                         (filter identity)
                         seq))
-  (insert-migrations db-spec sname name))
-
-(defn record [action]
-  (when *record*
-    (append-to-stash-file action)))
+  (when-not (empty? actions)
+    (insert-migrations db-spec sname name)))
