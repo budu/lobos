@@ -1,5 +1,9 @@
 # Lobos History
 
+## 0.8
+
+ * Support for migration
+
 ## 0.7
 
  * Add support for creating indexes

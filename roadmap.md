@@ -2,20 +2,23 @@
 
 You can have a look at the [wiki] for more details.
 
-## 0.11
+## 1.0
 
- * Emulate transaction support
+ * Clean up and some small improvements
+ * Make sure the API doesn't contains serious flaws
 
-## 0.10
+## 1.1
+
+ * Support for parsing SQL expressions
+ * Make the analyzer be feature complete in comparison to the compiler
+
+## 1.2
 
  * Support for declarative schema definition
 
-## 0.9
+## 1.3
 
- * Support for parsing SQL expressions
+ * Emulate transaction support
 
-## 0.8
-
- * Support for migration
 
 [wiki]: https://github.com/budu/lobos/wiki

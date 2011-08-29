@@ -148,7 +148,17 @@ You can always set the debug level to see the compiled statement:
 As you can see **Lobos** use delimited identifiers by default and schema
 qualified identifiers when an action use a schema.
 
+### Configuration
+
+The preferred location to keep your database specs and connection for
+**Lobos** is in the `src/lobos/config.clj` file. The namespace contained
+in it will be used by default when generating the migrations file. This
+is just a convention, you can use any other means you wish using normal
+Clojure code.
+
 ### Migrations
+
+#### Generating migrations
 
 **Lobos** records each actions and include a set of commands to create
 migrations, run and rollbacks them. When you execute an action, the
@@ -162,25 +172,39 @@ call used will be recorded inside a stash file found in
     (create (table :users (integer :id)))
 
 Recorded actions can be dumped into one or more migrations using the
-`dump` command:
+`generate-migration` command:
 
-    user> (dump 'create-users)
+    user> (generate-migration 'create-users)
     nil
 
 This command will create a migration definition into the migration file
 (located in `src/lobos/migrations.clj` by default) for all action found
-in the stash file. 
+in the stash file.
 
-Then you can use the `run` and `rollback` commands:
+You can always use `generate-migration` to create a new (empty)
+migration if there's no recorded actions and edit them directly from the
+migrations file.
+
+The `generate-migration` command will automatically generate the undo
+method for some actions.
+
+#### Migrate & Rollback
+
+Then you can use the `migrate` and `rollback` commands:
 
     user> (rollback)
     create-users
-    user> (run)
+    user> (migrate)
     create-users
 
-The `dump` command will automatically generate the undo method for some
-actions.
+These commands will run the `up` or `down` part of migrations in the
+correct order. Both can take any number of migration names and will only
+run these. By default the `migrate` command run all pending migrations
+while the `rollback` command only affect the last one.
 
+The `rollback` command can also take a number or `:all` as argument, in
+which case it will rollback only the number of migrations that you want.
+    
 There's also three print commands to look where you are into the
 migration process: `print-stash`, `print-pending` and `print-done`.
 
@@ -211,14 +235,14 @@ Lobos is available through Clojars.
 
 For the latest release, in Cake/Leiningen:
 
-    [lobos "0.8.0-SNAPSHOT"]
+    [lobos "0.8.0"]
 
 in Maven:
 
     <dependency>
       <groupId>lobos</groupId>
       <artifactId>lobos</artifactId>
-      <version>0.8.0-SNAPSHOT</version>
+      <version>0.8.0</version>
     </dependency>
 
 ## License
