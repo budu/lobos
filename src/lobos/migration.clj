@@ -231,9 +231,10 @@
            (list-migrations-names)))
 
 (defn do-migrations [db-spec sname with names & [silent]]
-  (let [migrations (->> names
+  (let [filter-migs #(only % (list-migrations-names))
+        migrations (->> names
                         (map str)
-                        (only (list-migrations-names))
+                        filter-migs
                         (when->> (= with :down) reverse)
                         (map symbol)
                         (map (partial ns-resolve *migrations-namespace*))
