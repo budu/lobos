@@ -209,6 +209,10 @@
                :else args)]
     (mig/do-migrations db-spec sname :down names)))
 
+(defcommand reset [& args]
+  (apply rollback args)
+  (migrate))
+
 (defcommand generate-migration [name & [msg]]
   (let [name (symbol (if (string? name)
                        name
