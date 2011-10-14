@@ -29,7 +29,6 @@
   (:use (clojure [walk   :only [postwalk]]
                  [set    :only [union]]
                  [string :only [replace]])
-        (clojure.contrib [def :only [defalias defvar]])
         lobos.utils))
 
 (ast/import-all)
@@ -85,27 +84,27 @@
 
 ;; ## Expression Definitions
 
-(defvar sql-infix-operators
+(def ^{:doc "A set of symbol representing SQL infix operators."}
+  sql-infix-operators
   '#{;; math operators
      + - * /
      ;; boolean operators
-     < > <= >= = != or and in like}
-  "A set of symbol representing SQL infix operators.")
+     < > <= >= = != or and in like})
 
-(defvar sql-prefix-operators
-  '#{not}
-  "A set of symbol representing SQL prefix operators.")
+(def ^{:doc "A set of symbol representing SQL prefix operators."}
+  sql-prefix-operators
+  '#{not})
 
-(defvar sql-functions
+(def ^{:doc "A set of symbol representing SQL functions."}
+  sql-functions
   '#{;; string functions
      length lower position replace str subs trim upper
      ;; numeric functions
      abs ceil floor mod
      ;; datetime functions
-     extract now current_date current_time current_timestamp}
-  "A set of symbol representing SQL functions.")
+     extract now current_date current_time current_timestamp})
 
-(defvar sql-symbols
+(def sql-symbols
   (union sql-infix-operators
          sql-prefix-operators
          sql-functions))
@@ -556,7 +555,7 @@
   real
   double-precision)
 
-(defalias double double-precision)
+(def double double-precision)
 
 (def-optional-precision-typed-columns
   float)
@@ -569,9 +568,9 @@
   clob
   nclob)
 
-(defalias text clob)
+(def text clob)
 
-(defalias ntext nclob)
+(def ntext nclob)
 
 (def-length-bounded-typed-columns  
   varchar

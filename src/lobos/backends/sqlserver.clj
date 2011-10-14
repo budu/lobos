@@ -11,8 +11,7 @@
   (:refer-clojure :exclude [compile defonce])
   (:require clojure.string
             (lobos [schema :as schema]))
-  (:use (clojure.contrib [def :only [defvar-]])
-        lobos.analyzer
+  (:use lobos.analyzer
         lobos.compiler
         lobos.metadata
         lobos.utils)
@@ -42,7 +41,7 @@
            (let [[[_ n]] (re-seq #"(\w+)(\(\))?" expr)]
              (Integer/parseInt n))))))
 
-(defvar- analyzer-data-type-aliases
+(def ^{:private true} analyzer-data-type-aliases
   {:bit :boolean
    :datetime2 :timestamp
    :image :blob
@@ -87,7 +86,7 @@
     (str (as-sql-keyword name)
          (as-list (map compile args)))))
 
-(defvar- compiler-data-type-aliases
+(def ^{:private true} compiler-data-type-aliases
   {:blob      :image
    :boolean   :bit
    :clob      :text

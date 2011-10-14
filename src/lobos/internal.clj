@@ -12,7 +12,7 @@
                    [connectivity :as conn]
                    [metadata :as metadata]
                    [schema :as schema]))
-  (:use (clojure.contrib [def :only [name-with-attributes]])
+  (:use (clojure.tools [macro :only [name-with-attributes]])
         lobos.utils))
 
 (defonce debug-level

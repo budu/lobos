@@ -8,19 +8,18 @@
 
 (ns lobos.metadata
   "Helpers to query the database's meta-data."
-  (:require (clojure.contrib.sql [internal :as sqlint])
+  (:require (clojure.java.jdbc [internal :as sqlint])
             (lobos [compiler :as compiler]
                    [connectivity :as conn]
                    [schema :as schema]))
-  (:use (clojure.contrib [def :only [defvar-]]))
   (:import (java.sql DatabaseMetaData)))
 
 ;; -----------------------------------------------------------------------------
 
 ;; ## Database Metadata
 
-(defvar- *db-meta* nil)
-(defvar- *db-meta-spec* nil)
+(def ^{:private true} *db-meta* nil)
+(def ^{:private true} *db-meta-spec* nil)
 
 (defn db-meta
   "Returns the binded DatabaseMetaData object found in *db-meta* or get

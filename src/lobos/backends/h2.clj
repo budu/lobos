@@ -11,7 +11,6 @@
   (:refer-clojure :exclude [compile defonce])
   (:require (lobos [schema :as schema]))
   (:use (clojure [string :only [split]])
-        (clojure.contrib [def :only [defvar-]])
         (lobos analyzer compiler connectivity internal metadata utils))
   (:import (lobos.ast AlterRenameAction
                       AutoIncClause

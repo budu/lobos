@@ -10,8 +10,7 @@
   "Compiler implementation for SQLite."
   (:refer-clojure :exclude [compile defonce])
   (:require (lobos [schema :as schema]))
-  (:use (clojure.contrib [def :only [defvar-]])
-        (lobos analyzer compiler connectivity internal metadata utils))
+  (:use (lobos analyzer compiler connectivity internal metadata utils))
   (:import (lobos.ast AlterTableStatement
                       AutoIncClause
                       CreateSchemaStatement
@@ -28,7 +27,7 @@
 
 ;; ## Analyzer
 
-(defvar- analyzer-data-type-aliases
+(def ^{:private true} analyzer-data-type-aliases
   {:time-with-time-zone :time
    :timestamp-with-time-zone :timestamp})
 

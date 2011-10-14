@@ -23,7 +23,7 @@
                    [connectivity :as conn]
                    [migration :as mig]
                    [schema :as schema]))
-  (:use (clojure.contrib [def :only [name-with-attributes]])
+  (:use (clojure.tools [macro :only [name-with-attributes]])
         (clojure [pprint :only [pprint]])
         lobos.internal
         lobos.utils))
