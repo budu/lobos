@@ -1,5 +1,6 @@
 
 .cake
+.lein-failures
 
 .lobos_stash.clj
 src/lobos/migrations.clj
