@@ -11,8 +11,7 @@
   (:refer-clojure :exclude [defonce replace])
   (:require (lobos [connectivity :as conn]
                    [schema :as schema]))
-  (:use (clojure.contrib [def :only [defvar-]])
-        (clojure [string :only [replace]])
+  (:use (clojure [string :only [replace]])
         lobos.internal
         lobos.metadata
         lobos.utils)

@@ -14,7 +14,7 @@
 
 (defn cnx-fixture [f]
   (binding [*cnx* (reify java.sql.Connection (close [this] nil))
-            clojure.contrib.sql.internal/get-connection (fn [& _] *cnx*)]
+            clojure.java.jdbc.internal/get-connection (fn [& _] *cnx*)]
     (f)))
 
 (use-fixtures :each cnx-fixture)

@@ -11,8 +11,7 @@
   (:refer-clojure :exclude [compile defonce])
   (:require (lobos [schema :as schema]
                    [ast :as ast]))
-  (:use (clojure.contrib [def :only [defvar-]])
-        (lobos [schema :only [build-definition]]
+  (:use (lobos [schema :only [build-definition]]
                analyzer
                compiler
                metadata
@@ -28,7 +27,7 @@
 
 ;; ## Analyzer
 
-(defvar- analyzer-data-type-aliases
+(def ^{:private true} analyzer-data-type-aliases
   {:bit :boolean
    :int :integer
    :text :clob
@@ -89,7 +88,7 @@
                    (filter identity)
                    (map #(when % (as-str \` % \`)))))))
 
-(defvar- compiler-data-type-aliases
+(def ^{:private true} compiler-data-type-aliases
   {:clob :text
    :nclob :text})
 

@@ -8,7 +8,7 @@
 
 (ns lobos.test.system
   (:refer-clojure :exclude [compile conj! disj! distinct drop sort take])
-  (:require (clojure.contrib [sql :as sql])
+  (:require (clojure.java [jdbc :as sql])
             (lobos [compiler :as compiler]
                    [connectivity :as conn]))
   (:use clojure.test
@@ -63,8 +63,8 @@
                    (sql/insert-records (table :users)
                                        {(identifier :name) "x"}))
           "An exception should have been thrown because of a check constraint")
-      (is (nil? (sql/insert-records (table :users)
-                                    {(identifier :name) "foo"}))
+      (is (sql/insert-records (table :users)
+                              {(identifier :name) "foo"})
           "The insert statement should not throw an exception"))))
 
 (def-db-test test-unique-constraint
@@ -74,8 +74,8 @@
                  (sql/insert-records (table :users)
                                      {(identifier :name) "foo"}))
         "An exception should have been thrown because of an unique constraint")
-    (is (nil? (sql/insert-records (table :users)
-                                  {(identifier :name) "bar"}))
+    (is (sql/insert-records (table :users)
+                            {(identifier :name) "bar"})
         "The insert statement should not throw an exception")))
 
 ;;; Using hardcoded id is a bad idea!
@@ -88,7 +88,7 @@
                                        {(identifier :title) "foo"
                                         (identifier :user_id) 2}))
           "An exception should have been thrown because of a foreign key constraint")
-      (is (nil? (sql/insert-records (table :posts)
-                                    {(identifier :title) "foo"
-                                     (identifier :user_id) 1}))
+      (is (sql/insert-records (table :posts)
+                              {(identifier :title) "foo"
+                               (identifier :user_id) 1})
           "The insert statement should not throw an exception"))))

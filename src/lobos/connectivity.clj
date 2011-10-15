@@ -9,9 +9,8 @@
 (ns lobos.connectivity
   "A set of connectivity functions."
   (:refer-clojure :exclude [defonce])
-  (:require (clojure.contrib.sql [internal :as sqlint]))
-  (:use (clojure.contrib [def :only [defalias defvar]])
-        lobos.utils))
+  (:require (clojure.java.jdbc [internal :as sqlint]))
+  (:use lobos.utils))
 
 ;; -----------------------------------------------------------------------------
 
@@ -25,9 +24,9 @@
 
 ;; ## Helpers
 
-(defalias find-connection sqlint/find-connection*)
+(def find-connection sqlint/find-connection*)
 
-(defalias connection sqlint/connection*)
+(def connection sqlint/connection*)
 
 (defn get-db-spec
   "Returns the associated db-spec or itself. *For internal use*."

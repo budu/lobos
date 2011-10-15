@@ -9,14 +9,14 @@
 (ns lobos.migration
   "Migrations support."
   (:refer-clojure :exclude [complement defonce replace])
-  (:require (clojure.contrib [sql :as sql])
+  (:require (clojure.java [jdbc :as sql])
             (lobos [analyzer :as analyzer]
                    [compiler :as compiler]
                    [connectivity :as conn]
                    [schema :as schema]))
   (:use (clojure [walk :only [postwalk]])
         (clojure.java [io :only [file writer]])
-        (clojure.contrib [def :only [defvar name-with-attributes]])
+        (clojure.tools [macro :only [name-with-attributes]])
         (clojure pprint)
         lobos.internal
         lobos.utils)
@@ -87,10 +87,10 @@
 
 ;; ## Migration Protocol
 
-(defvar migrations
-  (atom [])
-  "Used to agregate migrations in order of definition, *For internal
-  use*.")
+(def ^{:doc "Used to agregate migrations in order of definition,
+  *For internal use*."}
+  migrations
+  (atom []))
 
 (defprotocol Migration
   "The migration protocol is meant to be reified into a single migration

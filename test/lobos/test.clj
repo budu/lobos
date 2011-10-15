@@ -9,7 +9,7 @@
 (ns lobos.test
   (:refer-clojure :exclude [alter defonce drop])
   (:use clojure.test
-        (clojure.contrib [io :only [delete-file file]])
+        (clojure.java [io :only [delete-file file]])
         (lobos analyzer connectivity core utils)
         (lobos [schema :only [schema]]))
   (:import (java.lang UnsupportedOperationException)))

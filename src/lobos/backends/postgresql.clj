@@ -10,8 +10,7 @@
   "Compiler implementation for PostgreSQL."
   (:refer-clojure :exclude [compile defonce])
   (:require (lobos [schema :as schema]))
-  (:use (clojure.contrib [def :only [defvar-]])
-        lobos.analyzer
+  (:use lobos.analyzer
         lobos.compiler
         lobos.utils)
   (:import (lobos.ast AlterRenameAction
@@ -24,7 +23,7 @@
 
 ;; ## Analyzer
 
-(defvar- analyzer-data-type-aliases
+(def ^{:private true} analyzer-data-type-aliases
   {:bool :boolean
    :bpchar :char
    :bytea :blob
@@ -56,7 +55,7 @@
 
 ;; ## Compiler
 
-(defvar- compiler-data-type-aliases
+(def ^{:private true} compiler-data-type-aliases
   {:blob :bytea
    :clob :text
    :double :double-precision
