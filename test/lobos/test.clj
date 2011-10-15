@@ -64,7 +64,7 @@
   (try
     (clojure.lang.RT/classForName (:classname db-spec))
     true
-    (catch ClassNotFoundException e false)))
+    (catch Exception e false)))
 
 (def available-specs (filter driver-available? db-specs))
 
@@ -74,7 +74,7 @@
 (defn test-db-name [db-spec]
   (keyword (:subprotocol db-spec)))
 
-(def *db* nil)
+(def ^{:dynamic true} *db* nil)
 
 ;;;; Helpers
 

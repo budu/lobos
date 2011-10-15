@@ -18,8 +18,8 @@
 
 ;; ## Database Metadata
 
-(def ^{:private true} *db-meta* nil)
-(def ^{:private true} *db-meta-spec* nil)
+(def ^{:dynamic true :private true} *db-meta* nil)
+(def ^{:dynamic true :private true} *db-meta-spec* nil)
 
 (defn db-meta
   "Returns the binded DatabaseMetaData object found in *db-meta* or get

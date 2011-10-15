@@ -196,7 +196,10 @@
                                           (integer :bar)
                                           (foreign-key [:bar] :foo))))
         (is (= (inspect-schema :elements :baz :constraints cname)
-               (ForeignKeyConstraint. cname [:bar] :foo [:bar] nil {}))
+               (ForeignKeyConstraint. cname [:bar] :foo [:bar] nil
+                                      (if (= *db* :h2)
+                                        {:on-delete :restrict :on-update :restrict}
+                                        {})))
             (format "A foreign key constraint named '%s' should have been created"
                     (name cname))))
       (drop lobos (table :baz))

@@ -10,11 +10,11 @@
   (:use clojure.test
         lobos.connectivity))
 
-(def *cnx*)
+(def ^{:dynamic true} *cnx*)
 
 (defn cnx-fixture [f]
   (binding [*cnx* (reify java.sql.Connection (close [this] nil))
-            clojure.java.jdbc.internal/get-connection (fn [& _] *cnx*)]
+            *get-cnx* (fn [& _] *cnx*)]
     (f)))
 
 (use-fixtures :each cnx-fixture)

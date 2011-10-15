@@ -37,7 +37,7 @@
           (-> @global-connections connection-info :db-spec)
           connection-info))))
 
-(defn- get-cnx
+(defn ^{:dynamic true} *get-cnx*
   "Replaces `get-connection` from `contrib.sql.internal`
   namespace. Dissociates the `:schema` key to prevent conflict."
   [db-spec]
@@ -74,7 +74,7 @@
                              connection-name)))))))
 
 (defn- open-global* [connection-name db-spec]
-  (let [cnx (get-cnx db-spec)]
+  (let [cnx (*get-cnx* db-spec)]
     (when-let [ac (-> db-spec :auto-commit)]
       (.setAutoCommit cnx ac))
     (swap! global-connections assoc
@@ -132,7 +132,7 @@
   "Evaluates func in the context of a new connection to a database then
   closes the connection."
   [db-spec func]
-  (with-open [cnx (get-cnx db-spec)]
+  (with-open [cnx (*get-cnx* db-spec)]
     (binding [sqlint/*db* (assoc sqlint/*db*
                             :connection cnx
                             :level 0

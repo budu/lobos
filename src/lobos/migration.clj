@@ -27,17 +27,17 @@
 
 ;; ## Globals
 
-(def *record* :stash)
+(def ^{:dynamic true} *record* :stash)
 
-(def *stash-file* (file ".lobos_stash.clj"))
+(def ^{:dynamic true} *stash-file* (file ".lobos_stash.clj"))
 
-(def *src-directory* "src/")
+(def ^{:dynamic true} *src-directory* "src/")
 
-(def *migrations-namespace* 'lobos.migrations)
+(def ^{:dynamic true} *migrations-namespace* 'lobos.migrations)
 
-(def *config-namespace* 'lobos.config)
+(def ^{:dynamic true} *config-namespace* 'lobos.config)
 
-(def *migrations-table* :lobos_migrations)
+(def ^{:dynamic true} *migrations-table* :lobos_migrations)
 
 ;; -----------------------------------------------------------------------------
 
