@@ -113,6 +113,17 @@
 (defmacro inspect-schema [& keys]
   `(-> (analyze-schema *db* :lobos) ~@keys))
 
+(defn open-global-connections []
+  (doseq [db-spec available-specs]
+    (try
+      (open-global (test-db-name db-spec) db-spec)
+      (catch Exception _
+        (println "WARNING: Failed to connect to" (:subprotocol db-spec))))))
+
+(defn close-global-connections []
+  (doseq [db (available-global-cnx)]
+    (close-global db)))
+
 ;;;; Fixtures
 
 (def tmp-files-ext '(db sqlite3))
@@ -135,11 +146,6 @@
       (println (format "WARNING: Driver for %s isn't available: %s missing"
                        (:subprotocol db-spec)
                        (:classname db-spec)))))
-  (doseq [db-spec available-specs]
-    (try
-      (open-global (test-db-name db-spec) db-spec)
-      (catch Exception _
-        (println "WARNING: Failed to connect to" (:subprotocol db-spec)))))
+  (open-global-connections)
   (f)
-  (doseq [db (available-global-cnx)]
-    (close-global db)))
+  (close-global-connections))
