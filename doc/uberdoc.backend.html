@@ -2526,8 +2526,8 @@ $(document).ready(function() {
     ul.css('margin-top', '0px')
 
 })
-</script><title>lobos -- Marginalia</title></head><body><table><tr><td class="docs"><div class="header"><h1 class="project-name">lobos</h1><h2 class="project-version">0.7.0</h2><br /><p>A library to create and manipulate SQL database schemas.</p>
-</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.2.0</td></tr><tr><td class="dep-name">org.clojure/clojure-contrib</td><td class="dotted"><hr /></td><td class="dep-version">1.2.0</td></tr></table></div><div class="dependencies"><h3>dev dependencies</h3><table><tr><td class="dep-name">swank-clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.2.1</td></tr><tr><td class="dep-name">lein-clojars</td><td class="dotted"><hr /></td><td class="dep-version">0.6.0</td></tr><tr><td class="dep-name">marginalia</td><td class="dotted"><hr /></td><td class="dep-version">0.5.0</td></tr><tr><td class="dep-name">cljss</td><td class="dotted"><hr /></td><td class="dep-version">0.1.1</td></tr><tr><td class="dep-name">hiccup</td><td class="dotted"><hr /></td><td class="dep-version">0.3.1</td></tr><tr><td class="dep-name">clj-help</td><td class="dotted"><hr /></td><td class="dep-version">0.2.0</td></tr><tr><td class="dep-name">com.h2database/h2</td><td class="dotted"><hr /></td><td class="dep-version">1.3.154</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left almost blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#lobos.compiler">lobos.compiler</a></li><li><a href="#lobos.backends.h2">lobos.backends.h2</a></li><li><a href="#lobos.backends.mysql">lobos.backends.mysql</a></li><li><a href="#lobos.backends.postgresql">lobos.backends.postgresql</a></li><li><a href="#lobos.backends.sqlite">lobos.backends.sqlite</a></li><li><a href="#lobos.backends.sqlserver">lobos.backends.sqlserver</a></li><li><a href="#lobos.ast">lobos.ast</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#lobos.compiler" name="lobos.compiler"><h1 class="project-name">lobos.compiler</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>This namespace include the <code>compile</code> multimethod, a default
+</script><title>lobos -- Marginalia</title></head><body><table><tr><td class="docs"><div class="header"><h1 class="project-name">lobos</h1><h2 class="project-version">1.0.0-SNAPSHOT</h2><br /><p>A library to create and manipulate SQL database schemas.</p>
+</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.3.0</td></tr><tr><td class="dep-name">org.clojure/java.jdbc</td><td class="dotted"><hr /></td><td class="dep-version">0.0.7</td></tr><tr><td class="dep-name">org.clojure/tools.macro</td><td class="dotted"><hr /></td><td class="dep-version">0.1.1</td></tr></table></div><div class="dependencies"><h3>dev dependencies</h3><table><tr><td class="dep-name">lein-clojars</td><td class="dotted"><hr /></td><td class="dep-version">0.7.0</td></tr><tr><td class="dep-name">lein-marginalia</td><td class="dotted"><hr /></td><td class="dep-version">0.6.1</td></tr><tr><td class="dep-name">cljss</td><td class="dotted"><hr /></td><td class="dep-version">0.1.1</td></tr><tr><td class="dep-name">hiccup</td><td class="dotted"><hr /></td><td class="dep-version">0.3.1</td></tr><tr><td class="dep-name">com.h2database/h2</td><td class="dotted"><hr /></td><td class="dep-version">1.3.160</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left almost blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#lobos.compiler">lobos.compiler</a></li><li><a href="#lobos.backends.h2">lobos.backends.h2</a></li><li><a href="#lobos.backends.mysql">lobos.backends.mysql</a></li><li><a href="#lobos.backends.postgresql">lobos.backends.postgresql</a></li><li><a href="#lobos.backends.sqlite">lobos.backends.sqlite</a></li><li><a href="#lobos.backends.sqlserver">lobos.backends.sqlserver</a></li><li><a href="#lobos.ast">lobos.ast</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#lobos.compiler" name="lobos.compiler"><h1 class="project-name">lobos.compiler</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>This namespace include the <code>compile</code> multimethod, a default
   implementation based on the SQL standard and some helpers
   functions. The compiler works on an AST defined in the <code>lobos.ast</code>
   namespace. Database specific implementations can be found in the
@@ -2543,7 +2543,7 @@ $(document).ready(function() {
 </td><td class="codes" /></tr><tr><td class="docs"><p>When no implementation specific method is found, fall back on the
 default standard compiler.</p>
 </td><td class="codes" /><pre class="brush: clojure">(def backends-hierarchy
-  (atom (-> (make-hierarchy)
+  (atom (-&gt; (make-hierarchy)
             (derive :h2 ::standard)
             (derive :mysql ::standard)
             (derive :postgresql ::standard)
@@ -2551,7 +2551,7 @@ default standard compiler.</p>
             (derive :sqlserver ::standard))))</pre></tr><tr><td class="docs"><p>Compiles the given object into SQL.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defmulti compile
   (fn [o]
-    [(-> o :db-spec :subprotocol (or ::standard) keyword)
+    [(-&gt; o :db-spec :subprotocol (or ::standard) keyword)
      (type o)])
   :hierarchy backends-hierarchy)</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Helpers</h2>
@@ -2559,14 +2559,14 @@ default standard compiler.</p>
   optional <code>level</code> argument to determine which qualification level to
   output, only support <code>:schema</code> for now.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defn as-identifier
-  [db-spec name & qualifiers]
+  [db-spec name &amp; qualifiers]
   (compile (IdentifierExpression. db-spec name qualifiers)))</pre></tr><tr><td class="docs"><p>Throws an UnsupportedOperationException using the given message. Can
-  be given a test, in which case it throw an exception only if it's
+  be given a condition, in which case it throw an exception only if it's
   true.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defn unsupported
   ([msg] (unsupported true msg))
-  ([test msg]
-     (when test
+  ([cond msg]
+     (when cond
        (throw (UnsupportedOperationException. (str msg))))))</pre></tr><tr><td class="docs"><p>Constructs a Mode AST form with the specified <code>db-spec</code>.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defn mode
   [db-spec]
@@ -2576,7 +2576,7 @@ default standard compiler.</p>
   [table]
   (let [fkey? #(instance? ForeignKeyConstraintDefinition %)
         foreign-keys (vector (:tname table)
-                             (->> (:elements table)
+                             (-&gt;&gt; (:elements table)
                                   (filter fkey?)))
         table (update-in table [:elements]
                (fn [es] (filter #(not (fkey? %)) es)))]
@@ -2610,14 +2610,14 @@ function while strings will be properly delimited by single quotes.</p>
   [expression]
   (let [{:keys [scalar]} expression]
     (cond (keyword? scalar) (str (as-sql-keyword scalar))
-          (string? scalar) (str "'" scalar "'")
+          (string? scalar) (str &quot;'&quot; scalar &quot;'&quot;)
           :else scalar)))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard IdentifierExpression]
   [identifier]
   (let [{:keys [db-spec name qualifiers]} identifier]
-    (join* \. (->> (concat qualifiers [name])
+    (join* \. (-&gt;&gt; (concat qualifiers [name])
                    (filter identity)
-                   (map #(when % (as-str \" % \")))))))</pre></tr><tr><td class="docs">
+                   (map #(when % (as-str \&quot; % \&quot;)))))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard FunctionExpression]
   [function]
   (let [{:keys [db-spec name args]} function]
@@ -2627,14 +2627,14 @@ function while strings will be properly delimited by single quotes.</p>
   [operator]
   (let [{:keys [db-spec op left right]} operator]
     (if (vector? (first right))
-      (str "("
-           (compile left) " "
-           (as-sql-keyword op) " "
+      (str &quot;(&quot;
+           (compile left) &quot; &quot;
+           (as-sql-keyword op) &quot; &quot;
            (as-list (map compile (first right)))
-           ")")
-      (str "(" (apply join
-                      (str " " (as-sql-keyword op) " ")
-                      (map compile (conj right left))) ")"))))</pre></tr><tr><td class="docs"><p><code>DataTypeClause</code> instances are compiled with their <code>dtype</code>
+           &quot;)&quot;)
+      (str &quot;(&quot; (apply join
+                      (str &quot; &quot; (as-sql-keyword op) &quot; &quot;)
+                      (map compile (conj right left))) &quot;)&quot;))))</pre></tr><tr><td class="docs"><p><code>DataTypeClause</code> instances are compiled with their <code>dtype</code>
 property made into SQL keywords using the <code>as-sql-keyword</code>
 function. If the data-type has an argument list, it will be passed
 through the <code>as-list</code> function.</p>
@@ -2644,13 +2644,13 @@ through the <code>as-list</code> function.</p>
         {:keys [encoding collate time-zone]} options]
     (join \space
       (str (as-sql-keyword dtype) (as-list args))
-      (when encoding ["CHARACTER SET" (as-str encoding)])
-      (when collate ["COLLATE" (as-str collate)])
-      (when time-zone ["WITH TIME ZONE"]))))</pre></tr><tr><td class="docs"><h3>Clauses</h3>
+      (when encoding [&quot;CHARACTER SET&quot; (as-str encoding)])
+      (when collate [&quot;COLLATE&quot; (as-str collate)])
+      (when time-zone [&quot;WITH TIME ZONE&quot;]))))</pre></tr><tr><td class="docs"><h3>Clauses</h3>
 </td><td class="codes" /></tr><tr><td class="docs"><p>Standard <code>AutoIncClause</code> are using the <code>ALWAYS</code> variant.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard AutoIncClause]
   [_]
-  "GENERATED ALWAYS AS IDENTITY")</pre></tr><tr><td class="docs"><h3>Definitions</h3>
+  &quot;GENERATED ALWAYS AS IDENTITY&quot;)</pre></tr><tr><td class="docs"><h3>Definitions</h3>
 </td><td class="codes" /></tr><tr><td class="docs"><p><code>ColumnDefinition</code> instance will get their names made into SQL
 identifiers using the <code>as-identifier</code> function. It's data-type will
 get compiled with the appropriate method. The options will be added
@@ -2664,9 +2664,9 @@ they are.</p>
     (apply join \space
       (as-identifier db-spec cname)
       (compile data-type)
-      (when default  (str "DEFAULT " (compile default)))
+      (when default  (str &quot;DEFAULT &quot; (compile default)))
       (when auto-inc (compile auto-inc))
-      (when not-null "NOT NULL")
+      (when not-null &quot;NOT NULL&quot;)
       others)))</pre></tr><tr><td class="docs"><p><code>UniqueConstraintDefinition</code> instances will get their names made into
 SQL identifiers using the <code>as-identifier</code> function. The <code>ctype</code>
 property must one of <code>:primary-key</code> or <code>:unique</code>.</p>
@@ -2674,7 +2674,7 @@ property must one of <code>:primary-key</code> or <code>:unique</code>.</p>
   [definition]
   (let [{:keys [db-spec cname ctype columns]} definition]
     (join \space
-      "CONSTRAINT"
+      &quot;CONSTRAINT&quot;
       (as-identifier db-spec cname)
       (as-sql-keyword ctype)
       (as-list (map (partial as-identifier db-spec) columns)))))</pre></tr><tr><td class="docs"><p><code>ForeignKeyConstraintDefinition</code> instances are always compiled with
@@ -2686,25 +2686,25 @@ actions.</p>
   (let [{:keys [db-spec cname columns parent-table parent-columns match
                 triggered-actions]} definition]
     (join \space
-      "CONSTRAINT"
+      &quot;CONSTRAINT&quot;
       (as-identifier db-spec cname)
-      "FOREIGN KEY"
+      &quot;FOREIGN KEY&quot;
       (as-list (map (partial as-identifier db-spec) columns))
-      "REFERENCES"
+      &quot;REFERENCES&quot;
       (as-identifier db-spec parent-table (:schema db-spec))
       (as-list (map (partial as-identifier db-spec) parent-columns))
-      (when match (str "MATCH " (as-sql-keyword match)))
+      (when match (str &quot;MATCH &quot; (as-sql-keyword match)))
       (when (contains? triggered-actions :on-delete)
-        (str "ON DELETE " (as-sql-keyword (:on-delete triggered-actions))))
+        (str &quot;ON DELETE &quot; (as-sql-keyword (:on-delete triggered-actions))))
       (when (contains? triggered-actions :on-update)
-        (str "ON UPDATE " (as-sql-keyword (:on-update triggered-actions)))))))</pre></tr><tr><td class="docs">
+        (str &quot;ON UPDATE &quot; (as-sql-keyword (:on-update triggered-actions)))))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard CheckConstraintDefinition]
   [definition]
   (let [{:keys [db-spec cname condition]} definition]
     (join \space
-      "CONSTRAINT"
+      &quot;CONSTRAINT&quot;
       (as-identifier db-spec cname)
-      "CHECK"
+      &quot;CHECK&quot;
       (compile condition))))</pre></tr><tr><td class="docs"><h3>Create and Drop Statements</h3>
 </td><td class="codes" /></tr><tr><td class="docs"><p>The default create statement will extract all foreign key constraint
 from its create table statements to be added afterward using alter
@@ -2717,17 +2717,17 @@ add statements.</p>
                              (assoc db-spec :schema sname)
                              foreign-keys))]
     (conj alters
-          (str "CREATE SCHEMA "
-               (apply join "\n" (conj (map compile elements)
+          (str &quot;CREATE SCHEMA &quot;
+               (apply join &quot;\n&quot; (conj (map compile elements)
                                       (as-identifier db-spec sname)))))))</pre></tr><tr><td class="docs"><p><code>CreateTableStatement</code> instances will properly compile all their
 elements.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard CreateTableStatement]
   [statement]
   (let [{:keys [db-spec tname elements]} statement]
-    (format "CREATE TABLE %s %s"
+    (format &quot;CREATE TABLE %s %s&quot;
             (as-identifier db-spec tname (:schema db-spec))
             (or (as-list (map compile elements))
-                "()"))))</pre></tr><tr><td class="docs">
+                &quot;()&quot;))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard CreateIndexStatement]
   [statement]
   (let [{:keys [db-spec iname tname columns options]} statement
@@ -2738,8 +2738,8 @@ elements.</p>
                           (apply join \space
                             (as-identifier db-spec (first %))
                             (map as-sql-keyword options))))]
-    (format "CREATE %sINDEX %s ON %s %s"
-            (str (when ((set options) :unique) "UNIQUE "))
+    (format &quot;CREATE %sINDEX %s ON %s %s&quot;
+            (str (when ((set options) :unique) &quot;UNIQUE &quot;))
             (as-identifier db-spec iname)
             (as-identifier db-spec tname (:schema db-spec))
             (as-list (map index-column columns)))))</pre></tr><tr><td class="docs">
@@ -2747,7 +2747,7 @@ elements.</p>
   [statement]
   (let [{:keys [db-spec otype oname behavior]} statement]
     (join \space
-      "DROP"
+      &quot;DROP&quot;
       (as-sql-keyword otype)
       (as-identifier db-spec oname (:schema db-spec))
       (as-sql-keyword behavior))))</pre></tr><tr><td class="docs"><h3>Alter Statement and Actions</h3>
@@ -2757,17 +2757,17 @@ elements.</p>
   (let [{:keys [db-spec element]} action
         element (assoc element :db-spec db-spec)]
     (join \space
-          "ADD"
+          &quot;ADD&quot;
           (compile element))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard AlterDropAction]
   [action]
   (let [{:keys [db-spec element]} action
         is-column (instance? ColumnDefinition element)]
     (join \space
-          "DROP"
+          &quot;DROP&quot;
           (if is-column
-            "COLUMN"
-            "CONSTRAINT")
+            &quot;COLUMN&quot;
+            &quot;CONSTRAINT&quot;)
           (as-identifier db-spec (:cname element)))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard AlterModifyAction]
   [action]
@@ -2775,17 +2775,17 @@ elements.</p>
         default (:default element)]
     (if default
       (join \space
-            "ALTER COLUMN"
+            &quot;ALTER COLUMN&quot;
             (as-identifier db-spec (:cname element))
             (if (= default :drop)
-              "DROP DEFAULT"
-              (str "SET DEFAULT " (compile default))))
-      (unsupported "Only set/drop default supported."))))</pre></tr><tr><td class="docs"><p><code>AlterRenameAction</code> instances aren't supported by the default
+              &quot;DROP DEFAULT&quot;
+              (str &quot;SET DEFAULT &quot; (compile default))))
+      (unsupported &quot;Only set/drop default supported.&quot;))))</pre></tr><tr><td class="docs"><p><code>AlterRenameAction</code> instances aren't supported by the default
 compiler.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard AlterRenameAction]
   [action]
   (let [{:keys [db-spec element]} action]
-     (unsupported "Rename action not supported.")))</pre></tr><tr><td class="docs"><p><code>AlterTableStatement</code> instances will get dispatched further into one
+     (unsupported &quot;Rename action not supported.&quot;)))</pre></tr><tr><td class="docs"><p><code>AlterTableStatement</code> instances will get dispatched further into one
 of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</code>,
 <code>AlterModifyAction</code> or <code>AlterRenameAction</code>.</p>
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard AlterTableStatement]
@@ -2793,7 +2793,7 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
   (let [{:keys [db-spec tname action element]} statement
         element (assoc element :sname (:schema db-spec) :tname tname)]
     (join \space
-          "ALTER TABLE"
+          &quot;ALTER TABLE&quot;
           (as-identifier db-spec tname (:schema db-spec))
           (case action
             :add    (compile (AlterAddAction. db-spec element))
@@ -2804,8 +2804,7 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
   (:refer-clojure :exclude [compile defonce])
   (:require (lobos [schema :as schema]))
   (:use (clojure [string :only [split]])
-        (clojure.contrib [def :only [defvar-]])
-        (lobos analyzer compiler connectivity metadata utils))
+        (lobos analyzer compiler connectivity internal metadata utils))
   (:import (lobos.ast AlterRenameAction
                       AutoIncClause
                       CreateSchemaStatement
@@ -2817,8 +2816,8 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
 </td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod analyze [:h2 UniqueConstraint]
   [_ sname tname cname meta]
-  (let [columns (split (:column_list meta) #",")
-        ctype (-> meta :constraint_type as-keyword)]
+  (let [columns (split (:column_list meta) #&quot;,&quot;)
+        ctype (-&gt; meta :constraint_type as-keyword)]
     (UniqueConstraint.
      (make-index-name tname ctype columns)
      ctype
@@ -2828,13 +2827,15 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
   (let [db-spec (db-meta-spec)]
     (concat
      (map (fn [meta] (analyze UniqueConstraint sname tname
-                              (-> meta :constraint_name keyword)
+                              (-&gt; meta :constraint_name keyword)
                               meta))
-          (query-schema :constraints
-                        (and (or (= :CONSTRAINT_TYPE "UNIQUE")
-                                 (= :CONSTRAINT_TYPE "PRIMARY KEY"))
-                             (= :TABLE_SCHEMA (as-str sname))
-                             (= :TABLE_NAME (as-str tname)))))
+          (query db-spec
+                 :INFORMATION_SCHEMA
+                 :CONSTRAINTS
+                 (and (or (= :CONSTRAINT_TYPE &quot;UNIQUE&quot;)
+                          (= :CONSTRAINT_TYPE &quot;PRIMARY KEY&quot;))
+                      (= :TABLE_SCHEMA (as-str sname))
+                      (= :TABLE_NAME (as-str tname)))))
      (map (fn [[cname meta]] (analyze ForeignKeyConstraint cname meta))
           (references-meta sname tname)))))</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Compiler</h2>
@@ -2843,13 +2844,13 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
   [expression]
   (let [{:keys [dtype args options]} expression]
     (unsupported (= dtype :binary)
-      "Use varbinary instead.")
+      &quot;Use varbinary instead.&quot;)
     (unsupported (:time-zone options)
-      "Time zones not supported.")
+      &quot;Time zones not supported.&quot;)
     (str (as-sql-keyword dtype) (as-list args))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:h2 AutoIncClause]
   [_]
-  "AUTO_INCREMENT")</pre></tr><tr><td class="docs">
+  &quot;AUTO_INCREMENT&quot;)</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [::standard CreateSchemaStatement]
   [statement]
   (let [{:keys [db-spec sname elements]} statement
@@ -2858,8 +2859,8 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
                              (assoc db-spec :schema sname)
                              foreign-keys))]
     (conj alters
-          (str "CREATE SCHEMA "
-               (apply join "\n" (conj (map compile elements)
+          (str &quot;CREATE SCHEMA &quot;
+               (apply join &quot;\n&quot; (conj (map compile elements)
                                       (as-identifier db-spec sname)))))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:h2 CreateSchemaStatement]
   [statement]
@@ -2872,13 +2873,13 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
                              #(assoc-in % [:db-spec :schema] sname))
                        elements)
                   alters)
-          (str "CREATE SCHEMA "
+          (str &quot;CREATE SCHEMA &quot;
                (as-identifier db-spec sname)))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:h2 DropStatement]
   [statement]
   (let [{:keys [db-spec otype oname behavior]} statement]
     (join \space
-      "DROP"
+      &quot;DROP&quot;
       (as-sql-keyword otype)
       (as-identifier db-spec oname (:schema db-spec))
       (when (and behavior (#{:table} otype))
@@ -2888,26 +2889,26 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
   (let [{:keys [db-spec element]} action
         old-name (:cname element)
         new-name (:others element)]
-    (format "ALTER COLUMN %s RENAME TO %s"
+    (format &quot;ALTER COLUMN %s RENAME TO %s&quot;
             (as-identifier db-spec old-name)
             (as-identifier db-spec new-name))))</pre></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#lobos.backends.mysql" name="lobos.backends.mysql"><h1 class="project-name">lobos.backends.mysql</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Compiler implementation for MySQL.</p>
 </td><td class="codes" /><pre class="brush: clojure">(ns lobos.backends.mysql
   (:refer-clojure :exclude [compile defonce])
   (:require (lobos [schema :as schema]
                    [ast :as ast]))
-  (:use (clojure.contrib [def :only [defvar-]])
-        (lobos [schema :only [build-definition]]
+  (:use (lobos [schema :only [build-definition]]
                analyzer
                compiler
                metadata
                utils))
   (:import (lobos.schema Column
                          DataType
+                         Schema
                          UniqueConstraint)))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(ast/import-all)</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Analyzer</h2>
 </td><td class="codes" /></tr><tr><td class="docs">
-</td><td class="codes" /><pre class="brush: clojure">(defvar- analyzer-data-type-aliases
+</td><td class="codes" /><pre class="brush: clojure">(def ^{:private true} analyzer-data-type-aliases
   {:bit :boolean
    :int :integer
    :text :clob
@@ -2915,7 +2916,7 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
    :tinytext :clob})</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod analyze [:mysql DataType]
   [_ column-meta]
-  (let [dtype (-> column-meta :type_name as-keyword)
+  (let [dtype (-&gt; column-meta :type_name as-keyword)
         dtype (first (replace analyzer-data-type-aliases [dtype]))]
     (schema/data-type
      dtype
@@ -2926,7 +2927,7 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
   [_ sname tname cname index-meta]
   (let [pkeys (primary-keys sname tname)
         pkey (pkeys (keyword cname))
-        columns (vec (map #(-> % :column_name keyword)
+        columns (vec (map #(-&gt; % :column_name keyword)
                           index-meta))]
     (UniqueConstraint.
      (if pkey
@@ -2940,36 +2941,47 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
   (analyze Column
     (first
      (resultset-seq
-      (.getColumns (db-meta) (name sname) nil (name tname) (name cname))))))</pre></tr><tr><td class="docs"><hr />
+      (.getColumns (db-meta) (name sname) nil (name tname) (name cname))))))</pre></tr><tr><td class="docs">
+</td><td class="codes" /><pre class="brush: clojure">(defmethod analyze [:mysql Schema]
+  [_ sname]
+  (let [db-spec (db-meta-spec)
+        sname (or sname
+                  (-&gt;&gt; db-spec
+                       :subname
+                       (re-find #&quot;//.*/(.+)$&quot;)
+                       second))]
+    (when-not sname
+      (throw (java.sql.SQLException. &quot;No database selected&quot;)))
+    (analyze [:lobos.analyzer/standard Schema] sname)))</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Compiler</h2>
 </td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:mysql IdentifierExpression]
   [identifier]
   (let [{:keys [db-spec name qualifiers]} identifier]
-    (join* \. (->> (concat qualifiers [name])
+    (join* \. (-&gt;&gt; (concat qualifiers [name])
                    (filter identity)
                    (map #(when % (as-str \` % \`)))))))</pre></tr><tr><td class="docs">
-</td><td class="codes" /><pre class="brush: clojure">(defvar- compiler-data-type-aliases
+</td><td class="codes" /><pre class="brush: clojure">(def ^{:private true} compiler-data-type-aliases
   {:clob :text
    :nclob :text})</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:mysql DataTypeClause]
   [expression]
   (let [{:keys [dtype args options]} expression
         {:keys [encoding collate]} options
-        encoding (when (= dtype :nclob) "UTF8")
+        encoding (when (= dtype :nclob) &quot;UTF8&quot;)
         dtype (first (replace compiler-data-type-aliases [dtype]))
         args (if (#{:time :timestamp} dtype) [] args)]
     (unsupported (= dtype :real)
-      "Use double instead.")
+      &quot;Use double instead.&quot;)
     (unsupported (:time-zone options)
-      "Time zones not supported.")
+      &quot;Time zones not supported.&quot;)
     (join \space
       (str (as-sql-keyword dtype) (as-list args))
-      (when encoding (str "CHARACTER SET " (as-str encoding)))
-      (when collate (str "COLLATE " (as-str collate))))))</pre></tr><tr><td class="docs">
+      (when encoding (str &quot;CHARACTER SET &quot; (as-str encoding)))
+      (when collate (str &quot;COLLATE &quot; (as-str collate))))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:mysql AutoIncClause]
   [_]
-  "AUTO_INCREMENT")</pre></tr><tr><td class="docs">
+  &quot;AUTO_INCREMENT&quot;)</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:mysql CreateSchemaStatement]
   [statement]
   (let [{:keys [db-spec sname elements]} statement
@@ -2981,19 +2993,19 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
                              #(assoc-in % [:db-spec :schema] sname))
                        elements)
                   alters)
-          (str "CREATE SCHEMA "
+          (str &quot;CREATE SCHEMA &quot;
                (as-identifier db-spec sname)))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:mysql DropStatement]
   [statement]
   (let [{:keys [db-spec otype oname behavior options]} statement]
     (if (= otype :index)
       (join \space
-        "DROP INDEX"
+        &quot;DROP INDEX&quot;
         (as-identifier db-spec oname)
-        "ON"
+        &quot;ON&quot;
         (as-identifier db-spec (:tname options) (:schema db-spec)))
       (join \space
-        "DROP"
+        &quot;DROP&quot;
         (as-sql-keyword otype)
         (as-identifier db-spec oname (:schema db-spec))
         (when (and behavior (#{:table} otype))
@@ -3004,11 +3016,11 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
         is-unique (instance? UniqueConstraintDefinition element)
         is-pkey (and is-unique (= (:type element) :primary-key))]
     (join \space
-          "DROP"
-          (cond (instance? ColumnDefinition element) "COLUMN"
-                (instance? ForeignKeyConstraintDefinition element) "FOREIGN KEY"
-                (and is-unique (= (:ctype element) :unique)) "INDEX"
-                is-pkey "PRIMARY KEY")
+          &quot;DROP&quot;
+          (cond (instance? ColumnDefinition element) &quot;COLUMN&quot;
+                (instance? ForeignKeyConstraintDefinition element) &quot;FOREIGN KEY&quot;
+                (and is-unique (= (:ctype element) :unique)) &quot;INDEX&quot;
+                is-pkey &quot;PRIMARY KEY&quot;)
           (when-not is-pkey
             (as-identifier db-spec (:cname element))))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:mysql AlterRenameAction]
@@ -3022,23 +3034,23 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
                                         old-name)
                    :cname new-name))]
     (join \space
-          "CHANGE"
+          &quot;CHANGE&quot;
           (as-identifier db-spec old-name)
           (compile (build-definition column db-spec)))))</pre></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#lobos.backends.postgresql" name="lobos.backends.postgresql"><h1 class="project-name">lobos.backends.postgresql</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Compiler implementation for PostgreSQL.</p>
 </td><td class="codes" /><pre class="brush: clojure">(ns lobos.backends.postgresql
   (:refer-clojure :exclude [compile defonce])
   (:require (lobos [schema :as schema]))
-  (:use (clojure.contrib [def :only [defvar-]])
-        lobos.analyzer
+  (:use lobos.analyzer
         lobos.compiler
         lobos.utils)
   (:import (lobos.ast AlterRenameAction
                       ColumnDefinition
                       DataTypeClause)
-           (lobos.schema DataType)))</pre></tr><tr><td class="docs"><hr />
+           (lobos.schema DataType
+                         Schema)))</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Analyzer</h2>
 </td><td class="codes" /></tr><tr><td class="docs">
-</td><td class="codes" /><pre class="brush: clojure">(defvar- analyzer-data-type-aliases
+</td><td class="codes" /><pre class="brush: clojure">(def ^{:private true} analyzer-data-type-aliases
   {:bool :boolean
    :bpchar :char
    :bytea :blob
@@ -3052,17 +3064,20 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
    :timetz :time})</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod analyze [:postgresql DataType]
   [_ column-meta]
-  (let [dtype (-> column-meta :type_name as-keyword)
+  (let [dtype (-&gt; column-meta :type_name as-keyword)
         options {:time-zone (#{:timetz :timestamptz} dtype)}
         dtype (first (replace analyzer-data-type-aliases
                               [dtype]))]
     (schema/data-type
      dtype
      (analyze-data-type-args dtype column-meta)
-     options)))</pre></tr><tr><td class="docs"><hr />
+     options)))</pre></tr><tr><td class="docs">
+</td><td class="codes" /><pre class="brush: clojure">(defmethod analyze [:postgresql Schema]
+  [_ sname]
+  (analyze [:lobos.analyzer/standard Schema] (or sname :public)))</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Compiler</h2>
 </td><td class="codes" /></tr><tr><td class="docs">
-</td><td class="codes" /><pre class="brush: clojure">(defvar- compiler-data-type-aliases
+</td><td class="codes" /><pre class="brush: clojure">(def ^{:private true} compiler-data-type-aliases
   {:blob :bytea
    :clob :text
    :double :double-precision
@@ -3075,37 +3090,32 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
         dtype (first (replace compiler-data-type-aliases [dtype]))
         args (if (#{:bytea :text} dtype) [] args)]
     (unsupported (#{:binary :varbinary} dtype)
-      "Use blob instead.")
+      &quot;Use blob instead.&quot;)
     (join \space
       (str (as-sql-keyword dtype) (as-list args))
-      (when time-zone "WITH TIME ZONE"))))</pre></tr><tr><td class="docs">
+      (when time-zone &quot;WITH TIME ZONE&quot;))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:postgresql ColumnDefinition]
   [definition]
   (let [{:keys [db-spec cname data-type default
                 auto-inc not-null others]} definition]
     (apply join \space
       (as-identifier db-spec cname)
-      (if auto-inc "SERIAL" (compile data-type))
-      (when default (str "DEFAULT " (compile default)))
-      (when not-null "NOT NULL")
+      (if auto-inc &quot;SERIAL&quot; (compile data-type))
+      (when default (str &quot;DEFAULT &quot; (compile default)))
+      (when not-null &quot;NOT NULL&quot;)
       others)))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:postgresql AlterRenameAction]
   [action]
   (let [{:keys [db-spec element]} action
         old-name (:cname element)
         new-name (:others element)]
-    (format "RENAME COLUMN %s TO %s"
+    (format &quot;RENAME COLUMN %s TO %s&quot;
             (as-identifier db-spec old-name)
             (as-identifier db-spec new-name))))</pre></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#lobos.backends.sqlite" name="lobos.backends.sqlite"><h1 class="project-name">lobos.backends.sqlite</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Compiler implementation for SQLite.</p>
 </td><td class="codes" /><pre class="brush: clojure">(ns lobos.backends.sqlite
   (:refer-clojure :exclude [compile defonce])
   (:require (lobos [schema :as schema]))
-  (:use (clojure.contrib [def :only [defvar-]])
-        lobos.analyzer
-        lobos.compiler
-        lobos.connectivity
-        lobos.metadata
-        lobos.utils)
+  (:use (lobos analyzer compiler connectivity internal metadata utils))
   (:import (lobos.ast AlterTableStatement
                       AutoIncClause
                       CreateSchemaStatement
@@ -3115,15 +3125,16 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
                       IdentifierExpression)
            (lobos.schema DataType
                          ForeignKeyConstraint
+                         Schema
                          UniqueConstraint)))</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Analyzer</h2>
 </td><td class="codes" /></tr><tr><td class="docs">
-</td><td class="codes" /><pre class="brush: clojure">(defvar- analyzer-data-type-aliases
+</td><td class="codes" /><pre class="brush: clojure">(def ^{:private true} analyzer-data-type-aliases
   {:time-with-time-zone :time
    :timestamp-with-time-zone :timestamp})</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod analyze [:sqlite DataType]
   [_ column-meta]
-  (let [dtype (-> column-meta :type_name as-keyword)
+  (let [dtype (-&gt; column-meta :type_name as-keyword)
         tz? #{:time-with-time-zone :timestamp-with-time-zone}
         [dtype options] (if (tz? dtype)
                           [dtype {:time-zone true}]
@@ -3138,7 +3149,7 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
      options)))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod analyze [:sqlite UniqueConstraint]
   [_ sname tname cname index-meta]
-  (let [columns (vec (map #(-> % :column_name keyword)
+  (let [columns (vec (map #(-&gt; % :column_name keyword)
                           index-meta))]
     (UniqueConstraint.
      (make-index-name tname :unique columns)
@@ -3146,7 +3157,7 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
      columns)))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defn- analyze-primary-keys [tname]
   (let [columns (reduce
-                 #(conj %1 (-> %2 :column_name keyword))
+                 #(conj %1 (-&gt; %2 :column_name keyword))
                  []
                  (resultset-seq
                   (.getPrimaryKeys (db-meta) nil nil (name tname))))]
@@ -3156,12 +3167,14 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
         :primary-key
         columns)])))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defn- analyze-foreign-keys [tname]
-  (let [fks (group-by :id (raw-query (format "pragma foreign_key_list(%s);"
-                                             (name tname))))]
+  (let [fks (group-by :id  (try
+                             (raw-query (format &quot;pragma foreign_key_list(%s);&quot;
+                                                (name tname)))
+                             (catch Exception _)))]
     (for [fk fks]
       (let [fk (second fk)
-            pcolumns (reduce #(conj %1 (-> %2 :to keyword)) [] fk)
-            fcolumns (reduce #(conj %1 (-> %2 :from keyword)) [] fk)
+            pcolumns (reduce #(conj %1 (-&gt; %2 :to keyword)) [] fk)
+            fcolumns (reduce #(conj %1 (-&gt; %2 :from keyword)) [] fk)
             fk (first fk)
             ptable (keyword (:table fk))
             match (as-keyword (:match fk))
@@ -3187,7 +3200,16 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
   [_ sname tname]
   (concat (analyze-unique sname tname)
           (analyze-primary-keys tname)
-          (analyze-foreign-keys tname)))</pre></tr><tr><td class="docs"><hr />
+          (analyze-foreign-keys tname)))</pre></tr><tr><td class="docs">
+</td><td class="codes" /><pre class="brush: clojure">(defmethod analyze [:sqlite Schema]
+  [_ sname]
+  (let [db-spec (db-meta-spec)
+        sname (or sname
+                  (-&gt;&gt; db-spec
+                       :subname
+                       (re-find #&quot;^\./(.*)\.\w+$&quot;)
+                       second))]
+    (analyze [:lobos.analyzer/standard Schema] sname)))</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Compiler</h2>
 </td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:sqlite IdentifierExpression]
@@ -3198,11 +3220,11 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
   (let [{:keys [dtype args options]} expression
         {:keys [collate time-zone]} options]
     (unsupported (and (#{:decimal :numeric} dtype) (= (count args) 2))
-      "Doesn't support scale argument.")
+      &quot;Doesn't support scale argument.&quot;)
     (join \space
       (str (as-sql-keyword dtype) (as-list args))
-      (when collate (str "COLLATE " (as-str collate)))
-      (when time-zone "WITH TIME ZONE"))))</pre></tr><tr><td class="docs">
+      (when collate (str &quot;COLLATE &quot; (as-str collate)))
+      (when time-zone &quot;WITH TIME ZONE&quot;))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:sqlite AutoIncClause]
   [_]
   nil)</pre></tr><tr><td class="docs">
@@ -3217,25 +3239,24 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
              :name)
        (with-connection db-spec
          (raw-query
-          (format "select name from sqlite_master where type <> 'index';")))))</pre></tr><tr><td class="docs">
+          (format &quot;select name from sqlite_master where type &lt;&gt; 'index';&quot;)))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:sqlite DropStatement]
   [statement]
   (let [{:keys [db-spec otype oname behavior]} statement]
     (if (= otype :schema)
       (drop-schema db-spec)
       (join \space
-        "DROP"
+        &quot;DROP&quot;
         (as-sql-keyword otype)
         (as-identifier db-spec oname)))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:sqlite AlterTableStatement]
   [statement]
-  (unsupported "Alter statement unsupported."))</pre></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#lobos.backends.sqlserver" name="lobos.backends.sqlserver"><h1 class="project-name">lobos.backends.sqlserver</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Compiler implementation for SQL Server.</p>
+  (unsupported &quot;Alter statement unsupported.&quot;))</pre></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#lobos.backends.sqlserver" name="lobos.backends.sqlserver"><h1 class="project-name">lobos.backends.sqlserver</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Compiler implementation for SQL Server.</p>
 </td><td class="codes" /><pre class="brush: clojure">(ns lobos.backends.sqlserver
   (:refer-clojure :exclude [compile defonce])
   (:require clojure.string
             (lobos [schema :as schema]))
-  (:use (clojure.contrib [def :only [defvar-]])
-        lobos.analyzer
+  (:use lobos.analyzer
         lobos.compiler
         lobos.metadata
         lobos.utils)
@@ -3250,17 +3271,18 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
                       FunctionExpression
                       IdentifierExpression)
            (lobos.schema DataType
-                         Expression)))</pre></tr><tr><td class="docs"><hr />
+                         Expression
+                         Schema)))</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Analyzer</h2>
 </td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod analyze [:microsoft-sql-server Expression]
   [_ expr]
   (when expr
     (Expression.
-     (cond (re-find #"^\(\((\d+)\)\)$" expr)
-           (let [[[_ n]] (re-seq #"(\w+)(\(\))?" expr)]
+     (cond (re-find #&quot;^\(\((\d+)\)\)$&quot; expr)
+           (let [[[_ n]] (re-seq #&quot;(\w+)(\(\))?&quot; expr)]
              (Integer/parseInt n))))))</pre></tr><tr><td class="docs">
-</td><td class="codes" /><pre class="brush: clojure">(defvar- analyzer-data-type-aliases
+</td><td class="codes" /><pre class="brush: clojure">(def ^{:private true} analyzer-data-type-aliases
   {:bit :boolean
    :datetime2 :timestamp
    :image :blob
@@ -3269,7 +3291,7 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
    :text :clob})</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod analyze [:microsoft-sql-server DataType]
   [_ column-meta]
-  (let [dtype (-> column-meta :type_name as-keyword)
+  (let [dtype (-&gt; column-meta :type_name as-keyword)
         [dtype options] (if (= dtype :datetimeoffset)
                           [:timestamp {:time-zone true}]
                           [dtype nil])
@@ -3278,13 +3300,16 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
     (schema/data-type
      dtype
      (analyze-data-type-args dtype column-meta)
-     options)))</pre></tr><tr><td class="docs"><hr />
+     options)))</pre></tr><tr><td class="docs">
+</td><td class="codes" /><pre class="brush: clojure">(defmethod analyze [:microsoft-sql-server Schema]
+  [_ sname]
+  (analyze [:lobos.analyzer/standard Schema] (or sname :dbo)))</pre></tr><tr><td class="docs"><hr />
 </td><td class="codes" /></tr><tr><td class="docs"><h2>Compiler</h2>
 </td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:sqlserver IdentifierExpression]
   [identifier]
   (let [{:keys [db-spec name qualifiers]} identifier]
-    (join* \. (->> (concat qualifiers [name])
+    (join* \. (-&gt;&gt; (concat qualifiers [name])
                    (filter identity)
                    (map #(when % (as-str \[ % \])))))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:sqlserver FunctionExpression]
@@ -3295,7 +3320,7 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
                name)]
     (str (as-sql-keyword name)
          (as-list (map compile args)))))</pre></tr><tr><td class="docs">
-</td><td class="codes" /><pre class="brush: clojure">(defvar- compiler-data-type-aliases
+</td><td class="codes" /><pre class="brush: clojure">(def ^{:private true} compiler-data-type-aliases
   {:blob      :image
    :boolean   :bit
    :clob      :text
@@ -3311,16 +3336,16 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
                 (first (replace compiler-data-type-aliases [dtype])))
         args (if (#{:image :ntext :text} dtype) [] args)]
     (unsupported (and (= dtype :time) time-zone)
-      "Time zone unsupported for time data type.")
+      &quot;Time zone unsupported for time data type.&quot;)
     (join \space
       (str (as-sql-keyword dtype) (as-list args))
-      (when collate (str "COLLATE " (as-str collate))))))</pre></tr><tr><td class="docs">
+      (when collate (str &quot;COLLATE &quot; (as-str collate))))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:sqlserver AutoIncClause]
   [_]
-  "IDENTITY")</pre></tr><tr><td class="docs">
+  &quot;IDENTITY&quot;)</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defn- drop-schema-cascade [db-spec sname]
   (vec (for [element (with-db-meta db-spec
-                       (-> (analyze-schema sname) :elements keys))]
+                       (-&gt; (analyze-schema sname) :elements keys))]
          (compile (schema/build-drop-statement
                    (schema/table element)
                    :cascade
@@ -3329,16 +3354,16 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
   [statement]
   (let [{:keys [db-spec otype oname behavior options]} statement
         sql-string (join \space
-                     "DROP"
+                     &quot;DROP&quot;
                      (as-sql-keyword otype)
                      (as-identifier db-spec oname
                                     (when (not= otype :schema)
                                       (:schema db-spec))))]
     (if (= otype :index)
       (join \space
-        "DROP INDEX"
+        &quot;DROP INDEX&quot;
         (as-identifier db-spec oname)
-        "ON"
+        &quot;ON&quot;
         (as-identifier db-spec (:tname options) (:schema db-spec)))
       (apply join \;
              (conj
@@ -3352,25 +3377,25 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
         default (:default element)
         cname (when default
                 (make-index-name (:tname element)
-                                 "default"
+                                 &quot;default&quot;
                                  (list (:cname element))))]
     (cond (= default :drop)
           (join \space
-                "DROP CONSTRAINT"
+                &quot;DROP CONSTRAINT&quot;
                 (as-identifier db-spec cname))
           default
           (join \space
-                "ADD CONSTRAINT"
+                &quot;ADD CONSTRAINT&quot;
                 (as-identifier db-spec cname)
-                "DEFAULT"
+                &quot;DEFAULT&quot;
                 (compile default)
-                "FOR"
+                &quot;FOR&quot;
                 (as-identifier db-spec (:cname element)))
-          :else (unsupported "Only set/drop default supported."))))</pre></tr><tr><td class="docs">
+          :else (unsupported &quot;Only set/drop default supported.&quot;))))</pre></tr><tr><td class="docs">
 </td><td class="codes" /><pre class="brush: clojure">(defmethod compile [:sqlserver AlterRenameAction]
   [action]
   (let [{:keys [db-spec element]} action]
-    (format "EXEC sp_rename '%s', '%s', 'COLUMN';"
+    (format &quot;EXEC sp_rename '%s', '%s', 'COLUMN';&quot;
             (join \.
                   (as-identifier db-spec (:sname element))
                   (as-identifier db-spec (:tname element))
@@ -3383,7 +3408,7 @@ of the action supported: <code>AlterAddAction</code>, <code>AlterDropAction</cod
     (if (= action :rename)
       (compile (AlterRenameAction. db-spec element))
       (join \space
-            "ALTER TABLE"
+            &quot;ALTER TABLE&quot;
             (as-identifier db-spec tname (:schema db-spec))
             (case action
                   :add    (compile (AlterAddAction. db-spec element))

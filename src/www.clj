@@ -165,7 +165,7 @@
     Leiningen or Cake by adding the following dependency to you project
     file:"]
 
-    [:pre.brush:.clojure "[lobos \"0.7.0\"]"]
+    [:pre.brush:.clojure "[lobos \"0.8.0\"]"]
 
     [:p [:b "Lobos"] " is also available through Maven:"]
 
@@ -173,7 +173,7 @@
 "<dependency>
   <groupId>lobos</groupId>
   <artifactId>lobos</artifactId>
-  <version>0.7.0</version>
+  <version>0.8.0</version>
 </dependency>")]
 
     [:p "You can always add the current or previous version manually,
@@ -448,7 +448,8 @@ Macro
     [:ul
      [:li (link-to "doc/uberdoc.frontend.html" "Frontend documentation")]
      [:li (link-to "doc/uberdoc.backend.html"  "Backend documentation for the compiler")]
-     [:li (link-to "doc/uberdoc.analyzer.html" "Documentation for the analyzer")]]))
+     [:li (link-to "doc/uberdoc.analyzer.html" "Documentation for the analyzer")]
+     [:li (link-to "doc/uberdoc.migration.html" "Migration documentation")]]))
 
 (defpage downloads ["Downloads"]
   (let [tags (->> ".git/refs/tags"
