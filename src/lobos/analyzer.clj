@@ -179,6 +179,7 @@
   {:arglists '([connection-info? sname?])}
   (let [[db-spec sname _] (optional-cnx-and-sname args)]
     (with-db-meta db-spec
+      (autorequire-backend db-spec)
       (let [sname (or (keyword sname)
                       (default-schema)
                       (first _))]
