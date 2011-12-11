@@ -187,7 +187,7 @@
   [db-spec sname]
   (autorequire-backend db-spec)
   (when-not (-> (analyzer/analyze-schema db-spec sname)
-                :elements
+                :tables
                 *migrations-table*)
     (let [action (schema/table *migrations-table*
                                (schema/varchar :name 255))

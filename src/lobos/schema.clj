@@ -689,7 +689,7 @@
 
 ;; `Schema` records can be constructed using the `schema` function.
 ;; *For internal use*.
-(defrecord Schema [sname elements options]
+(defrecord Schema [sname tables indexes options]
   Creatable Dropable
   
   (build-create-statement [this db-spec]
@@ -698,7 +698,7 @@
      sname
      (flatten
       (map #(build-create-statement (second %) db-spec)
-           elements))))
+           (concat tables indexes)))))
 
   (build-drop-statement [this behavior db-spec]
     (DropStatement. db-spec :schema sname behavior nil)))
@@ -708,6 +708,12 @@
   [o]
   (instance? Schema o))
 
+(defn- filtered-elements->map
+  [pred elements]
+  (into (sorted-map)
+        (map #(vector (:name %) %)
+             (filter pred elements))))
+
 (defn schema
   "Constructs an abstract schema definition."
   {:arglists '([schema-name options? & elements])}
@@ -716,8 +722,8 @@
   (let [[options elements] (optional (comp not definition?) args)]
     (Schema.
      schema-name
-     (into (sorted-map)
-           (map #(vector (:name %) %) elements))
+     (filtered-elements->map table? elements)
+     (filtered-elements->map index? elements)
      (or options {}))))
 
 ;; -----------------------------------------------------------------------------

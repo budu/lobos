@@ -216,22 +216,23 @@
                (schema nil))
       "Invalid schema definition")
   (is (= (schema :foo)
-         (Schema. :foo {} {}))
+         (Schema. :foo {} {} {}))
       "Empty schema")
   (is (= (schema :foo {:bar nil :baz nil})
-         (Schema. :foo {} {:bar nil
-                           :baz nil}))
+         (Schema. :foo {} {} {:bar nil
+                              :baz nil}))
       "Empty schema with option.")
   (is (= (schema :foo (table :bar) (table :baz))
          (Schema. :foo {:bar (table :bar)
-                                     :baz (table :baz)} {}))
-      "Schema with elements")
+                        :baz (table :baz)} {} {}))
+      "Schema with tables")
   (is (= (schema :foo {:bar nil :baz nil}
                  (table :bar)
                  (table :baz))
          (Schema. :foo
                   {:bar (table :bar)
                    :baz (table :baz)}
+                  {}
                   {:bar nil
                    :baz nil}))
-      "Schema with elements and options."))
+      "Schema with tables and options."))

@@ -28,7 +28,7 @@
         #(with-schema [lobos :lobos]
            ;; cannot rely on creating just a schema as some dbms ignore that action
            (create lobos (table :foo (integer :bar)))
-           (= (-> :lobos analyze-schema :elements :foo)
+           (= (-> :lobos analyze-schema :tables :foo)
               (table :foo (integer :bar))))]
     (is (thrown? Exception (test-action))
         "An exception should have been thrown because there are no connection")
@@ -61,11 +61,11 @@
 (def-db-test test-create-and-drop-table
   (with-schema [lobos :lobos]
     (create lobos (table :foo (integer :bar)))
-    (is (= (inspect-schema :elements :foo)
+    (is (= (inspect-schema :tables :foo)
            (table :foo (integer :bar)))
         "A table named 'foo' should have been created")
     (drop lobos (table :foo))
-    (is (nil? (inspect-schema :elements :foo))
+    (is (nil? (inspect-schema :tables :foo))
         "A table named 'foo' should have been dropped")))
 
 (def-db-test test-create-and-drop-index
@@ -73,17 +73,17 @@
     (create lobos (table :foo (integer :bar)))
     (let [cname (make-index-name :foo :index [:bar])]
       (create lobos (index :foo [:bar]))
-      (is (= (inspect-schema :elements :foo :indexes cname)
+      (is (= (inspect-schema :tables :foo :indexes cname)
              (index :foo [:bar]))
           "An index named 'foo_index_bar' should have been created")
       (drop lobos (index :foo [:bar]))
-      (is (empty? (inspect-schema :elements :foo :indexes))
+      (is (empty? (inspect-schema :tables :foo :indexes))
           "An index named 'foo_index_bar' should have been dropped"))
     (drop lobos (table :foo))))
 
 (def-db-test test-alter-table
   (with-schema [lobos :lobos]
-    (let [actual #(-> % :elements :foo (assoc :indexes {}))]
+    (let [actual #(-> % :tables :foo (assoc :indexes {}))]
       (create lobos (table :foo (integer :a)))
       (when-supported (alter lobos :add (table :foo (integer :b)))
         (is (= (actual (inspect-schema))
@@ -125,9 +125,9 @@
 
 (def-db-test test-data-types
   (with-schema [lobos :lobos]
-    (let [actual-type #(inspect-schema :elements :foo :columns :bar :data-type :dtype eq)
+    (let [actual-type #(inspect-schema :tables :foo :columns :bar :data-type :dtype eq)
           expected-type #(-> % :data-type :dtype eq)
-          actual-args #(inspect-schema :elements :foo :columns :bar :data-type :args)
+          actual-args #(inspect-schema :tables :foo :columns :bar :data-type :args)
           expected-args #(-> % :data-type :args)]
       
       (doseq [dtype [:smallint :integer :bigint
@@ -171,7 +171,7 @@
           (when-supported (create lobos (table :foo (column :bar dtype)))
             (is (= (actual-type) (expected-type (column* :bar dtype [])))
                 (str "Data type should match " (-> dtype :dtype name)))
-            (is (inspect-schema :elements :foo :columns :bar
+            (is (inspect-schema :tables :foo :columns :bar
                                 :data-type :options :time-zone)
                 (str "Timezone should be set for " (-> dtype :dtype name)))
             (drop lobos (table :foo))))))))
@@ -181,7 +181,7 @@
     (doseq [ctype [:unique :primary-key]]
       (let [cname (make-index-name :foo ctype [:a])]
         (when-supported (create lobos (table :foo (integer :a ctype)))
-          (is (= (inspect-schema :elements :foo :constraints cname)
+          (is (= (inspect-schema :tables :foo :constraints cname)
                  (UniqueConstraint. cname ctype [:a]))
               (format "A %s constraint named '%s' should have been created"
                       (name ctype)
@@ -195,7 +195,7 @@
                           (create lobos (table :baz
                                           (integer :bar)
                                           (foreign-key [:bar] :foo))))
-        (is (= (inspect-schema :elements :baz :constraints cname)
+        (is (= (inspect-schema :tables :baz :constraints cname)
                (ForeignKeyConstraint. cname [:bar] :foo [:bar] nil
                                       (if (= *db* :h2)
                                         {:on-delete :restrict :on-update :restrict}
@@ -208,7 +208,7 @@
 (def-db-test test-default-schema
   (when-not (= *db* :mysql)
     (create *db* (table :foo (integer :bar)))
-    (is (= (-> *db* analyze-schema :elements :foo)
+    (is (= (-> *db* analyze-schema :tables :foo)
            (table :foo (integer :bar)))
         "A table named 'foo' should have been created in the default schema")
     (drop *db* (table :foo))))

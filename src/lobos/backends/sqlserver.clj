@@ -114,7 +114,7 @@
 
 (defn- drop-schema-cascade [db-spec sname]
   (vec (for [element (with-db-meta db-spec
-                       (-> (analyze-schema sname) :elements keys))]
+                       (-> (analyze-schema sname) :tables keys))]
          (compile (schema/build-drop-statement
                    (schema/table element)
                    :cascade

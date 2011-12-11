@@ -136,7 +136,7 @@
 
 (deftest test-create-migrations-table
   (with-migrations-table
-    (is (= (inspect-schema :elements :lobos_migrations)
+    (is (= (inspect-schema :tables :lobos_migrations)
            (schema/table :lobos_migrations
                          (schema/varchar :name 255)))
         "A table named 'lobos_migrations' should be created")))
