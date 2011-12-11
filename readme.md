@@ -275,10 +275,6 @@ user=> (-> (analyze-schema)
 
 Distributed under the [Eclipse Public License], the same as Clojure.
 
-*[DSL]:  Domain-specific language
-*[REPL]: Read–eval–print loop
-*[DDL]:  Data definition language
-
 [Clojure]:                http://clojure.org/
 [mailing list]:           http://groups.google.com/group/lobos-library
 [Clojars]:                http://clojars.org/lobos
