@@ -134,6 +134,11 @@
               :else %))
      value)))
 
+(defn expression?
+  "Returns true if the given object is an Expression."
+  [o]
+  (instance? Expression o))
+
 (defmacro expression [form]
   `(Expression.
     ~(postwalk
@@ -157,6 +162,11 @@
 
   (build-drop-statement [this behavior db-spec]
     (DropStatement. db-spec :index iname nil {:tname tname})))
+
+(defn index?
+  "Returns true if the given object is an Index."
+  [o]
+  (instance? Index o))
 
 (defn index
   ([table columns] (index table nil columns))
@@ -182,6 +192,11 @@
 
   (build-definition [this db-spec]
     (ConstraintDefinition. db-spec cname)))
+
+(defn constraint?
+  "Returns true if the given object is a Constraint."
+  [o]
+  (instance? Constraint o))
 
 (defn constraint
   "Constructs an unspecified abstract constraint definition and add it
@@ -323,6 +338,11 @@
 ;; *For internal use*.
 (defrecord DataType [dtype args options])
 
+(defn data-type?
+  "Returns true if the given object is a DataType."
+  [o]
+  (instance? DataType o))
+
 (defn data-type
   "Constructs an abstract data-type definition using the given keyword
   `dtype`. Can also take an options list of arguments (`args`) and
@@ -374,6 +394,11 @@
        (when auto-inc (AutoIncClause. db-spec))
        not-null
        others))))
+
+(defn column?
+  "Returns true if the given object is a Column."
+  [o]
+  (instance? Column o))
 
 (defmacro default [form]
   `[:default (expression ~form)])
@@ -637,6 +662,11 @@
   (build-drop-statement [this behavior db-spec]
     (DropStatement. db-spec :table name behavior nil)))
 
+(defn table?
+  "Returns true if the given object is a Table."
+  [o]
+  (instance? Table o))
+
 (defn table*
   "Constructs an abstract table definition. The `table-name` is
   mandatory."
@@ -676,7 +706,7 @@
 (defn schema?
   "Returns true if the given object is a Schema."
   [o]
-  (isa? (type o) Schema))
+  (instance? Schema o))
 
 (defn schema
   "Constructs an abstract schema definition."
