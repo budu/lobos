@@ -1,260 +1,286 @@
 # Lobos
 
-**Lobos** is a library to create and manipulate abstract SQL database
-schemas and applying them to any supported RDBMS that support a flexible
-migrations mechanism. It is based on the original ClojureQL but exclude
-the query language part which is better handled by the [new ClojureQL]
-project.
+**Lobos** is a SQL database schema manipulation and migration library
+written in [Clojure]. It currently support supports H2, MySQL,
+PostgreSQL, SQLite and SQL Server.
 
-This is currently an early release, use it at your own risk. You can
-have a look at the [roadmap] for more information about future releases
-and consult the [history] to see what have been done.
+If you have any questions, please join the [mailing list].
 
-**Lobos** supports H2, MySQL, PostgreSQL, SQLite and SQL Server. You'll
-need to add the relevant JDBC driver manually. For SQLite you'll need a
-custom [SQLite JDBC driver].
+## Features
 
-You may also be interested in joining the [Lobos Google Group].
+ * A comprehensive data definition language DSL.
+ * Migrations for schema changes.
+ * An analyzer to query the schema.
+
+## Installation
+
+Lobos is available through [Clojars].
+
+For the latest release, in Cake/Leiningen, use:
+
+#### `project.clj`
+```clojure
+:dependencies [[lobos "1.0.0-SNAPSHOT"]]
+```
+
+or in Maven:
+
+#### `pom.xml`
+```xml
+<dependency>
+  <groupId>lobos</groupId>
+  <artifactId>lobos</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+</dependency>
+```
 
 ## Usage
 
-Here's a quick overview of how it works in its current state. For more
-in depth documentation you can refer to the [commented code] for the
-front-end.
+Here's a small tutorial on how to use Lobos.
 
-### Basics
+### Basic Example
 
-First you'll need to use at least the following namespaces:
+Start by creating a new project with your preferred tool. Assuming a
+[Leiningen] compatible project file, add **Lobos** and a database driver
+to the `dependencies` section:
+
+```clojure
+:dependencies [...
+               [lobos "1.0.0-SNAPSHOT"]
+               [postgresql "9.1-901.jdbc4"]]
+```
+
+Once you have your dependencies downloaded, open up a REPL and load
+these namespaces:
     
-    (use 'lobos.connectivity
-         'lobos.core
-         'lobos.schema)
+```clojure
+(use 'lobos.connectivity
+     'lobos.core
+     'lobos.schema)
+```
 
-Then you'll need a connection. The following example define a connection
-and makes it the default global connection:
+You'll get warnings about some already defined function, just ignore
+this for now.
+
+Then you'll need to create a connection, the following snippet define
+one and makes it the default global connection:
     
-    (def db
-         {:classname "org.postgresql.Driver"
-          :subprotocol "postgresql"
-          :user "test"
-          :password "test123"
-          :subname "//localhost:5432/test"})
+```clojure
+(def db
+     {:classname "org.postgresql.Driver"
+      :subprotocol "postgresql"
+      :user "test"
+      :password "test123"
+      :subname "//localhost:5432/test"})
 
-    (open-global db)
+(open-global db)
+```
 
-You can send DDL statements (called *actions*) directly to a connected
-database like this:
+You can now send DDL statements (called *actions*) directly like this:
 
-    user> (create db (table :users (integer :id :unique)))
-    nil
+```clojure
+(create (table :users (integer :id :unique)))
+```
 
 You can omit the connection altogether. In that case, actions will use
 the connection bound by `with-connection` or the default one.
 
-    user> (drop (table :users))
-    nil
+```clojure
+(drop (table :users))
+```
 
-### More Complex Example
+Now that you've tested the basics of **Lobos** at the REPL, let's try
+out a more real-world example.
 
-**Lobos** supports a comprehensive set of features for creating tables.
-Here's a more complex example using custom helpers to define a complete
-schema:
+### Real-world Example
 
-    (ns sample-schema
-      (:refer-clojure :exclude [alter compile drop
-                                bigint boolean char double float time])
-      (:use (lobos core schema)))
-    
-    (defn surrogate-key [table]
-      (integer table :id :auto-inc :primary-key))
-    
-    (defn datetime-tracked [table]
-      (-> table
-          (timestamp :updated_on)
-          (timestamp :created_on (default (now)))))
-    
-    (defn refer-to [table ptable]
-      (let [cname (-> (->> ptable name butlast (apply str))
-                      (str "_id")
-                      keyword)]
-        (integer table cname [:refer ptable :id :on-delete :set-null])))
-    
-    (defmacro tbl [name & elements]
-      `(-> (table ~name
-             (surrogate-key)
-             (datetime-tracked))
-           ~@elements))
-    
-    (def sample-schema
-      (schema :lobos
-       (tbl :users
-        (varchar :name 100 :unique)
-        (check :name (> (length :name) 1)))
-    
-       (tbl :posts
-        (varchar :title 200 :unique)
-        (text :content)
-        (refer-to :users))
-    
-       (tbl :comments
-        (text :content)
-        (refer-to :users)
-        (refer-to :posts))))
+By *real-world*, I'm not talking about a production ready database
+schema, it's about how to integrate **Lobos** into your real
+projects. We'll continue using the previously created test project, but
+this time we'll use files. In your `src/` directory, create a directory
+named `lobos` and a file called `config.clj` inside it.
 
-Then you can use the `create` action to create that schema:
+#### `src/lobos/config.clj`
+```clojure
+(ns lobos.config
+  (:use lobos.connectivity))
 
-    user> (use 'sample-schema)
-    nil
-    user> (create sample-schema)
-    nil
+(def db
+  {:classname "org.postgresql.Driver"
+   :subprotocol "postgresql"
+   :user "test"
+   :password "test123"
+   :subname "//localhost:5432/test"})
 
-### Altering Tables
+(open-global db)
+```
 
-There's also the `alter` action which let you manipulate tables:
+Next, we'll see how to create helpers that will show the composable
+nature of the **Lobos** DSL. This part is entirely optional.
 
-    user> (alter :add (table :users (text :about-me)))
-    nil
-    user> (alter :add (table :users
-                        (text :location)
-                        (text :occupation)))
-    nil
-    user> (alter :add (table :comments (check :comment-limit (< (length :content) 144))))
-    nil
-    user> (alter :modify (table :users (column :location (default "Somewhere"))))
-    nil
-    user> (alter :drop (table :users (column :occupation)))
-    nil
-    user> (alter :rename (table :users (column :location :to :origin)))
-    nil
+Add a new file called `helpers.clj`
 
-### Dropping Schema Elements
+#### `src/lobos/helpers.clj`
+```clojure
+(ns lobos.helpers
+  (:refer-clojure :exclude [bigint boolean char double float time])
+  (:use (lobos schema)))
+```
 
-The `drop` action has the optional `behavior` parameter that works even
-on database without built-in support for it:
+The above namespace declaration exclude some `clojure.core` definitions
+that clashes with data-type functions, this prevents warnings from being
+shown.
 
-    user> (drop sqlserver-spec (table :users) :cascade)
-    nil
+Every schema element definition is a simple function that return an
+intermediate representation that abstract real database schema element.
+This allow you to make your own functions (and macros) that can help
+define a database schema more concisely.
 
-### Debugging
+Now, let's define a bunch of useful helpers:
 
-You can always set the debug level to see the compiled statement:
+#### `src/lobos/helpers.clj`
+```clojure
+(defn surrogate-key [table]
+  (integer table :id :auto-inc :primary-key))
 
-    user> (set-debug-level :sql)
-    :sql
-    user> (create (table :users (integer :id :unique)))
-    CREATE TABLE "lobos"."users" ("id" INTEGER, CONSTRAINT "unique_id" UNIQUE ("id"))
-    nil
+(defn timestamps [table]
+  (-> table
+      (timestamp :updated_on)
+      (timestamp :created_on (default (now)))))
 
-As you can see **Lobos** use delimited identifiers by default and schema
-qualified identifiers when an action use a schema.
+(defn refer-to [table ptable]
+  (let [cname (-> (->> ptable name butlast (apply str))
+                  (str "_id")
+                  keyword)]
+    (integer table cname [:refer ptable :id :on-delete :set-null])))
+```
 
-### Configuration
+The first one add a standardized surrogate key called `id` to the
+specified table. The second takes a table definition and add two
+generally useful columns to it. Finally, the third one create a
+foreign-key column to another table given its name. We can use these
+helpers in the same way as already existing column definition functions.
 
-The preferred location to keep your database specs and connection for
-**Lobos** is in the `src/lobos/config.clj` file. The namespace contained
-in it will be used by default when generating the migrations file. This
-is just a convention, you can use any other means you wish using normal
-Clojure code.
+To wrap it up, we'll add a macro that we'll use instead of the included
+`table` macro. It will help us create tables which implicitly include a
+surrogate key and the timestamp columns.
+
+#### `src/lobos/helpers.clj`
+```clojure
+(defmacro tbl [name & elements]
+  `(-> (table ~name
+              (surrogate-key)
+              (timestamps))
+       ~@elements))
+```
+
+We have everything set up in place to create our first migrations, so
+let's do that.
 
 ### Migrations
 
-#### Generating migrations
+By default all migrations are kept in a single file in the
+`lobos.migrations` namespace. This is a normal Clojure source file so if
+you prefer having only one migration per file, just do that and require
+these files in the migrations namespace.
 
-**Lobos** records each actions and include a set of commands to create
-migrations, run and rollbacks them. When you execute an action, the
-call used will be recorded inside a stash file found in
-`.lobos_stash.clj`.
+#### `src/lobos/migrations.clj`
+```clojure
+(ns lobos.migrations
+  (:refer-clojure :exclude [alter drop
+                            bigint boolean char double float time])
+  (:use (lobos [migration :only [defmigration]] core schema
+               config helpers)))
+```
 
-    user> (create (table :users (integer :id)))
-    nil
-    user> (print-stash)
+Migrations are define using the `defmigration` macro which is composed
+of two bodies, one making whatever changes you want to do, the other
+reverting those changes.
 
-    (create (table :users (integer :id)))
+#### `src/lobos/migrations.clj`
+```clojure
+(defmigration add-users-table
+  (up [] (create
+          (tbl :users
+            (varchar :name 100 :unique)
+            (check :name (> (length :name) 1)))))
+  (down [] (drop (table :users))))
 
-Recorded actions can be dumped into one or more migrations using the
-`generate-migration` command:
+(defmigration add-posts-table
+  (up [] (create
+          (tbl :posts
+            (varchar :title 200 :unique)
+            (text :content)
+            (refer-to :users))))
+  (down [] (drop (table :posts))))
 
-    user> (generate-migration 'create-users)
-    nil
+(defmigration add-comments-table
+  (up [] (create
+          (tbl :comments
+            (text :content)
+            (refer-to :users)
+            (refer-to :posts))))
+  (down [] (drop (table :comments))))
+```
 
-This command will create a migration definition into the migration file
-(located in `src/lobos/migrations.clj` by default) for all action found
-in the stash file.
+Each migrations must have a unique name that will be used by **Lobos**
+to figure out which ones have been applied.
 
-You can always use `generate-migration` to create a new (empty)
-migration if there's no recorded actions and edit them directly from the
-migrations file.
+To apply all pending migrations, use the `migrate` function in a REPL:
 
-The `generate-migration` command will automatically generate the undo
-method for some actions.
+```clojure
+user> (migrate)
+add-users-table
+add-posts-table
+add-comments-table
+```
 
-#### Migrate & Rollback
+This function can take a bunch of migration names in which case it will
+only apply those.
 
-Then you can use the `migrate` and `rollback` commands:
+If, for some reason, you need to rollback some migrations, use the aptly
+named `rollback` function:
 
-    user> (rollback)
-    create-users
-    user> (migrate)
-    create-users
+```clojure
+user> (rollback)
+add-comments-table
+```
 
-These commands will run the `up` or `down` part of migrations in the
-correct order. Both can take any number of migration names and will only
-run these. By default the `migrate` command run all pending migrations
-while the `rollback` command only affect the last one.
-
-The `rollback` command can also take a number or `:all` as argument, in
-which case it will rollback only the number of migrations that you want.
-    
-There's also three print commands to look where you are into the
-migration process: `print-stash`, `print-pending` and `print-done`.
+By default it will rollback only the most recently applied migration. It
+can also take migration names, an integer or the `:all` keyword and
+perform the appropriate rollback.
 
 ### Analyzer
 
 Lobos includes a database analyzer which use the database meta-data or
 information schema to construct an abstract schema definition from an
-actual database schema. This feature is only experimental for the
-moment and is used internally integration testing.
+actual database schema.
 
-    user> (use 'lobos.analyzer)
-    nil
-    user> (analyze-schema :test)
-    #:lobos.schema.Schema{...}
-    user> (-> :test analyze-schema :elements :users :columns :name)
-    #:lobos.schema.Column{...}
-    user> (-> :test analyze-schema :elements :posts :constraints :posts_fkey_user_id)
-    #:lobos.schema.ForeignKeyConstraint{...}
+Here's an interactive session that show some possible uses:
 
-This feature may eventually be split into its own project and is quite
-limited in its current form. Currently it doesn't support check or
-foreign keys constraints and has *very* limited support for parsing SQL
-expressions.
-
-## Installation
-
-Lobos is available through Clojars.
-
-For the latest release, in Cake/Leiningen:
-
-    [lobos "0.8.0"]
-
-in Maven:
-
-    <dependency>
-      <groupId>lobos</groupId>
-      <artifactId>lobos</artifactId>
-      <version>0.8.0</version>
-    </dependency>
+```clojure
+user> (use 'lobos.analyzer)
+nil
+user> (-> (analyze-schema) :tables :keys)
+(:comments :lobos_migrations :posts :users)
+user> (-> (analyze-schema)
+          :tables :users :columns :name :data-type :name)
+:varchar
+user=> (-> (analyze-schema)
+           :tables :posts :constraints :posts_unique_title :columns)
+[:title]
+```
 
 ## License
 
-Copyright (C) 2011 Nicolas Buduroi. All rights reserved
+Distributed under the [Eclipse Public License], the same as Clojure.
 
-Distributed under the Eclipse Public License, the same as Clojure. See
-the file epl-v10.html in the project root directory.
+*[DSL]:  Domain-specific language
+*[REPL]: Read–eval–print loop
+*[DDL]:  Data definition language
 
-[new ClojureQL]: https://github.com/LauJensen/clojureql
-[roadmap]: https://github.com/budu/lobos/blob/master/roadmap.md
-[history]: https://github.com/budu/lobos/blob/master/history.md
-[SQLite JDBC driver]: https://github.com/budu/sqlitejdbc
-[commented code]: http://budu.github.com/lobos/doc/uberdoc.frontend.html
-[Lobos Google Group]: http://groups.google.com/group/lobos-library
+[Clojure]:                http://clojure.org/
+[mailing list]:           http://groups.google.com/group/lobos-library
+[Clojars]:                http://clojars.org/lobos
+[Leiningen]:              https://github.com/technomancy/leiningen
+[Eclipse Public License]: http://budu.github.com/lobos/epl-v10.html
