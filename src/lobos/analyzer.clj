@@ -56,7 +56,7 @@
   (when expr
     (Expression.
      (cond (re-find #"^(.*)::(.*)$" expr)
-           (let [[_ & [value dtype]] (first (re-seq #"(.*)::(.*)" expr))]
+           (let [[_ & [value name]] (first (re-seq #"(.*)::(.*)" expr))]
              (read-string (replace (str value) \' \"))) ;; HACK: to replace!
            (re-find #"^\d+$" expr) (Integer/parseInt expr)
            (re-find #"^(\w+)(\(\))?$" expr)

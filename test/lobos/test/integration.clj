@@ -125,8 +125,8 @@
 
 (def-db-test test-data-types
   (with-schema [lobos :lobos]
-    (let [actual-type #(inspect-schema :tables :foo :columns :bar :data-type :dtype eq)
-          expected-type #(-> % :data-type :dtype eq)
+    (let [actual-type #(inspect-schema :tables :foo :columns :bar :data-type :name eq)
+          expected-type #(-> % :data-type :name eq)
           actual-args #(inspect-schema :tables :foo :columns :bar :data-type :args)
           expected-args #(-> % :data-type :args)]
       
@@ -140,7 +140,7 @@
         (let [dtype (data-type dtype)]
           (when-supported (create lobos (table :foo (column :bar dtype)))
             (is (= (actual-type) (expected-type (column* :bar dtype [])))
-                (str "Data type should match " (-> dtype :dtype name)))
+                (str "Data type should match " (-> dtype :name name)))
             (drop lobos (table :foo)))))
       
       (doseq [dtype [:char :nchar :varchar :nvarchar
@@ -149,31 +149,31 @@
         (let [dtype (data-type dtype [3])]
           (when-supported (create lobos (table :foo (column :bar dtype nil)))
             (is (= (actual-type) (expected-type (column* :bar dtype [])))
-                (str "Data type should match " (-> dtype :dtype name)))
+                (str "Data type should match " (-> dtype :name name)))
             (is (= (actual-args) (expected-args (column* :bar dtype [])))
                 (format "Data type arguments should match %s for %s"
                         (:args dtype)
-                        (-> dtype :dtype name)))
+                        (-> dtype :name name)))
             (drop lobos (table :foo)))))
       
       (let [dtype (data-type :numeric [8 3])]
         (when-supported (create lobos (table :foo (column :bar dtype)))
           (is (= (actual-type) (expected-type (column* :bar dtype [])))
-              (str "Data type should match " (-> dtype :dtype name)))
+              (str "Data type should match " (-> dtype :name name)))
           (is (= (actual-args) (expected-args (column* :bar dtype [])))
               (format "Data type arguments should match %s for %s"
                       (:args dtype)
-                      (-> dtype :dtype name)))
+                      (-> dtype :name name)))
           (drop lobos (table :foo))))
 
       (doseq [dtype [:time :timestamp]]
         (let [dtype (data-type dtype [] {:time-zone true})]
           (when-supported (create lobos (table :foo (column :bar dtype)))
             (is (= (actual-type) (expected-type (column* :bar dtype [])))
-                (str "Data type should match " (-> dtype :dtype name)))
+                (str "Data type should match " (-> dtype :name name)))
             (is (inspect-schema :tables :foo :columns :bar
                                 :data-type :options :time-zone)
-                (str "Timezone should be set for " (-> dtype :dtype name)))
+                (str "Timezone should be set for " (-> dtype :name name)))
             (drop lobos (table :foo))))))))
 
 (def-db-test test-unique-constraint

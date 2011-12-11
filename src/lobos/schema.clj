@@ -336,7 +336,7 @@
 
 ;; `DataType` records can be constructed using the `data-type` function.
 ;; *For internal use*.
-(defrecord DataType [dtype args options])
+(defrecord DataType [name args options])
 
 (defn data-type?
   "Returns true if the given object is a DataType."
@@ -345,10 +345,10 @@
 
 (defn data-type
   "Constructs an abstract data-type definition using the given keyword
-  `dtype`. Can also take an options list of arguments (`args`) and
+  `name`. Can also take an options list of arguments (`args`) and
   `options`."
-  [dtype & [args options]]
-  (DataType. dtype (vec args)
+  [name & [args options]]
+  (DataType. name (vec args)
              (merge {:time-zone nil
                      :collate nil
                      :encoding nil}
@@ -362,13 +362,13 @@
   "If the given default value, it will be replaced by the standard
   function returning the current time, date or timestamp depending on
   the specified data-type. *For internal use*."
-  [dtype default]
+  [name default]
   (let [value (:value default)]
     (if (= value [:now])
       (Expression.
        (or ({:date [:current_date]
              :time [:current_time]
-             :timestamp [:current_timestamp]} dtype) value))
+             :timestamp [:current_timestamp]} name) value))
       default)))
 
 ;; `Column` records can be constructed using the `column` function or
@@ -380,16 +380,16 @@
   Buildable
   
   (build-definition [this db-spec]
-    (let [{:keys [dtype args options]} data-type]
+    (let [{:keys [name args options]} data-type]
       (ColumnDefinition.
        db-spec
        cname
-       (DataTypeClause. db-spec dtype args options)
+       (DataTypeClause. db-spec name args options)
        (if (= default :drop)
          :drop
          (when default
            (build-definition
-            (datetime-now-alias dtype default)
+            (datetime-now-alias name default)
             db-spec)))
        (when auto-inc (AutoIncClause. db-spec))
        not-null
