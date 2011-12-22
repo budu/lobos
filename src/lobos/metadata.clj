@@ -123,8 +123,13 @@
   [sname tname & [f]]
   (try
     (group-by :index_name
-      (filter #(and (> (:type %) DatabaseMetaData/tableIndexStatistic)
-                    ((or f identity) %))
+      (filter #(let [type (:type %)
+                     ;; HACK: new MySQL drivers return a string here!
+                     type (if (string? type)
+                            (Integer/parseInt type)
+                            (short type))]
+                 (and (> type DatabaseMetaData/tableIndexStatistic)
+                      ((or f identity) %)))
               (meta-call .getIndexInfo sname (name tname) false false)))
     (catch java.sql.SQLException _ nil)))
 
