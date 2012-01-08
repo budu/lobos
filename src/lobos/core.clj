@@ -164,10 +164,11 @@
         [params* & body] args]
     `(do
        (defn ~name [& params#]
+         (require mig/*migrations-namespace*)
          (let [[~'db-spec ~'sname ~params*]
                (optional-cnx-and-sname params#)]
            (mig/create-migrations-table ~'db-spec ~'sname)
-           (do ~@body)))
+           ~@body))
        (.setMeta #'~name
                  (merge (.meta #'~name)
                         {:arglists
