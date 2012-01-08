@@ -259,7 +259,7 @@ Here's an interactive session that show some possible uses:
 ```clojure
 user> (use 'lobos.analyzer)
 nil
-user> (-> (analyze-schema) :tables :keys)
+user> (-> (analyze-schema) :tables keys)
 (:comments :lobos_migrations :posts :users)
 user> (-> (analyze-schema)
           :tables :users :columns :name :data-type :name)
