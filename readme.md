@@ -54,9 +54,7 @@ Once you have your dependencies downloaded, open up a REPL and load
 these namespaces:
     
 ```clojure
-(use 'lobos.connectivity
-     'lobos.core
-     'lobos.schema)
+(use '(lobos connectivity core schema))
 ```
 
 You'll get warnings about some already defined function, just ignore
