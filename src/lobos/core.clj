@@ -204,7 +204,7 @@
                (let [arg (first args)
                      migs (mig/query-migrations-table db-spec sname)]
                  (cond
-                  (integer? arg) (take arg migs)
+                  (integer? arg) (take arg (reverse migs))
                   (= arg :all) migs
                   :else args))
                :else args)]
