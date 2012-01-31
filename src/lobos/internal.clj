@@ -27,11 +27,13 @@
 (defn autorequire-backend
   "Automatically require the backend for the given connection-info."
   [connection-info]
-  (->> connection-info
-       :subprotocol
-       (str "lobos.backends.")
-       symbol
-       require))
+  (if (:subprotocol connection-info)
+    (->> connection-info
+         :subprotocol
+         (str "lobos.backends.")
+         symbol
+         require)
+    (throw (Exception. "The :subprotocol key is missing from db-spec."))))
 
 (defn- execute*
   "Execute the given SQL string or sequence of strings. Prints them if
