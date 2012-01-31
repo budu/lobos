@@ -227,10 +227,10 @@ to figure out which ones have been applied.
 To apply all pending migrations, use the `migrate` function in a REPL:
 
 ```clojure
-user> (migrate)
-add-users-table
-add-posts-table
-add-comments-table
+(migrate)
+;=> add-users-table
+;=> add-posts-table
+;=> add-comments-table
 ```
 
 This function can take a bunch of migration names in which case it will
@@ -240,8 +240,8 @@ If, for some reason, you need to rollback some migrations, use the aptly
 named `rollback` function:
 
 ```clojure
-user> (rollback)
-add-comments-table
+(rollback)
+;=> add-comments-table
 ```
 
 By default it will rollback only the most recently applied migration. It
@@ -257,24 +257,24 @@ actual database schema.
 Here's an interactive session that show some possible uses:
 
 ```clojure
-user> (use 'lobos.analyzer)
-nil
-user> (-> (analyze-schema) :tables keys)
-(:comments :lobos_migrations :posts :users)
-user> (-> (analyze-schema)
-          :tables :users :columns :name :data-type :name)
-:varchar
-user=> (-> (analyze-schema)
-           :tables :posts :constraints :posts_unique_title :columns)
-[:title]
+(use 'lobos.analyzer)
+;=> nil
+(-> (analyze-schema) :tables keys)
+;=> (:comments :lobos_migrations :posts :users)
+(-> (analyze-schema) :tables :users :columns :name :data-type :name)
+;=> :varchar
+(-> (analyze-schema) :tables :posts :constraints :posts_unique_title :columns)
+;=> [:title]
 ```
 
 ## License
 
 Distributed under the [Eclipse Public License], the same as Clojure.
 
+
 [Clojure]:                http://clojure.org/
 [mailing list]:           http://groups.google.com/group/lobos-library
 [Clojars]:                http://clojars.org/lobos
 [Leiningen]:              https://github.com/technomancy/leiningen
 [Eclipse Public License]: http://budu.github.com/lobos/epl-v10.html
+
