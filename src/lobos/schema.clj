@@ -670,18 +670,18 @@
 (defn table*
   "Constructs an abstract table definition. The `table-name` is
   mandatory."
-  [table-name & [columns constraints indexes]]
-  (name-required table-name "table")
-  (Table. table-name
+  [name & [columns constraints indexes]]
+  (name-required name "table")
+  (Table. name
           (or columns {})
           (or constraints {})
           (or indexes {})))
 
 (defmacro table
   "Constructs an abstract table definition containing the given
-  elements. Takes an arbitrary number of table elements."
+  elements."
   [name & elements]
-  `(-> (table* ~name {} {} {}) ~@(reverse elements)))
+  `(-> (table* ~name) ~@(reverse elements)))
 
 ;; -----------------------------------------------------------------------------
 
