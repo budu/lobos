@@ -52,7 +52,7 @@ to the `dependencies` section:
 
 Once you have your dependencies downloaded, open up a REPL and load
 these namespaces:
-    
+
 ```clojure
 (use '(lobos connectivity core schema))
 ```
@@ -62,7 +62,7 @@ this for now.
 
 Then you'll need to create a connection, the following snippet define
 one and makes it the default global connection:
-    
+
 ```clojure
 (def db
      {:classname "org.postgresql.Driver"
@@ -178,9 +178,10 @@ let's do that.
 ### Migrations
 
 By default all migrations are kept in a single file in the
-`lobos.migrations` namespace. This is a normal Clojure source file so if
-you prefer having only one migration per file, just do that and require
-these files in the migrations namespace.
+`lobos.migrations` namespace. It'll get automatically loaded by
+migration commands, so there's no need to load it yourself. This is a normal
+Clojure source file so if you prefer having only one migration per file,
+just do that and require these files in the migrations namespace.
 
 #### `src/lobos/migrations.clj`
 ```clojure
