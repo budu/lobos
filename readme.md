@@ -166,10 +166,10 @@ surrogate key and the timestamp columns.
 #### `src/lobos/helpers.clj`
 ```clojure
 (defmacro tbl [name & elements]
-  `(-> (table ~name
-              (surrogate-key)
-              (timestamps))
-       ~@elements))
+  `(-> (table ~name)
+       (timestamps)
+       ~@(reverse elements)
+       (surrogate-key)))
 ```
 
 We have everything set up in place to create our first migrations, so
