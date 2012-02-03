@@ -433,7 +433,7 @@
    * `:primary-key` which make the current column the primary key
    * `[:refer tname & options]` which add a foreign key constraint to
      the specified table. The options are the same as the `foreign-key`
-     function with the expection that you can specify only one parent
+     function with the exception that you can specify only one parent
      column.
    * `:not-null` prevents this column from being null
    * `:auto-inc` (for integers types) which makes it auto-populated with
