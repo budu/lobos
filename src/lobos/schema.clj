@@ -173,7 +173,10 @@
   ([table name columns & options]
      (let [tname (if (keyword? table) table (:name table))
            cnames (map #(if (keyword? %) % (first %)) columns)
-           name (or name (make-index-name tname :index cnames))]
+           name (or name (make-index-name tname
+                                          (or ((set options) :unique)
+                                              :index)
+                                          cnames))]
        (if (keyword? table)
          (Index. name tname columns options)
          (update-in table [:indexes] conj
