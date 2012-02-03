@@ -222,26 +222,26 @@
 (defn unique-constraint
   "Constructs an abstract unique (or primary-key depending on the given
   type) constraint definition and add it to the given table."
-  [table name type columns]
-  (let [name (or name (make-index-name table type columns))]
+  [table name type column-names]
+  (let [name (or name (make-index-name table type column-names))]
     (update-in table [:constraints] conj
-               [name (UniqueConstraint. name type (vec columns))])))
+               [name (UniqueConstraint. name type (vec column-names))])))
 
 (defn primary-key
   "Constructs an abstract primary key constraint definition and add it
   to the given table. If the name isn't specified, this constraint will
   be named using its specification."
-  ([table columns] (primary-key table nil columns))
-  ([table name columns]
-     (unique-constraint table name :primary-key columns)))
+  ([table column-names] (primary-key table nil column-names))
+  ([table name column-names]
+     (unique-constraint table name :primary-key column-names)))
 
 (defn unique
   "Constructs an abstract unique constraint definition and add it to the
   given table. If the name isn't specified, this constraint will
   be named using its specification."
-  ([table columns] (unique table nil columns))
-  ([table name columns]
-     (unique-constraint table name :unique columns)))
+  ([table column-names] (unique table nil column-names))
+  ([table name column-names]
+     (unique-constraint table name :unique column-names)))
 
 ;; `ForeignKeyConstraint` record can be constructed using the
 ;; `foreign-key` function. *For internal use*.
@@ -277,8 +277,8 @@
 
   If the name isn't specified, this constraint will be named
   using its specification."
-  {:arglists '([table name? columns parent-table parent-columns? match?
-                & triggered-actions])}
+  {:arglists '([table name? column-names parent-table
+                parent-column-names? match? & triggered-actions])}
   [table & args]
   (let [[constraint-name args] (optional keyword? args)
         columns                (first args)
