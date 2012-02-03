@@ -54,12 +54,12 @@
   and schema (or elements). For the available methods, see the
   `lobos.schema` namespace. For methods taking extra argument use the
   optional `args` argument, which takes a sequence. You can also supply
-  a `connection-info` and `level` argument. Use the default connection
+  a `level` and `connection-info` argument. Use the default connection
   and the `:sql` level when not specified.  *For debugging purpose*. e.g.:
 
     user> (debug build-create-statement
                  (sample-schema))"
-  [method object-or-fn & [args connection-info level]]
+  [method object-or-fn & [args level connection-info]]
   (let [level (or level @debug-level :sql)
         object (if (fn? object-or-fn)
                  (object-or-fn)
@@ -68,8 +68,10 @@
         ast (when-not (= :schema level)
               (apply method object (conj args db-spec)))]
     (case level
-      :sql (println (compiler/compile ast))
+      :sql (doseq [ast-element ast]
+             (pprint (compiler/compile ast-element)))
       :ast (do (println (type ast))
+               ;; TODO: walk to remove db-spec
                (pprint ast))
       :schema (do (println (type object))
                   (pprint object)))))
