@@ -100,6 +100,9 @@
 (defn exclude [items from]
   (filter #(not ((set items) %)) from))
 
+(defn remove-nil-values [m]
+  (apply dissoc m (for [[k v] m :when (nil? v)] k)))
+
 (defmacro when->> ; inspired by pallet.thread-expr
   [condition & body]
   (let [arg (last body)
@@ -114,3 +117,4 @@
   (let [parents (.getParentFile ^File (apply file f more))]
     (when parents
       (.mkdirs parents))))
+

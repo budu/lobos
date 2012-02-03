@@ -211,7 +211,7 @@
 ;; constraint. *For internal use*.
 (defrecord UniqueConstraint [cname ctype columns]
   Buildable
-  
+
   (build-definition [this db-spec]
     (UniqueConstraintDefinition.
      db-spec
@@ -348,11 +348,7 @@
   `name`. Can also take an options list of arguments (`args`) and
   `options`."
   [name & [args options]]
-  (DataType. name (vec args)
-             (merge {:time-zone nil
-                     :collate nil
-                     :encoding nil}
-                     options)))
+  (DataType. name (vec args) (or (remove-nil-values options) {})))
 
 ;; -----------------------------------------------------------------------------
 
@@ -378,7 +374,7 @@
 ;; *For internal use*.
 (defrecord Column [cname data-type default auto-inc not-null others]
   Buildable
-  
+
   (build-definition [this db-spec]
     (let [{:keys [name args options]} data-type]
       (ColumnDefinition.
@@ -410,14 +406,15 @@
   [column-name data-type options]
   (let [{:keys [default encoding collate]}
         (into {} (filter vector? options))
+        option-set (set options)
         data-type (when data-type
                     (update-in data-type [:options]
-                               (partial merge-with #(or %1 %2))
-                               {:encoding encoding
-                                :collate collate
-                                :time-zone ((set options) :time-zone)}))
+                               merge
+                               (remove-nil-values
+                                {:encoding encoding
+                                 :collate collate
+                                 :time-zone (option-set :time-zone)})))
         others     (vec (filter string? options))
-        option-set (set options)
         not-null   (clojure.core/boolean (:not-null option-set))
         auto-inc   (clojure.core/boolean (:auto-inc option-set))]
     (Column. column-name
@@ -597,7 +594,7 @@
 
 (def ntext nclob)
 
-(def-length-bounded-typed-columns  
+(def-length-bounded-typed-columns
   varchar
   nvarchar)
 
@@ -691,7 +688,7 @@
 ;; *For internal use*.
 (defrecord Schema [sname tables indexes options]
   Creatable Dropable
-  
+
   (build-create-statement [this db-spec]
     (CreateSchemaStatement.
      db-spec
