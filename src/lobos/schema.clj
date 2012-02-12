@@ -74,9 +74,9 @@
   "Throws an IllegalArgumentException when the given option map or set
   contains keys not listed as valid, else returns nil."
   [options & valid-keys]
-  (let [option-set (if (map? options)
-                     (apply hash-set (keys options))
-                     options)]
+  (let [option-set (apply hash-set (if (map? options)
+                                     (keys options)
+                                     options))]
     (when-let [invalid-keys (seq (apply disj option-set valid-keys))]
       (throw
        (IllegalArgumentException.
