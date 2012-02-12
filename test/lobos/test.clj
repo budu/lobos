@@ -19,7 +19,7 @@
 (def h2-spec
   {:classname   "org.h2.Driver"
    :subprotocol "h2"
-   :subname     "./lobos"
+   :subname     "./lobos.h2"
    :unsafe      true})
 
 (def mysql-spec
@@ -60,9 +60,10 @@
                sqlite-spec
                sqlserver-spec])
 
-(defn driver-available? [db-spec]
+(defn driver-available?
+  [{:keys [classname]}]
   (try
-    (clojure.lang.RT/classForName (:classname db-spec))
+    (clojure.lang.RT/classForName classname)
     true
     (catch Exception e false)))
 
