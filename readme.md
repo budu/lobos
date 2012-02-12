@@ -271,6 +271,11 @@ Here's an interactive session that show some possible uses:
 ;=> [:title]
 ```
 
+### Documentation
+
+For more detailed information on **Lobos**, please refer to the
+[documentation].
+
 ## License
 
 Distributed under the [Eclipse Public License], the same as Clojure.
@@ -281,4 +286,4 @@ Distributed under the [Eclipse Public License], the same as Clojure.
 [Clojars]:                http://clojars.org/lobos
 [Leiningen]:              https://github.com/technomancy/leiningen
 [Eclipse Public License]: http://budu.github.com/lobos/epl-v10.html
-
+[documentation]:          http://budu.github.com/lobos/documentation.html
