@@ -81,7 +81,8 @@ You can now send DDL statements (called *actions*) directly like this:
 ```
 
 You can omit the connection altogether. In that case, actions will use
-the connection bound by `with-connection` or the default one.
+the connection bound by `lobos.connectivity/with-connection` or the
+default one.
 
 ```clojure
 (drop (table :users))
