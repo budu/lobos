@@ -365,6 +365,7 @@
   `name`. Can also take an options list of arguments (`args`) and
   `options`."
   [name & [args options]]
+  (check-valid-options options :encoding :collate :time-zone)
   (update-options
    (DataType. name (vec args) {})
    options))

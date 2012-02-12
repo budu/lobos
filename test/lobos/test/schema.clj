@@ -105,7 +105,7 @@
                                             (in :ab [1 2 3])))))
       "Complex check constraint definition"))
 
-;;;; Column definition tests
+;;;; Column and data-type definition tests
 
 (def column-definition-stub
   (Column. :foo nil nil false false []))
@@ -139,16 +139,6 @@
            (table* :foo {:foo (assoc column-definition-stub
                                 :default :drop)}))
         "Should set :default value to :drop")))
-
-(deftest test-invalid-column
-  (testing "Invalid column definition"
-    (is (thrown-with-msg? IllegalArgumentException
-          #"A .*? definition needs at least a name."
-          (column* nil nil nil))
-        "An exception is thrown if no name is provided.")
-    (is (thrown-with-msg? IllegalArgumentException
-          #".*? are invalid, only .*? options are valid."
-          (column* :foo nil [:aut-inc])))))
 
 (deftest test-typed-column
   (testing "Typed column definition"
@@ -198,9 +188,6 @@
 ;;;; Table definition tests
 
 (deftest test-table*
-  (is (thrown? IllegalArgumentException
-               (table* nil nil nil nil))
-      "Invalid table definition")
   (is (= (table* :foo nil nil nil)
          (Table. :foo {} {} {}))
       "Table definition"))
@@ -219,9 +206,6 @@
 ;;;; Schema definition tests
 
 (deftest test-schema
-  (is (thrown? IllegalArgumentException
-               (schema nil))
-      "Invalid schema definition")
   (is (= (schema :foo)
          (Schema. :foo {} {} {}))
       "Empty schema")
@@ -243,3 +227,22 @@
                   {:bar nil
                    :baz nil}))
       "Schema with tables and options."))
+
+;;;; Invalid definition tests
+
+(deftest test-name-required
+  (doseq [definition [#(column* nil nil nil)
+                      #(table* nil nil nil nil)
+                      #(schema nil)]]
+    (is (thrown-with-msg? IllegalArgumentException
+          #"A .*? definition needs at least a name."
+          (definition))
+        "Should throw an exception when no name is provided.")))
+
+(deftest test-check-valid-options
+  (doseq [definition [#(column* :foo nil [:uto-inc])
+                      #(data-type :foo nil [:ncoding])]]
+    (is (thrown-with-msg? IllegalArgumentException
+          #".*? are invalid, only .*? options are valid."
+          (definition))
+        "Should throw an exception when options are mistyped.")))
