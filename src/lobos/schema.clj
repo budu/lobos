@@ -67,7 +67,7 @@
   [name etype]
   (when-not name
     (throw (IllegalArgumentException.
-            (format "A % definition needs at least a name."
+            (format "A %s definition needs at least a name."
                     etype)))))
 
 ;; -----------------------------------------------------------------------------
