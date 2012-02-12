@@ -112,9 +112,6 @@
 
 (deftest test-column
   (testing "Column definition"
-    (is (thrown? IllegalArgumentException
-                 (column {} nil nil nil))
-        "Invalid column definition")
     (is (= (table :foo (column :foo nil nil))
            (table* :foo {:foo column-definition-stub} {} {}))
         "Column with name and data-type")
@@ -142,6 +139,16 @@
            (table* :foo {:foo (assoc column-definition-stub
                                 :default :drop)}))
         "Should set :default value to :drop")))
+
+(deftest test-invalid-column
+  (testing "Invalid column definition"
+    (is (thrown-with-msg? IllegalArgumentException
+          #"A .*? definition needs at least a name."
+          (column* nil nil nil))
+        "An exception is thrown if no name is provided.")
+    (is (thrown-with-msg? IllegalArgumentException
+          #".*? are invalid, only .*? options are valid."
+          (column* :foo nil [:aut-inc])))))
 
 (deftest test-typed-column
   (testing "Typed column definition"

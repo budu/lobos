@@ -118,3 +118,18 @@
     (when parents
       (.mkdirs parents))))
 
+(defn update-options
+  "Takes an element and merge the given options map to its options
+  field. It also discard nil values from the map."
+  [element options]
+  (when element
+    (update-in element [:options]
+               merge
+               (remove-nil-values options))))
+
+;; Taken from clojure.contrib.seq
+(defn separate
+  "Returns a vector:
+   [ (filter f s), (filter (complement f) s) ]"
+  [f s]
+  [(filter f s) (filter (complement f) s)])

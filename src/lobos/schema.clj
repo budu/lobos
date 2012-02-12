@@ -70,6 +70,20 @@
             (format "A %s definition needs at least a name."
                     etype)))))
 
+(defn check-valid-options
+  "Throws an IllegalArgumentException when the given option map or set
+  contains keys not listed as valid, else returns nil."
+  [options & valid-keys]
+  (let [option-set (if (map? options)
+                     (apply hash-set (keys options))
+                     options)]
+    (when-let [invalid-keys (seq (apply disj option-set valid-keys))]
+      (throw
+       (IllegalArgumentException.
+        (format "%s are invalid, only %s options are valid."
+                (str invalid-keys)
+                (str valid-keys)))))))
+
 ;; -----------------------------------------------------------------------------
 
 ;; ## Definition Predicate
@@ -351,7 +365,9 @@
   `name`. Can also take an options list of arguments (`args`) and
   `options`."
   [name & [args options]]
-  (DataType. name (vec args) (or (remove-nil-values options) {})))
+  (update-options
+   (DataType. name (vec args) {})
+   options))
 
 ;; -----------------------------------------------------------------------------
 
@@ -407,19 +423,22 @@
   specific options. See the `column` function for more details.
   *For internal use*."
   [column-name data-type options]
-  (let [{:keys [default encoding collate]}
-        (into {} (filter vector? options))
-        option-set (set options)
-        data-type (when data-type
-                    (update-in data-type [:options]
-                               merge
-                               (remove-nil-values
-                                {:encoding encoding
-                                 :collate collate
-                                 :time-zone (option-set :time-zone)})))
-        others     (vec (filter string? options))
+  (let [[map-entries others] (separate vector? (filter identity options))
+        [kw-options  others] (separate keyword? others)
+        {:keys [default encoding collate] :as option-map}
+        (into {} map-entries)
+        option-set (set kw-options)
+        data-type (update-options data-type
+                                  (assoc (select-keys option-map
+                                                      [:encoding
+                                                       :collate])
+                                    :time-zone (option-set :time-zone)))
         not-null   (clojure.core/boolean (:not-null option-set))
         auto-inc   (clojure.core/boolean (:auto-inc option-set))]
+    (name-required column-name "column")
+    (check-valid-options (into option-set (keys option-map))
+                         :not-null :auto-inc :default :primary-key :unique
+                         :encoding :collate :time-zone)
     (Column. column-name
              data-type
              default
@@ -452,7 +471,6 @@
   data-type is :drop-default, it acts as a column drop default clause."
   {:arglists '([table column-name data-type? & options])}
   [table column-name & options]
-  (name-required column-name "column")
   (let [[data-type options] (optional #(instance? DataType %) options)
         reference? #(and (vector? %) (= (first %) :refer))
         [ptable pcol & others] (->> options (filter reference?) first next)
