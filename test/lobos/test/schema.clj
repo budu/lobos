@@ -241,6 +241,8 @@
 
 (deftest test-check-valid-options
   (doseq [definition [#(column* :foo nil [:uto-inc])
+                      #(column* :foo nil [[:ncoding ""]])
+                      #(column* :foo nil [[:refr :foo :bar]])
                       #(data-type :foo nil [:ncoding])]]
     (is (thrown-with-msg? IllegalArgumentException
           #".*? are invalid, only .*? options are valid."

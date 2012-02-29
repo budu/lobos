@@ -427,7 +427,9 @@
   (let [[map-entries others] (separate vector? (filter identity options))
         [kw-options  others] (separate keyword? others)
         {:keys [default encoding collate] :as option-map}
-        (into {} map-entries)
+        ;; HACK: trying to get refer option, but it's not a map entry and
+        ;; it's actually consumed by `column`, will clean up later.
+        (into {} (map (fn [[f & r]] [f (first r)]) map-entries))
         option-set (set kw-options)
         data-type (update-options data-type
                                   (assoc (select-keys option-map
@@ -439,7 +441,7 @@
     (name-required column-name "column")
     (check-valid-options (into option-set (keys option-map))
                          :not-null :auto-inc :default :primary-key :unique
-                         :encoding :collate :time-zone)
+                         :encoding :collate :time-zone :refer)
     (Column. column-name
              data-type
              default
