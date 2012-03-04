@@ -60,10 +60,11 @@
      columns)))
 
 (defn- analyze-column [sname tname cname]
-  (analyze Column
-    (first
-     (resultset-seq
-      (.getColumns (db-meta) (name sname) nil (name tname) (name cname))))))
+  (let [schema (if sname (name sname) "")]
+    (analyze Column
+      (first
+       (resultset-seq
+        (.getColumns (db-meta) schema nil (name tname) (name cname)))))))
 
 (defmethod analyze [:mysql Schema]
   [_ sname]
