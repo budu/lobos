@@ -137,6 +137,7 @@
     user> (alter :modify (table :foo (column :a [:default 0])))
     user> (alter :rename (table :foo (column :a :to :b)))"
   [action element]
+  (check-valid-options action :add :drop :modify :rename)
   (schema/build-alter-statement element action db-spec))
 
 (defaction drop

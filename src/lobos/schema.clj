@@ -70,20 +70,6 @@
             (format "A %s definition needs at least a name."
                     etype)))))
 
-(defn check-valid-options
-  "Throws an IllegalArgumentException when the given option map or set
-  contains keys not listed as valid, else returns nil."
-  [options & valid-keys]
-  (let [option-set (apply hash-set (if (map? options)
-                                     (keys options)
-                                     options))]
-    (when-let [invalid-keys (seq (apply disj option-set valid-keys))]
-      (throw
-       (IllegalArgumentException.
-        (format "%s are invalid, only %s options are valid."
-                (str invalid-keys)
-                (str valid-keys)))))))
-
 ;; -----------------------------------------------------------------------------
 
 ;; ## Definition Predicate
