@@ -76,10 +76,13 @@
                index-meta)))))
 
 (def action-rules
-  {DatabaseMetaData/importedKeyCascade    :cascade
-   DatabaseMetaData/importedKeySetNull    :set-null
-   DatabaseMetaData/importedKeyRestrict   :restrict
-   DatabaseMetaData/importedKeySetDefault :set-default})
+  ;; HACK: keys coerce to short has Clojure 1.2 doesn't seems to handle
+  ;; keys of different type, even weirder 1.3 says those keys are Longs
+  ;; while 1.2 says Integers!
+  {(short DatabaseMetaData/importedKeyCascade)    :cascade
+   (short DatabaseMetaData/importedKeySetNull)    :set-null
+   (short DatabaseMetaData/importedKeyRestrict)   :restrict
+   (short DatabaseMetaData/importedKeySetDefault) :set-default})
 
 (defmethod analyze [::standard ForeignKeyConstraint]
   [_ cname ref-meta]
