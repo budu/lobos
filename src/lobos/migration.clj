@@ -81,7 +81,10 @@
                          (reverse-rename element))
            nil))))
 
-(defmethod complement :default [_] nil)
+(defmethod complement :default [action]
+  (println
+   (format "WARNING: complement of %s not supported"
+           (first action))))
 
 ;; -----------------------------------------------------------------------------
 
