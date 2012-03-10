@@ -105,17 +105,16 @@ column names:
 
 In this case the index name will be automatically created by joining the
 table name, the word 'index' (or 'unique') and the column names with
-underscores. To choose the `name` of the index or to provide some
-`options` (only the `:unique` option is recognized for now) you can call
-it like that:
+underscores. You can optionally choose the `name` of the index and/or
+provide some `options` (only the `:unique` option is recognized for now)
+like that:
 
 ```clojure
-(index :users nil [:name])
-;=> #lobos.schema.Index{:iname :users_index_name, :tname :users, :columns [:name], :options nil}
+(index :users :foo [:name])
+;=> #lobos.schema.Index{:iname :foo, :tname :users, :columns [:name], :options nil}
+(index :users [:name] :unique)
+;=> #lobos.schema.Index{:iname :users_unique_name, :tname :users, :columns [:name], :options [:unique]}
 ```
-
-As you see, providing nil as name will let the function create the index
-name like in the first example.
 
 ### Constraint Element
 

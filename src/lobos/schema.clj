@@ -169,18 +169,24 @@
   (instance? Index o))
 
 (defn index
-  ([table columns] (index table nil columns))
-  ([table name columns & options]
-     (let [tname (if (keyword? table) table (:name table))
-           cnames (map #(if (keyword? %) % (first %)) columns)
-           name (or name (make-index-name tname
-                                          (or ((set options) :unique)
-                                              :index)
-                                          cnames))]
+  "Constructs an index on the specified table and columns. Can take an
+  optional index name and a set of options of which only :unique is
+  available for now. This can be used inside or outside a table
+  definition, in the later case you just have to provide the name of the
+  table as a keyword."
+  {:arglists '([table name? columns & options])}
+  [table & args]
+  (let [tname (if (keyword? table) table (:name table))
+        [name args] (optional keyword? args)
+        [columns & options] args
+        name (or name (make-index-name tname
+                                       (or ((set options) :unique)
+                                           :index)
+                                       columns))]
        (if (keyword? table)
          (Index. name tname columns options)
          (update-in table [:indexes] conj
-                    [name (Index. name tname columns options)])))))
+                    [name (Index. name tname columns options)]))))
 
 ;; -----------------------------------------------------------------------------
 

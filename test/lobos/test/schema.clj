@@ -13,6 +13,7 @@
   (:import (lobos.schema CheckConstraint
                          Column
                          ForeignKeyConstraint
+                         Index
                          UniqueConstraint
                          DataType
                          Table
@@ -104,6 +105,22 @@
                                                 (= :b "bar"))
                                             (in :ab [1 2 3])))))
       "Complex check constraint definition"))
+
+;;;; Index definition tests
+
+(deftest test-index
+  (is (= (index :foo [:bar :baz])
+         (Index. :foo_index_bar_baz :foo [:bar :baz] nil))
+      "Simple index definition")
+  (is (= (index :foo [:bar :baz] :unique)
+         (Index. :foo_unique_bar_baz :foo [:bar :baz] [:unique]))
+      "Simple index definition with options")
+  (is (= (index :foo :foo_index [:bar :baz])
+         (Index. :foo_index :foo [:bar :baz] nil))
+      "Named index definition")
+  (is (= (index :foo :foo_index [:bar :baz] :unique)
+         (Index. :foo_index :foo [:bar :baz] [:unique]))
+      "Named index definition with options"))
 
 ;;;; Column and data-type definition tests
 
