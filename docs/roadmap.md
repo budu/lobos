@@ -11,6 +11,7 @@ You can have a look at the [wiki] and the [issue tracker] for more details.
 
  * Support for parsing SQL expressions
  * Make the analyzer be feature complete in comparison to the compiler
+ * Make the alter modify feature complete
 
 ### Version 1.2
 
@@ -23,4 +24,3 @@ You can have a look at the [wiki] and the [issue tracker] for more details.
 
 [wiki]:          https://github.com/budu/lobos/wiki
 [issue tracker]: https://github.com/budu/lobos/issues
-
