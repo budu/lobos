@@ -43,15 +43,15 @@
 
 (deftest test-compile-column-definition
   (is (= (compile column-definition-stub)
-         "\"foo\" INTEGER")
+         "\"foo\" INTEGER NULL")
       "Compiling a simple column definition")
   (is (= (compile (assoc column-definition-stub
                     :default (ScalarExpression. nil 0)))
-         "\"foo\" INTEGER DEFAULT 0")
+         "\"foo\" INTEGER DEFAULT 0 NULL")
       "Compiling a column definition with default value")
   (is (= (compile (assoc column-definition-stub
                     :auto-inc (AutoIncClause. nil)))
-         "\"foo\" INTEGER GENERATED ALWAYS AS IDENTITY")
+         "\"foo\" INTEGER GENERATED ALWAYS AS IDENTITY NULL")
       "Compiling a column definition with auto-incrementing clause")
   (is (= (compile (assoc column-definition-stub
                     :not-null true))
@@ -59,7 +59,7 @@
       "Compiling a column definition with not null option")
   (is (= (compile (assoc column-definition-stub
                     :others ["BAR" "BAZ"]))
-         "\"foo\" INTEGER BAR BAZ")
+         "\"foo\" INTEGER NULL BAR BAZ")
       "Compiling a column definition with custom options"))
 
 (def unique-constraint-definition-stub
@@ -172,7 +172,7 @@
 
 (deftest test-compile-alter-statement
   (is (= (compile alter-statement-stub)
-         "ALTER TABLE \"foo\" ADD \"foo\" INTEGER")
+         "ALTER TABLE \"foo\" ADD \"foo\" INTEGER NULL")
       "Compiling an alter table statement to add a column")
   (is (= (compile (assoc alter-statement-stub :action :drop))
          "ALTER TABLE \"foo\" DROP COLUMN \"foo\"")

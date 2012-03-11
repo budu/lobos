@@ -82,7 +82,7 @@
       (as-identifier db-spec cname)
       (if auto-inc "SERIAL" (compile data-type))
       (when default (str "DEFAULT " (compile default)))
-      (when not-null "NOT NULL")
+      (if not-null "NOT NULL" "NULL")
       others)))
 
 (defmethod compile [:postgresql AlterRenameAction]

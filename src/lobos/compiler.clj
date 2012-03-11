@@ -185,7 +185,7 @@
       (compile data-type)
       (when default  (str "DEFAULT " (compile default)))
       (when auto-inc (compile auto-inc))
-      (when not-null "NOT NULL")
+      (if not-null "NOT NULL" "NULL")
       others)))
 
 ;; `UniqueConstraintDefinition` instances will get their names made into
