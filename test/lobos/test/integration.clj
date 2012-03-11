@@ -83,35 +83,32 @@
 
 (def-db-test test-alter-table
   (with-schema [lobos :lobos]
-    (let [actual #(-> % :tables :foo (assoc :indexes {}))]
+    (let [actual #(-> (inspect-schema) :tables :foo (assoc :indexes {}))]
       (create lobos (table :foo (integer :a)))
       (when-supported (alter lobos :add (table :foo (integer :b)))
-        (is (= (actual (inspect-schema))
-               (table :foo (integer :a) (integer :b)))
+        (is (= (actual) (table :foo (integer :a) (integer :b)))
             "A column named 'b' should have been added to table 'foo'"))
       (when-supported (alter lobos :drop (table :foo (integer :b)))
-        (is (= (actual (inspect-schema))
-               (table :foo (integer :a)))
+        (is (= (actual) (table :foo (integer :a)))
             "A column named 'b' should have been dropped from table 'foo'"))
       (when-supported (alter lobos :add (table :foo (unique [:a])))
-        (is (= (actual (inspect-schema))
-               (table :foo (integer :a :unique)))
+        (is (= (actual) (table :foo (integer :a :unique)))
             "A constraint named 'foo_unique_a' should have been added to table 'foo'"))
       (when-supported (alter lobos :drop (table :foo (unique [:a])))
-        (is (= (actual (inspect-schema))
-               (table :foo (integer :a)))
+        (is (= (actual) (table :foo (integer :a)))
             "A constraint named 'foo_unique_a' should have been dropped from table 'foo'"))
       (when-supported (alter lobos :modify (table :foo (column :a (default 0))))
-        (is (= (actual (inspect-schema))
-               (table :foo (integer :a (default 0))))
+        (is (= (actual) (table :foo (integer :a (default 0))))
             "A column default clause should have been set"))
-      (when-supported  (alter lobos :modify (table :foo (column :a :drop-default)))
-        (is (= (actual (inspect-schema))
-               (table :foo (integer :a)))
+      (when-supported (alter lobos :modify (table :foo (column :a :drop-default)))
+        (is (= (actual) (table :foo (integer :a)))
             "A column default clause should have been dropped"))
+      (when-supported (alter lobos :modify (table :foo (varchar :a 7)))
+        (is (= (actual) (table :foo (varchar :a 7)))))
+      (when-supported (alter lobos :modify (table :foo (integer :a)))
+        (is (= (actual) (table :foo (integer :a)))))
       (when-supported  (alter lobos :rename (table :foo (column :a :to :b)))
-        (is (= (actual (inspect-schema))
-               (table :foo (integer :b)))
+        (is (= (actual) (table :foo (integer :b)))
             "A column named 'a' should have been renamed to 'b'"))
       (drop lobos (table :foo)))))
 
@@ -129,7 +126,7 @@
           expected-type #(-> % :data-type :name eq)
           actual-args #(inspect-schema :tables :foo :columns :bar :data-type :args)
           expected-args #(-> % :data-type :args)]
-      
+
       (doseq [dtype [:smallint :integer :bigint
                      :numeric :decimal
                      :real :float :double
@@ -142,7 +139,7 @@
             (is (= (actual-type) (expected-type (column* :bar dtype [])))
                 (str "Data type should match " (-> dtype :name name)))
             (drop lobos (table :foo)))))
-      
+
       (doseq [dtype [:char :nchar :varchar :nvarchar
                      :binary :varbinary
                      :numeric :decimal]]
@@ -155,7 +152,7 @@
                         (:args dtype)
                         (-> dtype :name name)))
             (drop lobos (table :foo)))))
-      
+
       (let [dtype (data-type :numeric [8 3])]
         (when-supported (create lobos (table :foo (column :bar dtype)))
           (is (= (actual-type) (expected-type (column* :bar dtype [])))

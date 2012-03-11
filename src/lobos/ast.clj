@@ -87,6 +87,12 @@
 (defrecord AlterModifyAction
   [db-spec element])
 
+(defrecord AlterModifyDataTypeAndOptionsAction
+  [db-spec element])
+
+(defrecord AlterModifyDefaultAction
+  [db-spec element])
+
 (defrecord AlterRenameAction
   [db-spec element])
 
@@ -123,6 +129,8 @@
   AlterAddAction
   AlterDropAction
   AlterModifyAction
+  AlterModifyDataTypeAndOptionsAction
+  AlterModifyDefaultAction
   AlterRenameAction)
 
 ;; -----------------------------------------------------------------------------
@@ -172,6 +180,8 @@
    '(lobos.ast AlterAddAction
                AlterDropAction
                AlterModifyAction
+               AlterModifyDataTypeAndOptionsAction
+               AlterModifyDefaultAction
                AlterRenameAction)))
 
 (defn import-all

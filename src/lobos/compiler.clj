@@ -304,18 +304,31 @@
             "CONSTRAINT")
           (as-identifier db-spec (:cname element)))))
 
-(defmethod compile [::standard AlterModifyAction]
+(defmethod compile [::standard AlterModifyDataTypeAndOptionsAction]
+  [action]
+  (let [{:keys [db-spec element]} action]
+    (str "ALTER COLUMN " (compile element))))
+
+(defmethod compile [::standard AlterModifyDefaultAction]
   [action]
   (let [{:keys [db-spec element]} action
         default (:default element)]
-    (if default
-      (join \space
-            "ALTER COLUMN"
-            (as-identifier db-spec (:cname element))
-            (if (= default :drop)
-              "DROP DEFAULT"
-              (str "SET DEFAULT " (compile default))))
-      (unsupported "Only set/drop default supported."))))
+    (join \space
+          "ALTER COLUMN"
+          (as-identifier db-spec (:cname element))
+          (if (= default :drop)
+            "DROP DEFAULT"
+            (str "SET DEFAULT " (compile default))))))
+
+(defmethod compile [::standard AlterModifyAction]
+  [action]
+  (let [{:keys [db-spec element]} action
+        {:keys [data-type default]} element]
+    (cond
+     data-type (compile (AlterModifyDataTypeAndOptionsAction. db-spec element))
+     default   (compile (AlterModifyDefaultAction. db-spec element))
+     :else     (unsupported
+                "Only change data type or set/drop default supported."))))
 
 ;; `AlterRenameAction` instances aren't supported by the default
 ;; compiler.

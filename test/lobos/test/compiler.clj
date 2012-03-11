@@ -189,12 +189,13 @@
       "Compiling an alter table statement to drop a constraint")
   (is (= (compile (assoc alter-statement-stub
                     :action :modify
-                    :element (assoc column-definition-stub
+                    :element (assoc (dissoc column-definition-stub :data-type)
                                :default (ScalarExpression. nil 1))))
          "ALTER TABLE \"foo\" ALTER COLUMN \"foo\" SET DEFAULT 1")
       "Compiling an alter table statement to set default clause")
   (is (= (compile (assoc alter-statement-stub
                     :action :modify
-                    :element (assoc column-definition-stub :default :drop)))
+                    :element (assoc (dissoc column-definition-stub :data-type)
+                               :default :drop)))
          "ALTER TABLE \"foo\" ALTER COLUMN \"foo\" DROP DEFAULT")
       "Compiling an alter table statement to drop default clause"))
