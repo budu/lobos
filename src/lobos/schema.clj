@@ -429,11 +429,12 @@
                                                       [:encoding
                                                        :collate])
                                     :time-zone (option-set :time-zone)))
+        not-null   (not (clojure.core/boolean (:null option-set)))
         not-null   (clojure.core/boolean (:not-null option-set))
         auto-inc   (clojure.core/boolean (:auto-inc option-set))]
     (name-required column-name "column")
     (check-valid-options (into option-set (keys option-map))
-                         :not-null :auto-inc :default :primary-key :unique
+                         :null :not-null :auto-inc :default :primary-key :unique
                          :encoding :collate :time-zone :refer)
     (Column. column-name
              data-type
@@ -453,6 +454,7 @@
      the specified table. The options are the same as the `foreign-key`
      function with the exception that you can specify only one parent
      column.
+   * `:null` allow null values
    * `:not-null` prevents this column from being null
    * `:auto-inc` (for integers types) which makes it auto-populated with
      incremented integers
