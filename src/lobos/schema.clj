@@ -392,7 +392,8 @@
       (ColumnDefinition.
        db-spec
        cname
-       (DataTypeClause. db-spec name args options)
+       (when data-type
+         (DataTypeClause. db-spec name args options))
        (if (= default :drop)
          :drop
          (when default
