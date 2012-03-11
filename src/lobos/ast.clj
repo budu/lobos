@@ -7,7 +7,13 @@
 ; You must not remove this notice, or any other, from this software.
 
 (ns lobos.ast
-  "Abstract SQL syntax tree for the DDL part of the language.")
+  "Abstract SQL syntax tree for the DDL part of the language."
+  (:use clojure.template)
+  (:import (java.io Writer)))
+
+;; -----------------------------------------------------------------------------
+
+;; ## AST Records
 
 ;; ### Special Records
 
@@ -84,7 +90,44 @@
 (defrecord AlterRenameAction
   [db-spec element])
 
-;; ## Helpers
+
+;; -----------------------------------------------------------------------------
+
+;; ## Definations Print Method
+
+(defn print-without-db-spec [r, ^Writer w]
+  (.write w "#")
+  (.write w (.getName (class r)))
+  (print-method (dissoc r :db-spec) w))
+
+(do-template [record]
+  (defmethod print-method record [r, ^Writer w]
+    (print-without-db-spec r w))
+  Mode
+  ScalarExpression
+  IdentifierExpression
+  FunctionExpression
+  OperatorExpression
+  AutoIncClause
+  DataTypeClause
+  ColumnDefinition
+  ConstraintDefinition
+  UniqueConstraintDefinition
+  ForeignKeyConstraintDefinition
+  CheckConstraintDefinition
+  CreateSchemaStatement
+  CreateTableStatement
+  CreateIndexStatement
+  DropStatement
+  AlterTableStatement
+  AlterAddAction
+  AlterDropAction
+  AlterModifyAction
+  AlterRenameAction)
+
+;; -----------------------------------------------------------------------------
+
+;; ## Import Helpers
 
 (defn import-expressions
   "Import all expression AST records into the calling namespace."
