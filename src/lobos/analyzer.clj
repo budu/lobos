@@ -161,8 +161,10 @@
              (analyze DataType column-meta)
              (when-not auto-inc
                (analyze Expression (:column_def column-meta)))
-             auto-inc
-             (= (:is_nullable column-meta) "NO")
+             ;; HACK: to revise, need to have nil instead of false for
+             ;; easier testing, could this cause problems?
+             (or auto-inc nil)
+             (or (= (:is_nullable column-meta) "NO") nil)
              [])))
 
 (defmethod analyze [::standard Table]

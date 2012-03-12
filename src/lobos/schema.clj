@@ -429,9 +429,9 @@
                                                       [:encoding
                                                        :collate])
                                     :time-zone (option-set :time-zone)))
-        not-null   (not (clojure.core/boolean (:null option-set)))
-        not-null   (clojure.core/boolean (:not-null option-set))
-        auto-inc   (clojure.core/boolean (:auto-inc option-set))]
+        not-null   (when (:null option-set) false)
+        not-null   (if (and (nil? not-null) (:not-null option-set)) true not-null)
+        auto-inc   (when (:auto-inc option-set) true)]
     (name-required column-name "column")
     (check-valid-options (into option-set (keys option-map))
                          :null :not-null :auto-inc :default :primary-key :unique
@@ -486,8 +486,8 @@
      (update-in table [:columns] conj
                 [column-name
                  (case (first options)
-                   :to (Column. column-name nil nil false false (second options))
-                   :drop-default (Column. column-name nil :drop false false [])
+                   :to (Column. column-name nil nil nil nil (second options))
+                   :drop-default (Column. column-name nil :drop nil nil [])
                    (column* column-name data-type options))]))))
 
 ;; -----------------------------------------------------------------------------

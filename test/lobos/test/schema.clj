@@ -125,7 +125,7 @@
 ;;;; Column and data-type definition tests
 
 (def column-definition-stub
-  (Column. :foo nil nil false false []))
+  (Column. :foo nil nil nil nil []))
 
 (deftest test-column
   (testing "Column definition"

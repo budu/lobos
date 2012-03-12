@@ -170,6 +170,10 @@
 
 ;; ### Definitions
 
+(defn not-null-option [not-null]
+  (when-not (nil? not-null)
+    (if not-null "NOT NULL" "NULL")))
+
 ;; `ColumnDefinition` instance will get their names made into SQL
 ;; identifiers using the `as-identifier` function. It's data-type will
 ;; get compiled with the appropriate method. The options will be added
@@ -185,7 +189,7 @@
       (compile data-type)
       (when default  (str "DEFAULT " (compile default)))
       (when auto-inc (compile auto-inc))
-      (if not-null "NOT NULL" "NULL")
+      (not-null-option not-null)
       others)))
 
 ;; `UniqueConstraintDefinition` instances will get their names made into
