@@ -59,8 +59,13 @@
            (let [[_ & [value name]] (first (re-seq #"(.*)::(.*)" expr))]
              (read-string (replace (str value) \' \"))) ;; HACK: to replace!
            (re-find #"^\d+$" expr) (Integer/parseInt expr)
-           (re-find #"^(\w+)(\(\))?$" expr)
-           (let [[[_ func]] (re-seq #"(\w+)(\(\))?" expr)]
+           (re-find #"^'.*'$" expr) (second (re-matches #"^'(.*)'$" expr))
+           ;; HACK: consider only uppercase unquoted strings to be functions
+           ;; because of http://bugs.mysql.com/bug.php?id=64614
+           ;; will need to do something more clever if that bug isn't
+           ;; fixed by the time work start on the Lobos 1.1 parser
+           (re-find #"^(\[A-Z]+)(\(\))?$" expr)
+           (let [[[_ func]] (re-seq #"([A-Z]+)(\(\))?" expr)]
              (keyword func))
            :else (str expr)))))
 
