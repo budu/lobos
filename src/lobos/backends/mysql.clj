@@ -157,6 +157,25 @@
           (when-not is-pkey
             (as-identifier db-spec (:cname element))))))
 
+(defmethod compile [:mysql AlterModifyDataTypeAndOptionsAction]
+  [action]
+  (let [{:keys [db-spec element]} action
+        column (with-db-meta db-spec
+                 (analyze-column (:sname element)
+                                 (:tname element)
+                                 (:cname element)))
+        actual (build-definition column db-spec)
+        ;; HACK: ignore actual default clause if data-type changed
+        actual (if (= (:data-type actual)
+                      (:data-type element))
+                 actual
+                 (assoc actual :default nil))
+        element (merge-with
+                 #(if (nil? %2) % %2)
+                 actual
+                 element)]
+    (str "MODIFY " (compile element))))
+
 (defmethod compile [:mysql AlterRenameAction]
   [action]
   (let [{:keys [db-spec element]} action
