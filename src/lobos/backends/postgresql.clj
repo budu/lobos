@@ -80,7 +80,11 @@
                 auto-inc not-null others]} definition]
     (apply join \space
       (as-identifier db-spec cname)
-      (if auto-inc "SERIAL" (compile data-type))
+      (if auto-inc
+        (if (= :bigint (:dtype data-type))
+          "BIGSERIAL"
+          "SERIAL")
+        (compile data-type))
       (when default (str "DEFAULT " (compile default)))
       (not-null-option not-null)
       others)))
