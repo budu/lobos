@@ -8,8 +8,7 @@
 
 (ns lobos.metadata
   "Helpers to query the database's meta-data."
-  (:require (clojure.java.jdbc [internal :as sqlint])
-            (lobos [compiler :as compiler]
+  (:require (lobos [compiler :as compiler]
                    [connectivity :as conn]
                    [schema :as schema]))
   (:import (java.sql DatabaseMetaData)))
@@ -33,7 +32,7 @@
 
 (defn db-meta-spec
   []
-  (or (:db-spec sqlint/*db*)
+  (or (conn/jdbc-db-spec)
       *db-meta-spec*
       (conn/get-db-spec :default-connection)))
 

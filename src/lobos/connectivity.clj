@@ -9,8 +9,12 @@
 (ns lobos.connectivity
   "A set of connectivity functions."
   (:refer-clojure :exclude [defonce])
-  (:require (clojure.java.jdbc [internal :as sqlint]))
   (:use lobos.utils))
+
+(try
+  (require 'lobos.connectivity.jdbc-1)
+  (catch Throwable e
+    (require 'lobos.connectivity.jdbc-2)))
 
 ;; -----------------------------------------------------------------------------
 
@@ -28,11 +32,13 @@
 
 (def connection sqlint/connection*)
 
+(defn jdbc-db-spec [] (:db-spec sqlint/*db*))
+
 (defn get-db-spec
   "Returns the associated db-spec or itself. *For internal use*."
   [& [connection-info]]
   (let [connection-info (or connection-info :default-connection)]
-    (or (:db-spec sqlint/*db*)
+    (or (jdbc-db-spec)
         (if (keyword? connection-info)
           (-> @global-connections connection-info :db-spec)
           connection-info))))
