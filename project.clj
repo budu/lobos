@@ -2,7 +2,7 @@
   :description
   "A library to create and manipulate SQL database schemas."
   :dependencies [[org.clojure/clojure "1.3.0"]
-                 [org.clojure/java.jdbc "0.2.3"]
+                 [org.clojure/java.jdbc "0.1.1"]
                  [org.clojure/tools.macro "0.1.1"]]
   :dev-dependencies [[lein-clojars "0.7.0"]
                      [lein-marginalia "0.6.1"]
