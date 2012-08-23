@@ -1,6 +1,6 @@
-(defproject lobos "1.0.0-SNAPSHOT"
+(defproject org.clojars.jcrossley3/lobos "1.0.0-SNAPSHOT"
   :description
-  "A library to create and manipulate SQL database schemas."
+  "Compatible with both 0.1.x and 0.2.x versions of java.jdbc"
   :dependencies [[org.clojure/clojure "1.3.0"]
                  [org.clojure/java.jdbc "0.1.1"]
                  [org.clojure/tools.macro "0.1.1"]]
