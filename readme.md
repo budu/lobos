@@ -197,7 +197,7 @@ migrations namespace.
                config helpers)))
 ```
 
-Migrations are define using the `defmigration` macro which is composed
+Migrations are defined using the `defmigration` macro which is composed
 of two bodies, one making whatever changes you want to do, the other
 reverting those changes.
 
