@@ -39,6 +39,8 @@
 
 (def ^{:dynamic true} *migrations-table* :lobos_migrations)
 
+(def ^{:dynamic true} *reload-migrations* true)
+
 ;; -----------------------------------------------------------------------------
 
 ;; ## Action Complement
@@ -179,9 +181,11 @@
           [`(~'down [] ~@down)]))))
 
 (defn list-migrations []
-  (when (.exists (migrations-file))
-    (swap! migrations (constantly []))
-    (use :reload *migrations-namespace*)
+  (if *reload-migrations*
+    (when (.exists (migrations-file))
+      (swap! migrations (constantly []))
+      (use :reload *migrations-namespace*)
+      @migrations)
     @migrations))
 
 ;; ### Migrations Table Helpers
