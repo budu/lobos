@@ -1,6 +1,7 @@
 
 .cake
 .lein-failures
+.lein-deps-sum
 
 .lobos_stash.clj
 src/lobos/migrations.clj
@@ -8,6 +9,9 @@ src/lobos/config.clj
 
 classes
 lib
+public
+site
+target
 wiki
 www
 
