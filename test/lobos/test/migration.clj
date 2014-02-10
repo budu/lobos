@@ -88,6 +88,12 @@
            (-> "src/foo/bar.clj"
                (.replace \/ java.io.File/separatorChar)))
         (str "Should return a File object with a path to the migrations "
+             "namespace")))
+  (binding [*migrations-namespace* '[foo.bar :exclude [baz]]]
+    (is (= (.getPath (migrations-file))
+           (-> "src/foo/bar.clj"
+               (.replace \/ java.io.File/separatorChar)))
+        (str "Should return a File object with a path to the migrations "
              "namespace"))))
 
 (deftest test-create-mfile
@@ -223,7 +229,7 @@
     (do-migrations *db* :lobos :down '[foo baz] true)
     (is (= (pending-migrations *db* :lobos) (list "foo" "bar" "baz"))
         "Should return a list containing 'foo' 'bar' and 'baz'")))
-    
+
 (deftest test-generate-migration*
   (with-migrations-table
     (delete-file (migrations-file) true)
