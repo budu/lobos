@@ -136,10 +136,11 @@
     (pprint content wtr)))
 
 (defn ns-file [ns]
-  (file *src-directory*
-        (-> (str ns)
-            (.replace "." "/")
-            (str ".clj"))))
+  (let [n-name (if (coll? ns) (first ns) ns)]
+    (file *src-directory*
+          (-> (str n-name)
+              (.replace "." "/")
+              (str ".clj")))))
 
 ;; ### Stash File Helpers
 
