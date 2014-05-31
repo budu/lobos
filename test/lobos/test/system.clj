@@ -8,7 +8,7 @@
 
 (ns lobos.test.system
   (:refer-clojure :exclude [compile conj! disj! distinct drop sort take])
-  (:require (clojure.java [jdbc :as sql])
+  (:require (clojure.java.jdbc [deprecated :as sql])
             (lobos [compiler :as compiler]
                    [connectivity :as conn]))
   (:use clojure.test
