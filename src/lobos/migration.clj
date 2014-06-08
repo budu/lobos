@@ -9,7 +9,7 @@
 (ns lobos.migration
   "Migrations support."
   (:refer-clojure :exclude [complement defonce replace])
-  (:require (clojure.java [jdbc :as sql])
+  (:require (clojure.java.jdbc [deprecated :as sql])
             (lobos [analyzer :as analyzer]
                    [compiler :as compiler]
                    [connectivity :as conn]
