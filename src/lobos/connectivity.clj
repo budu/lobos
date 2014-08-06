@@ -13,10 +13,10 @@
 
 (try
   (require 'lobos.connectivity.jdbc-1)
-  (catch Throwable e
+  (catch Exception e
     (try
       (require 'lobos.connectivity.jdbc-2)
-      (catch Throwable e
+      (catch Exception e
         (do
           (ns-unalias 'lobos.connectivity 'sqlint)
           (require 'lobos.connectivity.jdbc-3))))))
