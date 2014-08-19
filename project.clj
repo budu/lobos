@@ -1,7 +1,7 @@
-(defproject sicia/lobos "1.0.0-beta2"
+(defproject lobos "1.0.0-beta1"
   :description
   "A library to create and manipulate SQL database schemas."
-  :url "http://github.com/siscia/lobos"
+  :url "http://budu.github.com/lobos/"
   :license {:name "Eclipse Public License"}
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [org.clojure/java.jdbc "0.3.3"]
