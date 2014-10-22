@@ -22,7 +22,7 @@ For the latest release, in Cake/Leiningen, use:
 
 #### `project.clj`
 ```clojure
-:dependencies [[lobos "1.0.0-beta1"]]
+:dependencies [[lobos "1.0.0-beta3"]]
 ```
 
 or in Maven:
@@ -32,7 +32,7 @@ or in Maven:
 <dependency>
   <groupId>lobos</groupId>
   <artifactId>lobos</artifactId>
-  <version>1.0.0-beta1</version>
+  <version>1.0.0-beta3</version>
 </dependency>
 ```
 
