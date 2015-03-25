@@ -128,7 +128,7 @@
        [:h1 "Lobos"]
        (unordered-list
         [(link-to "index.html" "Home")
-         (link-to "documentation.html" "Documention")
+         (link-to "documentation.html" "Documentation")
          (link-to "downloads.html" "Downloads")
          (link-to "contribute.html" "Contribute")])]
       [:div#content body]
